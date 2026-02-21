@@ -192,7 +192,7 @@ def extract_kidney(df, xpt_files):
     return df
 
    
-def build_dataset(xpt_files, save=False):
+def build_dataset(xpt_files):
     """
     This combines relevant features into a coherent dataset.
     """
@@ -219,25 +219,52 @@ def build_dataset(xpt_files, save=False):
     for col in ['avg_sleep_hours', 'stress_level', 'breathing_rate']:
         df[col] = np.nan
     
-    if (save):
-        path = f"{OUTPUT_DIRECTORY}/combined_dataset.csv"
-        df.to_csv(path, index=False)
-        logging.info(f"Dataset saved to: {path}")
-        
     logging.info("Finished building dataset")
     print("\n\n", df, "\n\n")
     
     return df
     
     
-def determine_hypertension_stage(df):
+def label_hypertension_stages(df, save=False):
     """
+    This adds a hypertension stage label to our dataset.
+    
     For reference, ACC/AHA 2017 Guidelines:
         0 - Normal:   Systolic < 120
         1 - Elevated: Systolic 120-129
         2 - Stage 1:  Systolic 130-139
         3 - Stage 2:  Systolic > 140
     """
+    logging.info("Labeling hypertension stages")
+    
+    def classify(row):
+        systolic, diastolic = row['systolic_bp'], row['diastolic_bp']
+        
+        # This should not happen
+        if pd.isna(systolic) or pd.isna(diastolic): 
+            return np.nan
+            
+        if systolic >= 140 or diastolic >= 90:
+            return 3
+            
+        if systolic >= 130 or diastolic >= 80:  
+            return 2
+            
+        if 120 <= systolic < 130 and diastolic < 80: 
+            return 1 
+        
+        return 0
+          
+    df['hypertension_stage'] = df.apply(classify, axis=1)
+    df = df.dropna(subset=['hypertension_stage'])
+    df['hypertension_stage'] = df['hypertension_stage'].astype(int)  
+    
+    if (save):
+        path = f"{OUTPUT_DIRECTORY}/combined_dataset.csv"
+        df.to_csv(path, index=False)
+        logging.info(f"Dataset saved to: {path}")
+        
+    return df
 
 
 def train():
@@ -246,8 +273,11 @@ def train():
 
 def main():
     make_output_dirs()
+    
     xpt_files = load_xpt_files()
-    build_dataset(xpt_files, True)
+    dataset = build_dataset(xpt_files)
+    
+    label_hypertension_stages(dataset, save=True)
 
 
 main()
