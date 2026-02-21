@@ -1,2 +1,6 @@
 .DS_Store
 .venv/
+.env
+cavista-hackathon-ai-firebase-adminsdk-fbsvc-10c14cab91.json
+__pycache__/
+.gitignore
