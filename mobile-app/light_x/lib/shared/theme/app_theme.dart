@@ -65,110 +65,110 @@ class AppTheme {
 
     // Icon
     iconTheme: const IconThemeData(color: AppColors.neutralBlack700, size: 24),
-    fontFamily: "Montserrat",
+    fontFamily: "Manrope",
 
     // Text Theme
     textTheme: const TextTheme(
       displayLarge: TextStyle(
-        fontFamily: 'Montserrat',
+        fontFamily: 'Manrope',
         fontSize: 128, // 8rem
         height: 1.0, // 8rem / 8rem
         fontWeight: FontWeight.w600,
         color: AppColors.neutralBlack900,
       ),
       displayMedium: TextStyle(
-        fontFamily: 'Montserrat',
+        fontFamily: 'Manrope',
         fontSize: 96, // 6rem
         height: 1.0, // 6rem / 6rem
         fontWeight: FontWeight.w600,
         color: AppColors.neutralBlack900,
       ),
       displaySmall: TextStyle(
-        fontFamily: 'Montserrat',
+        fontFamily: 'Manrope',
         fontSize: 72, // 4.5rem
         height: 1.0, // 4.5rem / 4.5rem
         fontWeight: FontWeight.w600,
         color: AppColors.neutralBlack900,
       ),
       headlineLarge: TextStyle(
-        fontFamily: 'Montserrat',
+        fontFamily: 'Manrope',
         fontSize: 60, // 3.75rem
         height: 1.0, // 3.75rem / 3.75rem
         fontWeight: FontWeight.w600,
         color: AppColors.neutralBlack900,
       ),
       headlineMedium: TextStyle(
-        fontFamily: 'Montserrat',
+        fontFamily: 'Manrope',
         fontSize: 48, // 3rem
         height: 1.0, // 3rem / 3rem
         fontWeight: FontWeight.w600,
         color: AppColors.neutralBlack900,
       ),
       headlineSmall: TextStyle(
-        fontFamily: 'Montserrat',
+        fontFamily: 'Manrope',
         fontSize: 36, // 2.25rem
         height: 1.111, // 2.5rem / 2.25rem
         fontWeight: FontWeight.w600,
         color: AppColors.neutralBlack900,
       ),
       titleLarge: TextStyle(
-        fontFamily: 'Montserrat',
+        fontFamily: 'Manrope',
         fontSize: 30, // 1.875rem
         height: 1.2, // 2.25rem / 1.875rem
         fontWeight: FontWeight.w600,
         color: AppColors.neutralBlack900,
       ),
       titleMedium: TextStyle(
-        fontFamily: 'Montserrat',
+        fontFamily: 'Manrope',
         fontSize: 24, // 1.5rem
         height: 1.333, // 2rem / 1.5rem
         fontWeight: FontWeight.w500,
         color: AppColors.neutralBlack900,
       ),
       titleSmall: TextStyle(
-        fontFamily: 'Montserrat',
+        fontFamily: 'Manrope',
         fontSize: 20, // 1.25rem
         height: 1.4, // 1.75rem / 1.25rem
         fontWeight: FontWeight.w500,
         color: AppColors.neutralBlack900,
       ),
       bodyLarge: TextStyle(
-        fontFamily: 'Montserrat',
+        fontFamily: 'Manrope',
         fontSize: 18, // 1.125rem
         height: 1.556, // 1.75rem / 1.125rem
         fontWeight: FontWeight.w400,
         color: AppColors.neutralBlack800,
       ),
       bodyMedium: TextStyle(
-        fontFamily: 'Montserrat',
+        fontFamily: 'Manrope',
         fontSize: 16, // 1rem
         height: 1.5, // 1.5rem / 1rem
         fontWeight: FontWeight.w400,
         color: AppColors.neutralBlack800,
       ),
       bodySmall: TextStyle(
-        fontFamily: 'Montserrat',
+        fontFamily: 'Manrope',
         fontSize: 14, // 0.875rem
         height: 1.429, // 1.25rem / 0.875rem
         fontWeight: FontWeight.w400,
         color: AppColors.neutralBlack700,
       ),
       labelLarge: TextStyle(
-        fontFamily: 'Montserrat',
+        fontFamily: 'Manrope',
         fontSize: 14, // 0.875rem
         height: 1.429, // 1.25rem / 0.875rem
         fontWeight: FontWeight.w500,
         color: AppColors.neutralBlack900,
       ),
       labelMedium: TextStyle(
-        fontFamily: 'Montserrat',
+        fontFamily: 'Manrope',
         fontSize: 12, // 0.75rem
         height: 1.333, // 1rem / 0.75rem
         fontWeight: FontWeight.w500,
         color: AppColors.neutralBlack900,
       ),
       labelSmall: TextStyle(
-        fontFamily: 'Montserrat',
+        fontFamily: 'Manrope',
         fontSize: 12, // 0.75rem (text-xxs)
         height: 1.333, // 1rem / 0.75rem
         fontWeight: FontWeight.w500,

@@ -34,7 +34,9 @@ class Spacing {
   static const double xxxl = 64;
 }
 
-extension SpacingValueExtension on double {
-  SizedBox get inRow => SizedBox(width: this);
-  SizedBox get inColumn => SizedBox(height: this);
+extension SpacingValueExtension on num {
+  SizedBox get inRow => SizedBox(width: toDouble());
+  SizedBox get inColumn => SizedBox(height: toDouble());
+  SliverToBoxAdapter get inSliverColumn => SliverToBoxAdapter(child: inColumn);
+  SliverToBoxAdapter get inSliverRow => SliverToBoxAdapter(child: inRow);
 }
