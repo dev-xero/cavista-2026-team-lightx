@@ -4,6 +4,9 @@ from pydantic import BaseModel
 from typing import List, Optional
 from datetime import date
 
+import xgboost as xgb
+
+
 app = FastAPI(title="Health-AI-API", description="Backend for Hypertension Tracking Application")
 
 # PYDANTIC MODELS 
@@ -36,15 +39,20 @@ class ExportData(BaseModel):
     latest_vitals: dict
     latest_analysis: dict
 
-# HELPER FUNCTIONS 
+
 def calculate_bmi(weight: float, height_cm: float):
-    
+    """
+    This helper function calculates the Body-Mass Index.
+    """
     height_m = height_cm / 100
     return round(weight / (height_m * height_m), 1)
 
 
 def calculate_framingham_score(onboarding: OnboardingData, vitals: SmartwatchData):
-    
+    """
+    This helper function calculates framingham risk score based on onboarding and
+    smart watch data.
+    """
     score = 0
     
     if onboarding.gender.lower() == "male":
@@ -64,10 +72,10 @@ def calculate_framingham_score(onboarding: OnboardingData, vitals: SmartwatchDat
     return score
 
 
-@app.post("/analyze")
-async def run_analysis(vitals: SmartwatchData, symptoms: SymptomsData):
+@app.post("/analyze-vitals")
+async def run_analysis(onboarding: OnboardingData, vitals: SmartwatchData):
     """
-    This runs inference on the Machine Learning model using smartwatch and
+    This endpoint runs inference on the Machine Learning model using smartwatch and
     onboarding data.
     """
 
@@ -83,6 +91,18 @@ async def run_analysis(vitals: SmartwatchData, symptoms: SymptomsData):
     return response
 
 
+@app.post("/suggest-tips")
+async def suggest_tips(symptoms: SymptomsData):
+    """
+    This endpoint will suggest health tips based on previous health data and current
+    symptoms.
+    """
+    pass
+    
+
 @app.post("/chat")
 async def llm_chat():
+    """
+    This endpoint uses the LLM chat interface.
+    """
     pass
