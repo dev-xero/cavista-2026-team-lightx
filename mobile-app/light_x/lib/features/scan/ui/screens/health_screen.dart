@@ -3,12 +3,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_blue_plus/flutter_blue_plus.dart';
 import 'package:light_x/features/scan/logic/health_service.dart';
 import 'package:light_x/features/scan/logic/models/health_data_snapshot.dart';
+import 'package:light_x/shared/components/buttons/app_back_button.dart';
+import 'package:light_x/shared/components/layout/app_scaffold.dart';
+import 'package:light_x/shared/components/layout/texts.dart';
+import 'package:light_x/shared/theme/src/app_colors.dart';
+import 'package:provider/provider.dart';
 
 class HealthScreen extends StatefulWidget {
-  final String deviceName;
-  final WatchHealthService service;
-
-  const HealthScreen({super.key, required this.deviceName, required this.service});
+  const HealthScreen({super.key});
 
   @override
   State<HealthScreen> createState() => _HealthScreenState();
@@ -18,71 +20,58 @@ class _HealthScreenState extends State<HealthScreen> with SingleTickerProviderSt
   late final _pulseCtrl = AnimationController(vsync: this, duration: const Duration(milliseconds: 700));
   int? _lastHr;
 
-  static const _bg = Color(0xFF0A0E1A);
-  static const _surface = Color(0xFF131929);
-  static const _textPri = Color(0xFFE8EDF5);
-
   @override
   void dispose() {
     _pulseCtrl.dispose();
-    widget.service.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
+    final healthService = context.watch<WatchHealthService?>();
+
     return StreamBuilder<BluetoothConnectionState>(
-      stream: widget.service.connectionState,
+      stream: healthService?.connectionState,
       builder: (_, connSnap) {
         final connected = connSnap.data == BluetoothConnectionState.connected;
-        return Scaffold(
-          backgroundColor: _bg,
-          appBar: AppBar(
-            backgroundColor: _surface,
-            elevation: 0,
-            leading: IconButton(
-              icon: const Icon(Icons.arrow_back_ios_new_rounded, color: _textPri),
-              onPressed: () => Navigator.of(context).pop(),
-            ),
-            title: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  widget.deviceName,
-                  style: const TextStyle(color: _textPri, fontSize: 16, fontWeight: FontWeight.w600),
-                ),
-                Row(
-                  children: [
-                    Container(
-                      width: 6,
-                      height: 6,
-                      margin: const EdgeInsets.only(right: 5),
-                      decoration: BoxDecoration(
-                        color: connected ? const Color(0xFF00E676) : const Color(0xFFFF4D6D),
-                        shape: BoxShape.circle,
-                      ),
+        return AppScaffold(
+          leading: AppBackButton(),
+          title: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              AppTexts.pageAppBarTitleText(healthService?.deviceName ?? "Unknown Device"),
+              Row(
+                children: [
+                  Container(
+                    width: 6,
+                    height: 6,
+                    margin: const EdgeInsets.only(right: 5),
+                    decoration: BoxDecoration(
+                      color: connected ? const Color(0xFF00E676) : const Color(0xFFFF4D6D),
+                      shape: BoxShape.circle,
                     ),
-                    Text(
-                      connected ? 'Connected' : 'Disconnected',
-                      style: TextStyle(
-                        fontSize: 11,
-                        color: connected ? const Color(0xFF00E676) : const Color(0xFFFF4D6D),
-                      ),
+                  ),
+                  Text(
+                    connected ? 'Connected' : 'Disconnected',
+                    style: TextStyle(
+                      fontSize: 11,
+                      color: connected ? const Color(0xFF00E676) : const Color(0xFFFF4D6D),
                     ),
-                  ],
-                ),
-              ],
-            ),
+                  ),
+                ],
+              ),
+            ],
           ),
-          body: connected ? _buildBody() : _buildDisconnected(),
+
+          body: connected ? _buildBody(healthService) : _buildDisconnected(),
         );
       },
     );
   }
 
-  Widget _buildBody() {
+  Widget _buildBody(WatchHealthService? healthService) {
     return StreamBuilder<HealthSnapshot>(
-      stream: widget.service.snapshots,
+      stream: healthService?.snapshots,
       builder: (_, snap) {
         final data = snap.data;
 
@@ -124,13 +113,13 @@ class _HealthScreenState extends State<HealthScreen> with SingleTickerProviderSt
     child: Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Icon(Icons.bluetooth_disabled_rounded, size: 64, color: Colors.white.withOpacity(0.12)),
+        Icon(Icons.bluetooth_disabled_rounded, size: 64, color: Colors.white.withValues(alpha: 0.12)),
         const SizedBox(height: 16),
         const Text('Device disconnected', style: TextStyle(color: Color(0xFF6B7A99), fontSize: 16)),
         const SizedBox(height: 8),
         TextButton(
           onPressed: () => Navigator.of(context).pop(),
-          child: const Text('Go back', style: TextStyle(color: Color(0xFF00E5FF))),
+          child: const Text('Go back', style: TextStyle(color: AppColors.primary)),
         ),
       ],
     ),
@@ -193,7 +182,7 @@ class _Spo2Card extends StatelessWidget {
   final double? spo2;
   const _Spo2Card({required this.spo2});
 
-  static const _color = Color(0xFF00E5FF);
+  static const _color = AppColors.primary;
   static const _textPri = Color(0xFFE8EDF5);
   static const _textSub = Color(0xFF6B7A99);
 
@@ -245,7 +234,7 @@ class _Spo2Card extends StatelessWidget {
           child: LinearProgressIndicator(
             value: spo2 != null ? (spo2! / 100).clamp(0.0, 1.0) : 0,
             minHeight: 6,
-            backgroundColor: _color.withOpacity(0.1),
+            backgroundColor: _color.withValues(alpha: 0.1),
             valueColor: AlwaysStoppedAnimation<Color>(spo2 != null ? _statusColor : _textSub),
           ),
         ),
@@ -317,12 +306,12 @@ class _BpCard extends StatelessWidget {
             if (bp != null) ...[
               Padding(
                 padding: const EdgeInsets.only(bottom: 10, left: 4, right: 4),
-                child: Text('/', style: TextStyle(color: _textSub.withOpacity(0.5), fontSize: 40)),
+                child: Text('/', style: TextStyle(color: _textSub.withValues(alpha: 0.5), fontSize: 40)),
               ),
               Text(
                 '${bp!.diastolic}',
                 style: TextStyle(
-                  color: _textPri.withOpacity(0.7),
+                  color: _textPri.withValues(alpha: 0.7),
                   fontSize: 48,
                   fontWeight: FontWeight.w300,
                   height: 1,
@@ -373,7 +362,7 @@ class _BpRangeBar extends StatelessWidget {
       child: LinearProgressIndicator(
         value: fraction,
         minHeight: 6,
-        backgroundColor: color.withOpacity(0.1),
+        backgroundColor: color.withValues(alpha: 0.1),
         valueColor: AlwaysStoppedAnimation<Color>(value != null ? color : _textSub),
       ),
     );
@@ -402,7 +391,7 @@ class _BatteryCard extends StatelessWidget {
     decoration: BoxDecoration(
       color: _card,
       borderRadius: BorderRadius.circular(20),
-      border: Border.all(color: _color.withOpacity(0.2)),
+      border: Border.all(color: _color.withValues(alpha: 0.2)),
     ),
     child: Row(
       children: [
@@ -458,7 +447,7 @@ class _MetricCard extends StatelessWidget {
     decoration: BoxDecoration(
       color: _card,
       borderRadius: BorderRadius.circular(20),
-      border: Border.all(color: color.withOpacity(0.2)),
+      border: Border.all(color: color.withValues(alpha: 0.2)),
     ),
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -467,7 +456,7 @@ class _MetricCard extends StatelessWidget {
           children: [
             Container(
               padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(color: color.withOpacity(0.1), borderRadius: BorderRadius.circular(10)),
+              decoration: BoxDecoration(color: color.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(10)),
               child: Icon(icon, color: color, size: 18),
             ),
             const SizedBox(width: 10),
@@ -480,9 +469,9 @@ class _MetricCard extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                 decoration: BoxDecoration(
-                  color: badgeColor!.withOpacity(0.12),
+                  color: badgeColor!.withValues(alpha: 0.12),
                   borderRadius: BorderRadius.circular(20),
-                  border: Border.all(color: badgeColor!.withOpacity(0.4)),
+                  border: Border.all(color: badgeColor!.withValues(alpha: 0.4)),
                 ),
                 child: Text(
                   badge!,
@@ -555,7 +544,7 @@ class _EcgPainter extends CustomPainter {
   void paint(Canvas canvas, Size size) {
     const c = Color(0xFFFF4D6D);
     final paint = Paint()
-      ..color = active ? c : c.withOpacity(0.2)
+      ..color = active ? c : c.withValues(alpha: 0.2)
       ..strokeWidth = 1.5
       ..style = PaintingStyle.stroke
       ..strokeCap = StrokeCap.round;
@@ -581,13 +570,13 @@ class _WaitingHint extends StatelessWidget {
   Widget build(BuildContext context) => Container(
     padding: const EdgeInsets.all(14),
     decoration: BoxDecoration(
-      color: const Color(0xFF00E5FF).withOpacity(0.06),
+      color: AppColors.primary.withValues(alpha: 0.06),
       borderRadius: BorderRadius.circular(12),
-      border: Border.all(color: const Color(0xFF00E5FF).withOpacity(0.2)),
+      border: Border.all(color: AppColors.primary.withValues(alpha: 0.2)),
     ),
     child: const Row(
       children: [
-        Icon(Icons.info_outline_rounded, color: Color(0xFF00E5FF), size: 18),
+        Icon(Icons.info_outline_rounded, color: AppColors.primary, size: 18),
         SizedBox(width: 10),
         Expanded(
           child: Text(

@@ -3,6 +3,11 @@ import 'package:flutter_blue_plus/flutter_blue_plus.dart';
 import 'package:light_x/features/scan/logic/ble_connector.dart';
 import 'package:light_x/features/scan/logic/ble_scanner.dart';
 import 'package:light_x/features/scan/logic/health_service.dart';
+import 'package:light_x/features/scan/providers/health_provider.dart';
+import 'package:light_x/shared/components/layout/app_scaffold.dart';
+import 'package:light_x/shared/components/layout/texts.dart';
+import 'package:light_x/shared/theme/src/app_colors.dart';
+import 'package:provider/provider.dart';
 import 'health_screen.dart';
 
 class ScanScreen extends StatefulWidget {
@@ -69,51 +74,30 @@ class _ScanScreenState extends State<ScanScreen> {
       _connectingId = null;
     });
 
+    context.read<HealthProvider>().setCurrDeviceName(name);
+    context.read<HealthProvider>().setHealthService(service);
+
     // Navigate first so StreamBuilder is subscribed before start() emits data
     if (!mounted) return;
-    Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (_) => HealthScreen(deviceName: name, service: service),
-      ),
-    );
+    Navigator.of(context).push(MaterialPageRoute(builder: (_) => HealthScreen()));
     await service.start();
   }
 
-  // ── UI ─────────────────────────────────────────────────────────────────────
-
-  static const _bg = Color(0xFF0A0E1A);
-  static const _surface = Color(0xFF131929);
-  static const _accent = Color(0xFF00E5FF);
-  static const _textPri = Color(0xFFE8EDF5);
-
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: _bg,
-      appBar: AppBar(
-        backgroundColor: _surface,
-        elevation: 0,
-        title: const Text(
-          'Nearby Devices',
-          style: TextStyle(color: _textPri, fontFamily: 'monospace', fontSize: 18, letterSpacing: 1.2),
-        ),
-        actions: [
-          StreamBuilder<bool>(
-            stream: _scanner.isScanning,
-            builder: (_, snap) {
-              final scanning = snap.data ?? false;
-              return Padding(
-                padding: const EdgeInsets.only(right: 12),
-                child: scanning
-                    ? const _ScanningBadge()
-                    : IconButton(
-                        icon: const Icon(Icons.refresh_rounded, color: _accent),
-                        onPressed: () => _scanner.startScan(),
-                      ),
-              );
-            },
-          ),
-        ],
+    return AppScaffold(
+      title: AppTexts.pageAppBarTitleText("Nearby Devices"),
+      trailing: StreamBuilder<bool>(
+        stream: _scanner.isScanning,
+        builder: (_, snap) {
+          final scanning = snap.data ?? false;
+          return scanning
+              ? const _ScanningBadge()
+              : IconButton(
+                  icon: Icon(Icons.refresh_rounded, color: AppColors.green600),
+                  onPressed: () => _scanner.startScan(),
+                );
+        },
       ),
       body: StreamBuilder<List<ScanResult>>(
         stream: _scanner.results,
@@ -124,7 +108,7 @@ class _ScanScreenState extends State<ScanScreen> {
             return _EmptyState(onScan: _scanner.startScan);
           }
           return ListView.separated(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            padding: EdgeInsets.zero,
             itemCount: results.length,
             separatorBuilder: (_, __) => const SizedBox(height: 8),
             itemBuilder: (_, i) {
@@ -169,18 +153,18 @@ class _ScanningBadgeState extends State<_ScanningBadge> with SingleTickerProvide
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
         decoration: BoxDecoration(
-          color: const Color(0xFF00E5FF).withOpacity(0.12),
+          color: AppColors.primary.withValues(alpha: 0.12),
           borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: const Color(0xFF00E5FF), width: 0.6),
+          border: Border.all(color: AppColors.primary, width: 0.6),
         ),
         child: const Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(Icons.sensors_rounded, color: Color(0xFF00E5FF), size: 14),
+            Icon(Icons.sensors_rounded, color: AppColors.primary, size: 14),
             SizedBox(width: 4),
             Text(
               'SCANNING',
-              style: TextStyle(color: Color(0xFF00E5FF), fontSize: 10, letterSpacing: 1.4, fontWeight: FontWeight.w700),
+              style: TextStyle(color: AppColors.primary, fontSize: 10, letterSpacing: 1.4, fontWeight: FontWeight.w700),
             ),
           ],
         ),
@@ -204,9 +188,6 @@ class _DeviceTile extends StatelessWidget {
     required this.onTap,
   });
 
-  static const _accent = Color(0xFF00E5FF);
-  static const _card = Color(0xFF1C2438);
-  static const _textPri = Color(0xFFE8EDF5);
   static const _textSub = Color(0xFF6B7A99);
 
   bool get _isUnknown => name.startsWith('Device ');
@@ -230,13 +211,13 @@ class _DeviceTile extends StatelessWidget {
       child: InkWell(
         onTap: disabled ? null : onTap,
         borderRadius: BorderRadius.circular(14),
-        splashColor: _accent.withOpacity(0.08),
+        splashColor: AppColors.primary.withValues(alpha: 0.08),
         child: Ink(
           decoration: BoxDecoration(
-            color: _card,
+            color: Colors.white,
             borderRadius: BorderRadius.circular(14),
             border: Border.all(
-              color: isConnecting ? _accent : Colors.white.withOpacity(0.06),
+              color: isConnecting ? AppColors.primary : Colors.white.withValues(alpha: 0.06),
               width: isConnecting ? 1.0 : 0.8,
             ),
           ),
@@ -247,12 +228,12 @@ class _DeviceTile extends StatelessWidget {
                 width: 44,
                 height: 44,
                 decoration: BoxDecoration(
-                  color: _accent.withOpacity(_isUnknown ? 0.04 : 0.08),
+                  color: AppColors.primary.withValues(alpha: _isUnknown ? 0.04 : 0.08),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Icon(
                   _isUnknown ? Icons.device_unknown_rounded : Icons.watch_rounded,
-                  color: _isUnknown ? _textSub : _accent,
+                  color: _isUnknown ? _textSub : AppColors.primary,
                   size: 22,
                 ),
               ),
@@ -264,7 +245,7 @@ class _DeviceTile extends StatelessWidget {
                     Text(
                       name,
                       style: TextStyle(
-                        color: _isUnknown ? _textSub : _textPri,
+                        color: _isUnknown ? _textSub : Colors.black,
                         fontSize: 15,
                         fontWeight: FontWeight.w600,
                       ),
@@ -278,7 +259,11 @@ class _DeviceTile extends StatelessWidget {
                 ),
               ),
               if (isConnecting)
-                const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2, color: _accent))
+                const SizedBox(
+                  width: 20,
+                  height: 20,
+                  child: CircularProgressIndicator(strokeWidth: 2, color: AppColors.primary),
+                )
               else
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.end,
@@ -315,7 +300,7 @@ class _RssiBars extends StatelessWidget {
           width: 4,
           height: 6.0 + i * 4,
           decoration: BoxDecoration(
-            color: i < bars ? color : color.withOpacity(0.2),
+            color: i < bars ? color : color.withValues(alpha: 0.2),
             borderRadius: BorderRadius.circular(2),
           ),
         ),
@@ -333,7 +318,7 @@ class _EmptyState extends StatelessWidget {
     child: Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Icon(Icons.bluetooth_searching_rounded, size: 64, color: Colors.white.withOpacity(0.12)),
+        Icon(Icons.bluetooth_searching_rounded, size: 64, color: Colors.white.withValues(alpha: 0.12)),
         const SizedBox(height: 16),
         const Text('No devices found', style: TextStyle(color: Color(0xFF6B7A99), fontSize: 16)),
         const SizedBox(height: 8),
@@ -345,8 +330,8 @@ class _EmptyState extends StatelessWidget {
         const SizedBox(height: 24),
         TextButton.icon(
           onPressed: onScan,
-          icon: const Icon(Icons.refresh_rounded, color: Color(0xFF00E5FF)),
-          label: const Text('Scan Again', style: TextStyle(color: Color(0xFF00E5FF))),
+          icon: const Icon(Icons.refresh_rounded, color: AppColors.primary),
+          label: const Text('Scan Again', style: TextStyle(color: AppColors.primary)),
         ),
       ],
     ),

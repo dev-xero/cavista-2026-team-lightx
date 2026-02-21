@@ -24,6 +24,7 @@ enum Routes {
   // ============================================================================
   home,
   watchScan,
+  healthDataResult,
 }
 
 extension RoutesExtension on Routes {
