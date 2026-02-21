@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:light_x/core/constants/constants.dart';
 import 'package:light_x/features/onboarding/providers/onboarding_provider.dart';
+import 'package:light_x/routes/app_router.dart';
 import 'package:light_x/shared/components/buttons/app_back_button.dart';
 import 'package:light_x/shared/components/buttons/app_button.dart';
 import 'package:light_x/shared/components/indicators/app_linear_progress_indicator.dart';
@@ -65,7 +66,12 @@ class Onboarding1 extends StatelessWidget {
                     );
                   }),
 
-                  AppButton(label: "Continue", onPressed: () {}),
+                  AppButton(
+                    label: "Continue",
+                    onPressed: () {
+                      Routes.onboarding2.push(context);
+                    },
+                  ),
                   8.inColumn,
                   SizedBox(
                     height: 56,
