@@ -31,11 +31,20 @@ class $AssetsSvgsGen {
   /// File path: assets/svgs/male_icon.svg
   String get maleIcon => 'assets/svgs/male_icon.svg';
 
+  /// File path: assets/svgs/new_scan.svg
+  String get newScan => 'assets/svgs/new_scan.svg';
+
   /// File path: assets/svgs/smoking_icon.svg
   String get smokingIcon => 'assets/svgs/smoking_icon.svg';
 
   /// List of all assets
-  List<String> get values => [femaleIcon, leftArrow, maleIcon, smokingIcon];
+  List<String> get values => [
+    femaleIcon,
+    leftArrow,
+    maleIcon,
+    newScan,
+    smokingIcon,
+  ];
 }
 
 class Assets {
