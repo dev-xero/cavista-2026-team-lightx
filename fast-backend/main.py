@@ -1,15 +1,18 @@
-from pydantic.v1 import validator
+import datetime
+import time
 import json
-from xgboost.testing.data import joblib
+import joblib
+import xgboost as xgb
+import numpy as np
+import pandas as pd
+import datetime as dt
+
+from pydantic.v1 import validator
 from fastapi import FastAPI
 from fastapi import FastAPI, HTTPException, UploadFile, File, Form, Depends
 from pydantic import BaseModel, Field
 from typing import List, Optional
 from datetime import date
-
-import xgboost as xgb
-import numpy as np
-import pandas as pd
 
 app = FastAPI(title="Health-AI-API", description="Backend for Hypertension Tracking Application")
 
@@ -21,10 +24,10 @@ schema = json.load(open("models/feature_schema.json"))
 FEATURES = schema["features"]
 
 STAGE_ADVICE = {
-    0: "Blood pressure is healthy. Maintain current lifestyle. Recheck annually.",
-    1: "Slightly elevated. Reduce sodium, increase exercise. Recheck in 3-6 months.",
-    2: "Stage 1 Hypertension. Consult a physician. Lifestyle changes required.",
-    3: "Stage 2 Hypertension. Seek medical attention promptly. Medication likely needed."
+    0: "Blood pressure is healthy. You may maintain your current lifestyle. Be sure to check-in annually.",
+    1: "Slightly elevated. Reduce sodium, increase and gradually increase exercise. Recheck in 3-6 months.",
+    2: "Stage 1 Hypertension, we recommend consulting a physician. Lifestyle changes required at this stage.",
+    3: "Stage 2 Hypertension, we recommend seeking medical attention promptly. Medication is likely needed."
 }
 
 STAGE_NAMES = {
@@ -149,6 +152,18 @@ def run_inference(data: UserData):
     )
 
 
+@app.get("/")
+async def base():
+    """
+    This is the base endpoint
+    """
+    return {
+        "data": None,
+        "message": "API is healthy. Use /docs for swagger documentation",
+        "timestamp": dt.datetime.now()
+    }
+
+
 @app.post("/predict")
 async def run_analysis(data: UserData):
     """
@@ -159,8 +174,12 @@ async def run_analysis(data: UserData):
         result = run_inference(data)
         framingham_score = calculate_framingham_score(data)
         return {
-            "result": result,
-            "framing_ham_risk_score": framingham_score
+            "data": {
+                "result": result,
+                "framing_ham_risk_score": framingham_score,
+            },
+            "message": "Prediction complete",
+            "timestamp": dt.datetime.now()
         }
         
     except Exception as e:

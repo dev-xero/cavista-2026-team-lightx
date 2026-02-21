@@ -1,5 +1,8 @@
-fastapi
+fastapi[standard]
 pydantic
 xgboost
 numpy
 pandas
+pytest
+joblib
+scikit-learn
