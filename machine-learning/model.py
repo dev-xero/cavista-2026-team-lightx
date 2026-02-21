@@ -82,7 +82,7 @@ def extract_bp(xpt_files):
     df = bp[['SEQN']].copy()
     df['systolic_bp']  = bp[sys_cols].mean(axis=1)
     df['diastolic_bp'] = bp[dia_cols].mean(axis=1)
-    df['heart_rate']   = bp['BPXPLS1'] if 'BPXPLS' in bp.columns else np.nan
+    df['heart_rate']   = bp['BPXOPLS1'] if 'BPXOPLS1' in bp.columns else np.nan
     
     return df
 
@@ -215,7 +215,8 @@ def build_dataset(xpt_files, save=False):
     df['map']            = df['diastolic_bp'] + (df['pulse_pressure'] / 3)
     df['chol_ratio']     = df['total_cholesterol'] / df['hdl_cholesterol'].replace(0, np.nan) 
     
-    for col in ['avg_sleep_hours', 'stress_level', 'spo2', 'breathing_rate', 'hrv']:
+    # For now, these are NaN on training
+    for col in ['avg_sleep_hours', 'stress_level', 'breathing_rate']:
         df[col] = np.nan
     
     if (save):
