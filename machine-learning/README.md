@@ -20,15 +20,16 @@ This module implements a multi-class classifier using XGBoost with the National 
 
 The National Health and Nutrition Examination Survey (NHANES) collects data about the health of adults and children. We can obtain the following data sources in XPT format:
 
-- Blood Pressure
-- Demographics
-- Body Measures
-- Cholesterol
-- Cholesterol
-- Blood Glucose
-- Diabetes
-- Smoking
-- Kidney Function
+| Dataset Name | Detail |
+| ---          | ---      |
+| Blood Pressure | Systolic and diastolic blood pressure |
+| Demographics | Demographics data such as age and gender |
+| Body Measures | Body measures such as Body Mass Index |
+| Total Cholesterol | Total cholesterol levels |
+| Blood Glucose | Respondent blood sugar levels |
+| Diabetes | Respondent diabetes status |
+| Smoking | Respondent smoking status (never smoked, previous smoker, current smoker) |
+| Kidney Function | Creatine effects on kidney function |
 
 This data is eventually combined into a cohesive single data set with computed/derived features.
 
