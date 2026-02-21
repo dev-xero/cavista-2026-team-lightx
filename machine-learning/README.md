@@ -37,20 +37,20 @@ This data is eventually combined into a single cohesive data set with computed/d
 
 1. We use `uv` as our package manager, ensure `uv` is setup correctly. To install required packages, use the command below:
   ```sh
-  uv add -r requirements.txt
+  > uv add -r requirements.txt
   ```
 2. On MacOS, OpenMP must be installed in order to use the `xgboost` library, run:
   ```sh
-  brew install libomp on MacOS
+  > brew install libomp on MacOS
   ```
 3. Create and setup the Python virtual environment:
   ```sh
-  python3 -m venv .venv
-  source ./venv/bin/activate
+  > python3 -m venv .venv
+  > source ./venv/bin/activate
   ```
 4. Train the Multi-class XGBoost Classifier Model
   ```sh
-  python3 train.py
+  > python3 train.py
   ```
 
 ## Fair Use Policy (NHANES)
