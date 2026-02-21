@@ -4,6 +4,8 @@ This module implements a multi-class classifier using XGBoost with the National 
 
 ## Architecture
 
+
+
 ## Required Packages
 
 - [xgboost](https://pypi.org/project/xgboost/): XGBoost Python Package.
@@ -16,6 +18,19 @@ This module implements a multi-class classifier using XGBoost with the National 
 
 ## Downloading the Datasets
 
+The National Health and Nutrition Examination Survey (NHANES) collects data about the health of adults and children. We can obtain the following data sources in XPT format:
+
+- Blood Pressure
+- Demographics
+- Body Measures
+- Cholesterol
+- Cholesterol
+- Blood Glucose
+- Diabetes
+- Smoking
+- Kidney Function
+
+This data is eventually combined into a cohesive single data set with computed/derived features.
 
 ## Local Setup
 
