@@ -31,7 +31,7 @@ The National Health and Nutrition Examination Survey (NHANES) collects data abou
 | Smoking | Respondent smoking status (never smoked, previous smoker, current smoker) |
 | Kidney Function | Creatine effects on kidney function |
 
-This data is eventually combined into a cohesive single data set with computed/derived features.
+This data is eventually combined into a single cohesive data set with computed/derived features.
 
 ## Local Setup
 
