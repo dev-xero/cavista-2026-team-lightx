@@ -31,8 +31,14 @@ class $AssetsSvgsGen {
   /// File path: assets/svgs/male_icon.svg
   String get maleIcon => 'assets/svgs/male_icon.svg';
 
+  /// File path: assets/svgs/needle.svg
+  String get needle => 'assets/svgs/needle.svg';
+
   /// File path: assets/svgs/new_scan.svg
   String get newScan => 'assets/svgs/new_scan.svg';
+
+  /// File path: assets/svgs/semi_circle.svg
+  String get semiCircle => 'assets/svgs/semi_circle.svg';
 
   /// File path: assets/svgs/smoking_icon.svg
   String get smokingIcon => 'assets/svgs/smoking_icon.svg';
@@ -42,7 +48,9 @@ class $AssetsSvgsGen {
     femaleIcon,
     leftArrow,
     maleIcon,
+    needle,
     newScan,
+    semiCircle,
     smokingIcon,
   ];
 }

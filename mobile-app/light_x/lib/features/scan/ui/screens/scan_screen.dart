@@ -4,11 +4,11 @@ import 'package:light_x/features/scan/logic/ble_connector.dart';
 import 'package:light_x/features/scan/logic/ble_scanner.dart';
 import 'package:light_x/features/scan/logic/health_service.dart';
 import 'package:light_x/features/scan/providers/health_provider.dart';
+import 'package:light_x/routes/app_router.dart';
 import 'package:light_x/shared/components/layout/app_scaffold.dart';
 import 'package:light_x/shared/components/layout/texts.dart';
 import 'package:light_x/shared/theme/src/app_colors.dart';
 import 'package:provider/provider.dart';
-import 'health_screen.dart';
 
 class ScanScreen extends StatefulWidget {
   const ScanScreen({super.key});
@@ -74,12 +74,14 @@ class _ScanScreenState extends State<ScanScreen> {
       _connectingId = null;
     });
 
-    context.read<HealthProvider>().setCurrDeviceName(name);
-    context.read<HealthProvider>().setHealthService(service);
+    final hp = context.read<HealthProvider>();
+
+    hp.setCurrDeviceName(name);
+    hp.setHealthService(service);
 
     // Navigate first so StreamBuilder is subscribed before start() emits data
     if (!mounted) return;
-    Navigator.of(context).push(MaterialPageRoute(builder: (_) => HealthScreen()));
+    Routes.healthDataResult.push(context);
     await service.start();
   }
 

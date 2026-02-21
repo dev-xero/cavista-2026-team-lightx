@@ -17,8 +17,14 @@ class HealthScreen extends StatefulWidget {
 }
 
 class _HealthScreenState extends State<HealthScreen> with SingleTickerProviderStateMixin {
-  late final _pulseCtrl = AnimationController(vsync: this, duration: const Duration(milliseconds: 700));
+  late final AnimationController _pulseCtrl;
   int? _lastHr;
+
+  @override
+  void initState() {
+    super.initState();
+    _pulseCtrl = AnimationController(vsync: this, duration: const Duration(milliseconds: 700));
+  }
 
   @override
   void dispose() {

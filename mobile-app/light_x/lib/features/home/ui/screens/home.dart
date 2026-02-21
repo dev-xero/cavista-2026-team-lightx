@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:light_x/core/assets/assets.dart';
 import 'package:light_x/core/constants/constants.dart';
+import 'package:light_x/features/home/ui/widgets/home/bar_chart_card.dart';
+import 'package:light_x/features/home/ui/widgets/home/health_tips_section.dart';
 import 'package:light_x/shared/components/buttons/app_button.dart';
 import 'package:light_x/shared/components/buttons/build_icon_button.dart';
 import 'package:light_x/shared/components/indicators/app_linear_progress_indicator.dart';
@@ -10,45 +12,82 @@ import 'package:light_x/shared/components/layout/app_text.dart';
 import 'package:light_x/shared/theme/src/app_colors.dart';
 import 'package:remixicon/remixicon.dart';
 
-class Home extends StatelessWidget {
+const items = [
+  BarChartItem(label: 'Mo', value: 48 / 80),
+  BarChartItem(label: 'Tu', value: 64 / 80),
+  BarChartItem(label: 'We', value: 56 / 80),
+  BarChartItem(label: 'Th', value: 40 / 80),
+  BarChartItem(label: 'Fr', value: 48 / 80, isActive: true),
+  BarChartItem(label: 'Sa', value: 32 / 80),
+  BarChartItem(label: 'Su', value: 44 / 80),
+];
+
+const tips = [
+  HealthTipItem(
+    title: 'Stay Hydrated',
+    description: 'Drink at least 8 glasses of water daily to keep your body functioning optimally.',
+    icon: Icons.local_fire_department_outlined,
+    iconColor: AppColors.orange,
+  ),
+  HealthTipItem(
+    title: 'Move More',
+    description: 'Aim for 30 minutes of moderate activity each day to boost your energy and mood.',
+    icon: Icons.directions_walk_outlined,
+    iconColor: AppColors.blue,
+  ),
+];
+
+class Home extends StatefulWidget {
   const Home({super.key});
 
+  @override
+  State<Home> createState() => _HomeState();
+}
+
+class _HomeState extends State<Home> {
   @override
   Widget build(BuildContext context) {
     return CustomScrollView(
       slivers: [
-        SliverToBoxAdapter(child: const TopPadding()),
         // Header Section
-        SliverToBoxAdapter(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 24),
-            child: Row(
-              children: [
-                const CircleAvatar(
-                  radius: 20,
-                  backgroundColor: AppColors.primary,
-                  child: Icon(Icons.person, color: Colors.white),
-                ),
-                12.inRow,
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const AppText(
-                        "Good Morning",
-                        fontSize: 20,
-                        fontWeight: FontWeight.w800,
-                        color: Color(0xFF0F172A),
+        PinnedHeaderSliver(
+          child: ColoredBox(
+            color: AppColors.lightScaffoldBg,
+            child: TopPadding(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(vertical: 24),
+                child: Row(
+                  children: [
+                    const CircleAvatar(
+                      radius: 20,
+                      backgroundColor: AppColors.primary,
+                      child: Icon(Icons.person, color: Colors.white),
+                    ),
+                    12.inRow,
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const AppText(
+                            "Good Morning",
+                            fontSize: 20,
+                            fontWeight: FontWeight.w800,
+                            color: Color(0xFF0F172A),
+                          ),
+                          AppText("Tuesday, Oct 24", fontSize: 12, color: AppColors.neutralBlack200),
+                        ],
                       ),
-                      AppText("Tuesday, Oct 24", fontSize: 12, color: AppColors.neutralBlack200),
-                    ],
-                  ),
+                    ),
+                    SizedBox.square(
+                      dimension: 36,
+                      child: BuildIconButton(
+                        onPressed: () {},
+                        icon: const Icon(RemixIcons.notification_2_line, size: 20),
+                      ),
+                    ),
+                  ],
                 ),
-                SizedBox.square(
-                  dimension: 36,
-                  child: BuildIconButton(onPressed: () {}, icon: const Icon(RemixIcons.notification_2_line, size: 20)),
-                ),
-              ],
+              ),
             ),
           ),
         ),
@@ -157,27 +196,26 @@ class Home extends StatelessWidget {
 
         24.inSliverColumn,
 
-        100.inSliverColumn, // Bottom spacer
-      ],
-    );
-  }
-
-  // --- Helper Build Methods ---
-
-  Widget _buildChartBar(String label, double heightPercent, bool isSelected) {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.end,
-      children: [
-        Container(
-          width: 32,
-          height: 80 * heightPercent,
-          decoration: BoxDecoration(
-            color: isSelected ? const Color(0xFF1C58D9) : const Color(0xFF1C58D9).withOpacity(0.1),
-            borderRadius: const BorderRadius.vertical(top: Radius.circular(8)),
+        SliverToBoxAdapter(
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              AppText("Weekly Trends", fontSize: 18, fontWeight: FontWeight.w700, color: const Color(0xFF0F172A)),
+              AppText("Full History", fontSize: 14, fontWeight: FontWeight.w700, color: const Color(0xFF1C58D9)),
+            ],
           ),
         ),
-        8.inColumn,
-        AppText(label, fontSize: 10, fontWeight: FontWeight.w600, color: const Color(0xFF94A3B8)),
+
+        16.inSliverColumn,
+        SliverToBoxAdapter(
+          child: BarChartCard(items: items, footerText: 'Your activity is 12% higher than last week'),
+        ),
+
+        24.inSliverColumn,
+
+        SliverToBoxAdapter(child: HealthTipsSection(tips: tips)),
+
+        100.inSliverColumn, // Bottom spacer
       ],
     );
   }
@@ -203,59 +241,6 @@ class Home extends StatelessWidget {
           ],
         ),
       ],
-    );
-  }
-
-  Widget _buildStatTile({
-    required IconData icon,
-    required Color iconColor,
-    required String title,
-    required String value,
-    required String unit,
-    required double progress,
-  }) {
-    return DecoratedBox(
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: const Color(0xFFE2E8F0)),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          children: [
-            Row(
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(10),
-                  decoration: BoxDecoration(color: iconColor.withOpacity(0.1), borderRadius: BorderRadius.circular(12)),
-                  child: Icon(icon, color: iconColor, size: 20),
-                ),
-                16.inRow,
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      AppText(title, fontSize: 14, fontWeight: FontWeight.w700, color: const Color(0xFF0F172A)),
-                      AppText("$value $unit", fontSize: 12, color: const Color(0xFF64748B)),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-            16.inColumn,
-            ClipRRect(
-              borderRadius: BorderRadius.circular(5),
-              child: LinearProgressIndicator(
-                value: progress,
-                minHeight: 8,
-                backgroundColor: const Color(0xFFE2E8F0),
-                valueColor: AlwaysStoppedAnimation<Color>(iconColor),
-              ),
-            ),
-          ],
-        ),
-      ),
     );
   }
 }
