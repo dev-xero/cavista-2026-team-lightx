@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:go_router/go_router.dart';
-import 'package:light_x/routes/src/onboarding.dart';
+import 'package:light_x/routes/src/onboarding_routes.dart';
 
 import 'src/splash_route.dart';
 
