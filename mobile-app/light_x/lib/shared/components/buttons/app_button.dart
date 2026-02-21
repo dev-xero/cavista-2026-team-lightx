@@ -44,7 +44,7 @@ class AppButton extends StatelessWidget {
     this.trailing,
     this.type = ButtonType.filled,
     this.color = AppColors.primary,
-    this.borderRadius = 30,
+    this.borderRadius = 24,
     this.size,
     this.style,
     this.padding,
