@@ -1,4 +1,5 @@
 import pandas as pd
+import numpy as np
 import logging
 import os
 import warnings
@@ -16,11 +17,18 @@ TEST_SIZE=0.2
 
 
 def make_output_dirs():
-    logging.info("Creating output directory")
+    """
+    This creates the model output directory if it doesn't already exist.
+    """
+    logging.info(f"Creating output directory {OUTPUT_DIRECTORY}")
     os.makedirs(OUTPUT_DIRECTORY, exist_ok=True)
-   
+ 
    
 def load_xpt(filename):
+    """
+    This loads individual XPT files into a Pandas DataFrame. It will log
+    an error when an invalid path is passed in.
+    """
     path = os.path.join(DATA_DIRECTORY, filename)
     
     if not os.path.exists(path):
@@ -28,96 +36,208 @@ def load_xpt(filename):
         return pd.DataFrame()
         
     df = pd.read_sas(path, format='xport', encoding='utf-8')
+    
+    output_path = os.path.join(OUTPUT_DIRECTORY, filename.replace('.XPT', '.csv'))
+    
+    df.to_csv(output_path, index=False)
+    logging.info(f"Saved CSV output to: {output_path}")
+    
     return df
+  
    
-   
-def load_dataset():
+def load_xpt_files():
+    """
+    This attempts to load all NHANES XPT data files. We neatly return this
+    data in a dictionary.
+    """
     logging.info("Attempting to load all .xpt files")
     
-    bp    = load_xpt("P_BPXO.XPT")     # Blood pressure readings
-    demo  = load_xpt("P_DEMO.XPT")     # Demographics
-    bmi   = load_xpt("P_BMX.XPT")      # Body measures
-    chol  = load_xpt("P_TCHOL.XPT")    # Total cholesterol
-    hdl   = load_xpt("P_HDL.XPT")      # HDL cholesterol
-    glu   = load_xpt("P_GLU.XPT")      # Blood glucose
-    smoke = load_xpt("P_SMQ.XPT")      # Smoking
-    kidney= load_xpt("P_BIOPRO.XPT")   # Kidney function
-    
-    logging.info("Loaded datasets")
-    
-    return bp, demo, bmi, chol, hdl, glu, smoke, kidney
-    
+    return {
+        "bp": load_xpt("P_BPXO.XPT"), 
+        "demo": load_xpt("P_DEMO.XPT"),
+        "bmi": load_xpt("P_BMX.XPT"),
+        "chol": load_xpt("P_TCHOL.XPT"),
+        "hdl": load_xpt("P_HDL.XPT"),
+        "glu": load_xpt("P_GLU.XPT"),
+        "smoke": load_xpt("P_SMQ.XPT"),
+        "kidney": load_xpt("P_BIOPRO.XPT")
+    }
 
-def combine_datasets(bp, demo, bmi, chol, hdl, glu, smoke, kidney):
-    logging.info("Attempting to combine all datasets")
+
+def extract_bp(xpt_files):
+    """
+    This extracts relevant features from the BP file.
+    """
+    logging.info("Extracting features from Blood Pressure data")
     
-    if not bp.empty:
-        logging.info("Loading blood pressure")
-        
-        bp_cols_sys = [c for c in ['BPXSY1','BPXSY2','BPXSY3'] if c in bp.columns]
-        bp_cols_dia = [c for c in ['BPXDI1','BPXDI2','BPXDI3'] if c in bp.columns]
-        
-        bp['SYSTOLIC']  = bp[bp_cols_sys].mean(axis=1)
-        bp['DIASTOLIC'] = bp[bp_cols_dia].mean(axis=1)
-        bp = bp[['SEQN', 'SYSTOLIC', 'DIASTOLIC']]
-        
-        print(demo, "\n\n")
+    bp = xpt_files["bp"]
     
+    # We need to obtain the columns we're interested in, namely systolic
+    # and diastolic bp.
+    sys_cols = [c for c in ['BPXOSY1','BPXOSY2','BPXOSY3'] if c in bp.columns]
+    dia_cols = [c for c in ['BPXODI1','BPXODI2','BPXODI3'] if c in bp.columns]
+
+    # This will obtain average systolic and diastolic bp values for
+    # each row.
+    df = bp[['SEQN']].copy()
+    df['systolic_bp']  = bp[sys_cols].mean(axis=1)
+    df['diastolic_bp'] = bp[dia_cols].mean(axis=1)
+    df['heart_rate']   = bp['BPXPLS1'] if 'BPXPLS' in bp.columns else np.nan
+    
+    return df
+
+
+def extract_demo(df, xpt_files):
+    """
+    This extracts relevant features from the DEMO file.
+    """
+    logging.info("Extracting features from Demographics data")
+    
+    demo = xpt_files['demo']
     if not demo.empty:
-        logging.info("Loading Demographic dataset")
-        demo = demo[['SEQN', 'RIDAGEYR', 'RIAGENDR', 'RIDRETH3']].rename(columns={
-            'RIDAGEYR': 'AGE',
-            'RIAGENDR': 'GENDER',
-            'RIDRETH3': 'ETHNICITY'
-        })
-        print(demo, "\n\n")
+        df['age']    = demo.set_index('SEQN')['RIDAGEYR'].reindex(df['SEQN']).values
+        df['gender'] = demo.set_index('SEQN')['RIAGENDR'].reindex(df['SEQN']).map({1:0, 2:1}).values
+
+    return df
     
-    if not bmi.empty:
-        logging.info("Loading BMI dataset")
-        bmi = bmi[['SEQN', 'BMXBMI', 'BMXWAIST']].rename(columns={
-            'BMXBMI':   'BMI',
-            'BMXWAIST': 'WAIST_CM'
-        })
-        print(bmi, "\n\n")
+    
+def extract_bmi(df, xpt_files):
+    """
+    This extracts relevant features from the BMI file.
+    """
+    logging.info("Extracting features from BMI data")
+    
+    bmi = xpt_files['bmi']
+    if not bmi.empty and 'BMXBMI' in bmi.columns:
+        df['bmi'] = bmi.set_index('SEQN')['BMXBMI'].reindex(df['SEQN']).values
+    
+    return df
+    
+    
+def extract_total_chol(df, xpt_files):
+    """
+    This extracts relevant features from the TOTAL CHOL file.
+    """
+    logging.info("Extracting features from Total Cholesterol data")
+    
+    chol = xpt_files['chol']
+    if not chol.empty and 'LBXTC' in chol.columns:
+        df['total_cholesterol'] = chol.set_index('SEQN')['LBXTC'].reindex(df['SEQN']).values
+    
+    return df
+
+
+def extract_high_chol(df, xpt_files):
+    """
+    This extracts relevant features from the HIGH CHOL file.
+    """
+    logging.info("Extracting features from High Cholesterol data")
+    
+    hdl = xpt_files['hdl']
+    if not hdl.empty and 'LBDHDD' in hdl.columns:
+        df['hdl_cholesterol'] = hdl.set_index('SEQN')['LBDHDD'].reindex(df['SEQN']).values
+    
+    return df
         
-    if not chol.empty:
-        logging.info("Loading Total Cholesterol dataset")
-        chol = chol[['SEQN', 'LBXTC']].rename(columns={'LBXTC': 'TOTAL_CHOLESTEROL'})
-        print(chol, "\n\n")
+        
+def extract_glucose(df, xpt_files):
+    """
+    This extracts relevant features from the Glucose file.
+    """
+    logging.info("Extracting features from Glucose data")
+    
+    glu = xpt_files['glu']
+    if not glu.empty and 'LBXGLU' in glu.columns:
+        df['fasting_glucose'] = glu.set_index('SEQN')['LBXGLU'].reindex(df['SEQN']).values
+ 
+    return df 
+    
+    
+def extract_smoking(df, xpt_files):
+    """
+    This extracts relevant features from the Smoking file.
+    """
+    logging.info("Extracting features from Smoking data")
+   
+    smoke = xpt_files['smoke']
+    smoke = smoke.set_index('SEQN')
+    
+    def recode(row):
+        ever = row.get('SMQ020', np.nan)
+        now  = row.get('SMQ040', np.nan)
+        if pd.isna(ever): return np.nan
+        # Here we just encode smoking status
+        # 0: Never smoked
+        # 1: Current smoker
+        # 2: Former smoker
+        if ever == 2: return 0
+        if now in [1, 2]: return 2
+        return 1                 
+        
+    df['smoking_status'] = smoke.apply(recode, axis=1).reindex(df['SEQN']).values
 
-    if not hdl.empty:
-        logging.info("Loading HDL Cholesterol dataset")
-        hdl = hdl[['SEQN', 'LBDHDD']].rename(columns={'LBDHDD': 'HDL_CHOLESTEROL'})
-        print(hdl, "\n\n")
+    return df
 
-    if not glu.empty:
-        logging.info("Loading Glucose dataset")
-        glu = glu[['SEQN', 'LBXGLU']].rename(columns={'LBXGLU': 'FASTING_GLUCOSE'})
-        print( glu, "\n\n")
 
-    if not smoke.empty and 'SMQ020' in smoke.columns:
-        logging.info("Loading Smoking dataset")
-        smoke = smoke[['SEQN', 'SMQ020']].rename(columns={'SMQ020': 'EVER_SMOKED'})
-        # This just encodes smoking data, 1=YES, 2=NO
-        smoke['EVER_SMOKED'] = smoke['EVER_SMOKED'].map({1: 1, 2: 0})
-        print(smoke, "\n\n")
-
+def extract_kidney(df, xpt_files):
+    """
+    This extracts relevant features from the Kidney file.
+    """
+    logging.info("Extracting features from Kidney data")
+    
+    kidney = xpt_files['kidney']
     if not kidney.empty and 'LBXSCR' in kidney.columns:
-        logging.info("Loading Kidney dataset")
-        kidney = kidney[['SEQN', 'LBXSCR']].rename(columns={'LBXSCR': 'CREATININE'})
-        print(kidney, "\n\n")
-
-    dfs = [df for df in [bp, demo, bmi, chol, hdl, glu, smoke, kidney] if not df.empty]
-    
-    merged = dfs[0]
-    for df in dfs[1:]:
-        merged = merged.merge(df, on='SEQN', how='left')
+        df['creatinine'] = kidney.set_index('SEQN')['LBXSCR'].reindex(df['SEQN']).values
         
-    logging.info("\n\nCombined all datasets")
-    print(merged, "\n\n")
+    return df
+
+   
+def build_dataset(xpt_files, save=False):
+    """
+    This combines relevant features into a coherent dataset.
+    """
+    logging.info("")
     
-    return merged
+    bp_df = extract_bp(xpt_files)
     
+    demo_df = extract_demo(bp_df, xpt_files)
+    bmi_df = extract_bmi(demo_df, xpt_files)
+    total_chol_df = extract_total_chol(bmi_df, xpt_files)
+    high_chol_df = extract_high_chol(total_chol_df, xpt_files)
+    glucose_df = extract_glucose(high_chol_df, xpt_files)
+    smoking_df = extract_smoking(glucose_df, xpt_files)
+    kidney_df = extract_kidney(smoking_df, xpt_files)
+    
+    # We can compute derived features
+    df = kidney_df
+    
+    df['pulse_pressure'] = df['systolic_bp'] - df['diastolic_bp']
+    df['map']            = df['diastolic_bp'] + (df['pulse_pressure'] / 3)
+    df['chol_ratio']     = df['total_cholesterol'] / df['hdl_cholesterol'].replace(0, np.nan) 
+    
+    for col in ['avg_sleep_hours', 'stress_level', 'spo2', 'breathing_rate', 'hrv']:
+        df[col] = np.nan
+    
+    if (save):
+        path = f"{OUTPUT_DIRECTORY}/combined_dataset.csv"
+        df.to_csv(path, index=False)
+        logging.info(f"Dataset saved to: {path}")
+        
+    logging.info("Finished building dataset")
+    print("\n\n", df, "\n\n")
+    
+    return df
+    
+    
+def determine_hypertension_stage(df):
+    """
+    For reference, ACC/AHA 2017 Guidelines:
+        0 - Normal:   Systolic < 120
+        1 - Elevated: Systolic 120-129
+        2 - Stage 1:  Systolic 130-139
+        3 - Stage 2:  Systolic > 140
+    """
+
 
 def train():
    pass
@@ -125,8 +245,8 @@ def train():
 
 def main():
     make_output_dirs()
-    bp, demo, bmi, chol, hdl, glu, smoke, kidney = load_dataset()
-    combine_datasets(bp, demo, bmi, chol, hdl, glu, smoke, kidney)
+    xpt_files = load_xpt_files()
+    build_dataset(xpt_files, True)
 
 
 main()
