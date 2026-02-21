@@ -27,7 +27,7 @@ The National Health and Nutrition Examination Survey (NHANES) collects data abou
 | Body Measures | Body measures such as Body Mass Index |
 | Total Cholesterol | Total cholesterol levels |
 | Blood Glucose | Respondent blood sugar levels |
-| Diabetes | Respondent diabetes status |
+| Diabetes | Respondent diabetes status (diabetic, not diabetic) |
 | Smoking | Respondent smoking status (never smoked, previous smoker, current smoker) |
 | Kidney Function | Creatine effects on kidney function |
 
