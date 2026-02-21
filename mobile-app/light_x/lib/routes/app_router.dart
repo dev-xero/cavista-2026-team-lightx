@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:go_router/go_router.dart';
+import 'package:light_x/routes/src/ai_chat_routes.dart';
 import 'package:light_x/routes/src/main_routes.dart';
 import 'package:light_x/routes/src/onboarding_routes.dart';
 import 'package:light_x/routes/src/scan_routes.dart';
@@ -18,6 +19,6 @@ class AppRouter {
     debugLogDiagnostics: true,
     initialLocation: Routes.home.path,
     navigatorKey: rootNavigatorKey,
-    routes: [splashRoute, ...onboardingRoutes, ...mainRoutes, ...scanRoutes],
+    routes: [splashRoute, ...onboardingRoutes, ...mainRoutes, scanRoute, ...aiChatRoutes],
   );
 }

@@ -54,4 +54,61 @@ class AppColors {
   // Colors
   static const blackGray = Color(0xFF64748B);
   static const lightGray = Color(0xFF94A3B8);
+  static const lightScaffoldBg = Color(0xFFF2F2F2);
+
+  /// customs
+
+  static const cardBackground = Color(0xFFFFFFFF);
+  static const cardBorder = Color(0xFFE2E8F0);
+
+  static const headingText = Color(0xFF0F172A);
+  static const bodyText = Color(0xFF64748B);
+
+  // Icon accent colors
+  static const orange = Color(0xFFF97316);
+  static const orangeBg = Color(0x1AF97316); // rgba(249,115,22,0.1)
+
+  static const blue = Color(0xFF1C58D9);
+  static const blueBg = Color(0x1A1C58D9); // rgba(28,88,217,0.1)
+
+  static const barFill = Color(0xFF3B82F6);
+  static const barOverlay = Color(0x333B82F6); // rgba(59,130,246,0.2)
+
+  static const activeBarFill = Color(0xFF1C58D9);
+  static const activeBarBorder = Color(0xFF1C58D9);
+
+  static const labelDefault = Color(0xFF94A3B8);
+  static const labelActive = Color(0xFF1C58D9);
+
+  static const divider = Color(0xFFF1F5F9);
+
+  static const footerText = Color(0xFF64748B);
+  static const footerIconBg = Color(0x1A14B8A6); // rgba(20,184,166,0.1)
+  static const footerIcon = Color(0xFF14B8A6);
+
+  static const headerBackground = Color(0xCCFFFFFF); // rgba(255,255,255,0.8)
+  static const headerBorder = Color(0xFFE2E8F0);
+
+  static const brandBlue = Color(0xFF1C58D9);
+  static const statusGreen = Color(0xFF10B981);
+  static const subtleText = Color(0xFF64748B);
+  static const primaryLight = Color(0x1A1C58D9); // 10% opacity
+  static const primaryShadowStrong = Color(0x331C58D9); // ~20%
+  static const primaryShadowSoft = Color(0x331C58D9);
+  static const white = Color(0xFFFFFFFF);
+  static const surface = Color(0xFFF8FAFC);
+  static const border = Color(0xFFE2E8F0);
+  static const textPrimary = Color(0xFF0F172A);
+  static const textSecondary = Color(0xFF64748B);
+  static const textMuted = Color(0xFF94A3B8);
+  static const thinkingDot = Color(0x661C58D9); // 40% opacity
+  static const userAvatarBg = Color(0xFF4281D6);
+  static const userAvatarBorder = Color(0x331C58D9);
+  static const footerBg = Color(0xCCFFFFFF); // rgba(255,255,255,0.8)
+  static const inputBg = Color(0xFFF1F5F9);
+  static const chipBg = Color(0x1A1C58D9); // rgba(28,88,217,0.1)
+  static const chipBorder = Color(0x4D1C58D9); // rgba(28,88,217,0.3)
+  static const sendBtnBg = Color(0xFF09357C);
+  static const sendBtnShadowStrong = Color(0x4D1C58D9); // rgba(28,88,217,0.3)
+  static const iconMuted = Color(0xFF94A3B8);
 }

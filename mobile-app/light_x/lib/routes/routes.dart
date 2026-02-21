@@ -25,6 +25,8 @@ enum Routes {
   home,
   watchScan,
   healthDataResult,
+
+  aiChat,
 }
 
 extension RoutesExtension on Routes {
