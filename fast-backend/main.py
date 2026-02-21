@@ -206,19 +206,66 @@ async def run_analysis(data: UserData):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-
 @app.post("/suggest", tags=["Health"])
 async def suggest_tips(symptoms: SymptomsData):
     """
-    This endpoint suggests health tips based on previous health data and current
-    symptoms.
+    This endpoint suggests health tips based on current symptoms using Google Gemini AI.
     """
-    pass
-    
+    try:
+        #Extract only the symptoms that are True
+        active_symptoms = [s.replace("_", " ") for s, has_symptom in symptoms.dict().items() if has_symptom]
+        
+        if not active_symptoms:
+            return {
+                "data": {"suggestions": "You're feeling well! Keep up the healthy diet, stay hydrated, and get regular exercise."},
+                "message": "No active symptoms",
+                "timestamp": dt.datetime.now()
+            }
+
+        prompt = f"""
+        You are an empathetic medical assistant for a cardiovascular/hypertension detection health app. 
+        The user is currently experiencing the following symptoms: {', '.join(active_symptoms)}. 
+        Provide 3 short, actionable, and safe health tips for immediate relief or care. 
+        Always include a brief disclaimer to seek medical attention if symptoms worsen.
+        """
+        
+        response = llm.generate_content(prompt)
+        
+        return {
+            "data": {"suggestions": response.text},
+            "message": "Tips generated successfully",
+            "timestamp": dt.datetime.now()
+        }
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"AI Service Error: {str(e)}")
+
+
+async def chat_streamer(prompt: str):
+    """Generator function to stream AI responses chunk-based"""
+    try:
+        response = llm.generate_content(prompt, stream=True)
+        for chunk in response:
+            if chunk.text:
+                yield f"data: {chunk.text}\n\n"
+    except Exception as e:
+        yield f"data: [Error communicating with AI: {str(e)}]\n\n"
+
 
 @app.post("/chat", tags=["Health"])
-async def chat():
+async def chat(req: ChatRequest):
     """
-    This endpoint uses the LLM chat interface.
+    This endpoint uses the LLM chat interface via Server-Sent Events (SSE) 
+    for instant streaming responses to the mobile app.
     """
-    pass
+    system_prompt = f"""
+    You are a helpful medical assistant for a cardiovascular health app.
+    Here is the user's recent health context: {req.context}
+    
+    User message: {req.message}
+    """
+    
+    return StreamingResponse(
+        chat_streamer(system_prompt), 
+        media_type="text/event-stream"
+    )
