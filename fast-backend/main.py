@@ -54,6 +54,7 @@ class UserData(BaseModel):
     bmi:            float   = Field(..., gt=0,   lt=100, description="Body Mass Index")
     avg_sleep_hours:float   = Field(..., ge=0,   le=24,  description="Average sleep hours per night")
     stress_level:   int     = Field(..., ge=1,   le=10,  description="Self-reported stress level 1-10")
+    diabetic:       int     = Field(..., ge=0,   le=1,  description="Self-reported diabetic status level 0-1")
 
     # These values are gotten from the smart watch
     systolic_bp:    float   = Field(..., gt=0,   description="Average systolic BP (mmHg)")
@@ -63,11 +64,11 @@ class UserData(BaseModel):
     breathing_rate: float   = Field(..., gt=0,   description="Breathing rate (breaths/min)") 
     hrv:            float   = Field(..., gt=0,   description="Heart rate variability (ms)")
 
-    # These values are optional to include
-    total_cholesterol: Optional[float] = Field(None, gt=0, description="Total cholesterol (mg/dL)")
-    hdl_cholesterol:   Optional[float] = Field(None, gt=0, description="HDL cholesterol (mg/dL)")
-    fasting_glucose:   Optional[float] = Field(None, gt=0, description="Fasting blood glucose (mg/dL)")
-    creatinine:        Optional[float] = Field(None, gt=0, description="Serum creatinine (mg/dL)")
+    # These values are optional to include, default values provided
+    total_cholesterol: float = Field(180.0, gt=0, description="Total cholesterol (mg/dL)")
+    hdl_cholesterol:   float = Field(50.0,  gt=0, description="HDL cholesterol (mg/dL)")
+    fasting_glucose:   float = Field(90.0,  gt=0, description="Fasting blood glucose (mg/dL)")
+    creatinine:        float = Field(1.0,   gt=0, description="Serum creatinine (mg/dL)")
 
     @validator('systolic_bp')
     def systolic_must_exceed_diastolic(cls, v, values):
@@ -98,8 +99,17 @@ def calculate_framingham_score(data: UserData):
     This helper function calculates framingham risk score based on onboarding and
     smart watch data.
     """
-    score = 0
-    return score
+    age_factor = (data.age - 20) / 10
+    chol_factor = (data.total_cholesterol - 160) / 40
+    
+    hdl = data.hdl_cholesterol
+    hdl_factor = (hdl - (40 if data.gender == 0 else 50)) / 10
+    
+    sbp_factor = (data.systolic_bp - 120) / 10
+    smoker_factor = 0 if data.smoking_status == 0 else 1
+    diabetic_factor = data.diabetic
+    
+    return age_factor + chol_factor + hdl_factor + sbp_factor + smoker_factor + diabetic_factor
 
 
 def run_inference(data: UserData):
