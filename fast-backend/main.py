@@ -4,21 +4,7 @@ from pydantic import BaseModel
 from typing import List, Optional
 from datetime import date
 
-# import firebase_admin
-# from firebase_admin import credentials
-
-# cred = credentials.Certificate("/workspaces/cavista-2026-team-lightx/cavista-hackathon-ai-firebase-adminsdk-fbsvc-10c14cab91.json")
-# firebase_admin.initialize_app(cred)
-
-
-app = FastAPI(
-    title="FastAPI-Health",
-    description="This is a backend API for handling the health application.",
-)
-
-
 app = FastAPI(title="Health-AI-API", description="Backend for Hypertension Tracking Application")
-
 
 # PYDANTIC MODELS 
 class OnboardingData(BaseModel):
@@ -40,7 +26,6 @@ class SmartwatchData(BaseModel):
     breathing_rate_rpm: int
 
 class SymptomsData(BaseModel):
-    
     anxiety: bool = False
     headaches: bool = False
     chest_pain: bool = False
@@ -52,82 +37,52 @@ class ExportData(BaseModel):
     latest_analysis: dict
 
 # HELPER FUNCTIONS 
-def calculate_bmi(weight: float, height_cm: float) -> float:
+def calculate_bmi(weight: float, height_cm: float):
+    
     height_m = height_cm / 100
     return round(weight / (height_m * height_m), 1)
 
-def determine_hypertension_stage(systolic: int, diastolic: int) -> str:
-    if systolic >= 180 or diastolic >= 120:
-        return "Hypertensive Crisis"
-    elif systolic >= 140 or diastolic >= 90:
-        return "Stage 2 Hypertension"
-    elif systolic >= 130 or diastolic >= 80:
-        return "Stage 1 Hypertension"
-    elif systolic >= 120 and diastolic < 80:
-        return "Elevated"
-    return "Normal"
 
-def calculate_framingham_score(OnboardingData, vitals: SmartwatchData) -> float:
-    score = 0
-    # Age factor
-    if gender.lower() == "male":
-        score += (age - 30) * 0.2
-    else:
-        score += (age - 30) * 0.15
+def calculate_framingham_score(onboarding: OnboardingData, vitals: SmartwatchData):
     
-    # BP factor
+    score = 0
+    
+    if onboarding.gender.lower() == "male":
+        score += (onboarding.age - 30) * 0.2
+    else:
+        score += (onboarding.age - 30) * 0.15
+    
     if vitals.systolic_bp > 120:
         score += (vitals.systolic_bp - 120) * 0.1
         
-    # Smoking factor
-    if smoking_status:
-        score += 3.0
-    # Diabetic factor    
-    if diabetic_status:
+    if onboarding.smoking_status:
         score += 3.0
         
+    if onboarding.diabetic_status:
+        score += 3.0
+    
+    return score
 
-
-# API ENDPOINTS
-@app.post("/smartwatch")
-async def append_smartwatch_data(data: SmartwatchData):
-    ["vitals"] = data.dict()
-    return {"message": "Smartwatch data synced"}
 
 @app.post("/analyze")
-async def run_analysis(
-    symptoms: str = Form(...)
-):
-    vitals_data = SmartwatchData(["vitals"])
+async def run_analysis(vitals: SmartwatchData, symptoms: SymptomsData):
+    """
+    This runs inference on the Machine Learning model using smartwatch and
+    onboarding data.
+    """
 
-    # 3. Calculate metrics
-    ht_stage = determine_hypertension_stage(vitals_data.systolic_bp, vitals_data.diastolic_bp)
-    risk_score = calculate_framingham_score( vitals_data, ml_results[])
-
-    # 4. Generate response
+    # TODO Use model here
+    # TODO Implement FR risk scoring
+    
     response = {
-        "hypertension_stage": ht_stage,
-        "preventive_measures": [
-            "Maintain a low-sodium diet.",
-            "Schedule a routine check-up within 2 weeks." if "Stage 2" in ht_stage else "Exercise 30 mins daily."
-        ],
-        "ml_insights": ml_results
+        "hypertension_stage_num": 0,
+        "framingham_risk_score:": 0,
+        "model_confidence": 0
     }
+    
+    return response
 
-    # Premium Gate
-    # if is_premium:
-    #     response["progression_risk"] = {
-    #         "X_year_risk_percent": risk_score,
-    #         "chart_data_points": [10, 12, 15, risk_score]#dummy data
-    #     }
-    # else:
-    #     response["progression_risk"] = "Upgrade to Premium to view progression risk charts."
-    # return response
 
-@app.get("/export")
-async def export_medical_data():
-    return {
-        
-        "latest_vitals": ["vitals"],
-        "latest_analysis": ["analyses"][-1] if ["analyses"] else None
-    }
+@app.post("/chat")
+async def llm_chat():
+    pass
