@@ -81,7 +81,7 @@ class WatchHealthService {
     // characteristic (0901/0002) to start pushing health data notifications.
     // Send the standard "start measurement" probe bytes used by most COLMI/
     // Nordic-based wearables. Silently skipped if the char isn't present.
-    await _triggerNordicUart(lookup);
+    await _triggerNordicUart(lookup, profile);
 
     // Trigger notify-all fallback if no *health* data channels were found
     // (battery alone doesn't count — we still need HR / SpO2 / BP)
@@ -105,10 +105,9 @@ class WatchHealthService {
                   c.role == ChannelRole.proprietary),
         )
         .length;
-    log(
-      " Health channels: $healthChannels, subscribed: $subscribedHealth, hasHealthData: $hasHealthData\n",
-      name: _tag,
-    );
+
+    log('Health channels: $healthChannels, subscribed: $subscribedHealth, has data: $hasHealthData', name: _tag);
+
     if (subscribedHealth == 0) {
       log('No health channels matched — subscribing to all notifying chars', name: _tag);
       await _subscribeAllNotifying(services);
@@ -173,29 +172,28 @@ class WatchHealthService {
     await _attach(char, handler, label: label);
   }
 
-  // ── Nordic UART trigger ───────────────────────────────────────────────────
-  // Sends standard probe commands to 0901/0002 (write char) to start health
-  // data notifications on COLMI/Nordic-based watches like the ULTRA3.
-  // Common command bytes observed across these watch families:
-  //   [0x01, 0x00] — start real-time HR
-  //   [0x69, 0x00] — start SpO2
-  //   [0x15, 0x01] — start BP
-  Future<void> _triggerNordicUart(Map<String, Map<String, BluetoothCharacteristic>> lookup) async {
-    final writeChar = lookup['0901']?['0002'];
-    if (writeChar == null || !writeChar.properties.write) return;
+  // ── UART trigger ─────────────────────────────────────────────────────────
+  // Sends profile-defined commands to the watch's write characteristic to
+  // start health data notifications. Only runs if the profile defines a
+  // uartTrigger — avoids the watchdog crash that happened on ULTRA3.
+  Future<void> _triggerNordicUart(
+    Map<String, Map<String, BluetoothCharacteristic>> lookup,
+    WatchProfile profile,
+  ) async {
+    final trigger = profile.uartTrigger;
+    if (trigger == null) return; // this watch pushes data on its own
 
-    log('Nordic UART write char found — sending measurement triggers', name: _tag);
+    final writeChar = lookup[trigger.service]?[trigger.characteristic];
+    if (writeChar == null || !writeChar.properties.write) {
+      log('UART trigger char ${trigger.service}/${trigger.characteristic} not found', name: _tag);
+      return;
+    }
 
-    final commands = [
-      [0x01, 0x00], // real-time heart rate
-      [0x69, 0x00], // SpO2
-      [0x15, 0x01], // blood pressure
-    ];
-
-    for (final cmd in commands) {
+    log('Sending ${trigger.commands.length} UART trigger commands', name: _tag);
+    for (final cmd in trigger.commands) {
       try {
         await writeChar.write(cmd, withoutResponse: false);
-        log('UART cmd sent: ${cmd.map((b) => b.toRadixString(16).padLeft(2, "0")).join(" ")}', name: _tag);
+        log('UART → ${cmd.map((b) => b.toRadixString(16).padLeft(2, "0")).join(" ")}', name: _tag);
         await Future.delayed(const Duration(milliseconds: 200));
       } catch (e) {
         log('UART cmd failed: $e', name: _tag);
