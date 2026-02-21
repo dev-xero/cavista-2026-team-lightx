@@ -14,7 +14,7 @@ This module implements a multi-class classifier using XGBoost with the National 
 - [Scikit-Learn](https://pypi.org/project/scikit-learn/): A set of python modules for machine learning and data mining.
 - [Matplotlib](https://pypi.org/project/matplotlib/): Python plotting package.
 - [Seaborn](https://pypi.org/project/seaborn/): Statistical data visualization.
-- [PyreadStat](https://pypi.org/project/pyreadstat/): Python package to read and write SAS (sas7bdat, sas7bcat, xport/xpt), SPSS (sav, zsav, por) and Stata (dta) files into/from pandas and polars data frames.
+- [PyreadStat](https://pypi.org/project/pyreadstat/): Python package to read and write SAS, SPSS and Stata (dta) files from pandas and polars data frames.
 
 ## Downloading the Datasets
 
