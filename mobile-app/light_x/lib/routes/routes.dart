@@ -23,6 +23,7 @@ enum Routes {
   // MAIN SCREENS
   // ============================================================================
   home,
+  watchScan,
 }
 
 extension RoutesExtension on Routes {
