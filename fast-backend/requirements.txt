@@ -6,3 +6,5 @@ pandas
 pytest
 joblib
 scikit-learn
+python-dotenv 
+google-generativeai

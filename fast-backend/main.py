@@ -1,3 +1,4 @@
+import os
 import datetime
 import time
 import json
@@ -6,7 +7,10 @@ import xgboost as xgb
 import numpy as np
 import pandas as pd
 import datetime as dt
+import google.generativeai as genAi
 
+from fastapi.responses import StreamingResponse
+from dotenv import load_dotenv
 from pydantic.v1 import validator
 from fastapi import FastAPI
 from fastapi import FastAPI, HTTPException, UploadFile, File, Form, Depends
@@ -15,6 +19,9 @@ from typing import List, Optional
 from datetime import date
 
 app = FastAPI(title="Team LightX API", description="Swagger Open API Specification")
+
+genAi_key = os.getenv("GEMINI_API_KEY")
+llm = genAi.GenerativeModel('gemini-1.5-flash')
 
 model = xgb.XGBClassifier()
 model.load_model("models/hypertension_model.json")
@@ -86,6 +93,10 @@ class PredictionResult(BaseModel):
     derived:        dict
     
 
+class ChatRequest(BaseModel):
+    msg: str
+    context: Optional[str] = "No previous context found."
+    
 def calculate_bmi(weight: float, height_cm: float):
     """
     This helper function calculates the Body-Mass Index.
@@ -199,7 +210,7 @@ async def run_analysis(data: UserData):
 @app.post("/suggest", tags=["Health"])
 async def suggest_tips(symptoms: SymptomsData):
     """
-    This endpoint will suggest health tips based on previous health data and current
+    This endpoint suggests health tips based on previous health data and current
     symptoms.
     """
     pass
