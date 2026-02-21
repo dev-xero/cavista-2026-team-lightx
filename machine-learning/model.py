@@ -1,3 +1,5 @@
+import json
+import joblib
 from sklearn.utils import compute_sample_weight
 from sklearn.metrics import classification_report, accuracy_score, roc_auc_score, confusion_matrix
 import pandas as pd
@@ -421,6 +423,36 @@ def evaluate(model, X_test, y_test):
 
     print(f"\n  Plots saved to {OUTPUT_DIRECTORY}/images")
     
+    
+def save(model, imputer):
+    logging.info("Saving model")
+    
+    FINAL_OUTPUT_DIRECTORY = f"{OUTPUT_DIRECTORY}/model"
+    os.makedirs(FINAL_OUTPUT_DIRECTORY, exist_ok=True)
+
+    model_path   = f"{FINAL_OUTPUT_DIRECTORY}/hypertension_model.json"
+    imputer_path = f"{FINAL_OUTPUT_DIRECTORY}/imputer.pkl"
+    schema_path  = f"{FINAL_OUTPUT_DIRECTORY}/feature_schema.json"
+
+    model.save_model(model_path)
+    joblib.dump(imputer, imputer_path)
+
+    with open(schema_path, 'w') as f:
+        json.dump({
+            "features": FEATURES,
+            "stages": STAGE_NAMES,
+            "phase2_features": [
+                "avg_sleep_hours",
+                "stress_level",
+                "breathing_rate",
+            ],
+            "notes": {
+                "phase2_features": "NaN during Phase 1 training. Pass real values at inference.",
+                "lab_features": "total_cholesterol, hdl_cholesterol, fasting_glucose, creatinine are optional, imputed if missing.",
+                "bp": "systolic_bp and diastolic_bp should be averages over multiple readings."
+            }
+        }, f, indent=2)
+    
 
 def main():
     make_output_dirs()
@@ -432,6 +464,7 @@ def main():
     model, imputer, X_test, y_test = train(df)
     
     evaluate(model, X_test, y_test)
+    save(model, imputer)
 
 
 main()
