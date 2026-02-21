@@ -14,7 +14,7 @@ from pydantic import BaseModel, Field
 from typing import List, Optional
 from datetime import date
 
-app = FastAPI(title="Health-AI-API", description="Backend for Hypertension Tracking Application")
+app = FastAPI(title="Team LightX API", description="Swagger Open API Specification")
 
 model = xgb.XGBClassifier()
 model.load_model("models/hypertension_model.json")
@@ -152,10 +152,10 @@ def run_inference(data: UserData):
     )
 
 
-@app.get("/")
+@app.get("/", tags=["Health"])
 async def base():
     """
-    This is the base endpoint
+    This is the base endpoint.
     """
     return {
         "data": None,
@@ -164,7 +164,7 @@ async def base():
     }
 
 
-@app.post("/predict")
+@app.post("/predict", tags=["Health"])
 async def run_analysis(data: UserData):
     """
     This endpoint runs inference on the Machine Learning model using smartwatch and
@@ -175,8 +175,8 @@ async def run_analysis(data: UserData):
         framingham_score = calculate_framingham_score(data)
         return {
             "data": {
-                "result": result,
-                "framing_ham_risk_score": framingham_score,
+                **result.dict(),
+                "risk_score": framingham_score,
             },
             "message": "Prediction complete",
             "timestamp": dt.datetime.now()
@@ -186,7 +186,7 @@ async def run_analysis(data: UserData):
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@app.post("/suggest-tips")
+@app.post("/suggest", tags=["Health"])
 async def suggest_tips(symptoms: SymptomsData):
     """
     This endpoint will suggest health tips based on previous health data and current
@@ -195,8 +195,8 @@ async def suggest_tips(symptoms: SymptomsData):
     pass
     
 
-@app.post("/chat")
-async def llm_chat():
+@app.post("/chat", tags=["Health"])
+async def chat():
     """
     This endpoint uses the LLM chat interface.
     """
