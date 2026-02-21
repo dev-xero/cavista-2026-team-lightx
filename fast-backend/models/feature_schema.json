@@ -1,0 +1,30 @@
+{
+  "features": [
+    "age",
+    "gender",
+    "smoking_status",
+    "bmi",
+    "heart_rate",
+    "total_cholesterol",
+    "hdl_cholesterol",
+    "fasting_glucose",
+    "creatinine",
+    "chol_ratio"
+  ],
+  "stages": {
+    "0": "Normal",
+    "1": "Elevated",
+    "2": "Stage 1 HTN",
+    "3": "Stage 2 HTN"
+  },
+  "phase2_features": [
+    "avg_sleep_hours",
+    "stress_level",
+    "breathing_rate"
+  ],
+  "notes": {
+    "phase2_features": "NaN during Phase 1 training. Pass real values at inference.",
+    "lab_features": "total_cholesterol, hdl_cholesterol, fasting_glucose, creatinine are optional, imputed if missing.",
+    "bp": "systolic_bp and diastolic_bp should be averages over multiple readings."
+  }
+}
