@@ -15,6 +15,33 @@ OUTPUT_DIRECTORY="./output"
 RANDOM_STATE=42
 TEST_SIZE=0.2
 
+FEATURES = [
+    "age",
+    "gender", 
+    "smoking_status",
+    "bmi",
+    "systolic_bp",
+    "diastolic_bp",
+    "heart_rate",
+    "pulse_pressure",
+    "map",
+    "total_cholesterol",
+    "hdl_cholesterol",
+    "fasting_glucose",
+    "creatinine",
+    "chol_ratio",
+    "avg_sleep_hours",
+    "stress_level",
+    "breathing_rate",
+]
+
+STAGE_NAMES = {
+    0: "Normal",
+    1: "Elevated",
+    2: "Stage 1 HTN",
+    3: "Stage 2 HTN"
+}
+
 
 def make_output_dirs():
     """
@@ -268,7 +295,9 @@ def label_hypertension_stages(df, save=False):
 
 
 def train():
-   pass
+    """
+    """
+    logging.info("Beginning model training")
 
 
 def main():
