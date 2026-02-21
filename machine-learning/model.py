@@ -107,6 +107,17 @@ def combine_datasets(bp, demo, bmi, chol, hdl, glu, smoke, kidney):
         kidney = kidney[['SEQN', 'LBXSCR']].rename(columns={'LBXSCR': 'CREATININE'})
         print(kidney, "\n\n")
 
+    dfs = [df for df in [bp, demo, bmi, chol, hdl, glu, smoke, kidney] if not df.empty]
+    
+    merged = dfs[0]
+    for df in dfs[1:]:
+        merged = merged.merge(df, on='SEQN', how='left')
+        
+    logging.info("\n\nCombined all datasets")
+    print(merged, "\n\n")
+    
+    return merged
+    
 
 def train():
    pass
