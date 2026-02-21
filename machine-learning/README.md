@@ -6,3 +6,5 @@
 
 1. `uv` package manager.
 2. `uv add -r requirements.txt`
+
+## Fair Use Policy (NHANES)
