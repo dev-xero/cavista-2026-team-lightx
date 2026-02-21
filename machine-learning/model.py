@@ -1,6 +1,9 @@
+from sklearn.metrics import classification_report, accuracy_score, roc_auc_score, confusion_matrix
 import pandas as pd
 import xgboost as xgb
 import numpy as np
+import seaborn as sns
+import matplotlib.pyplot as plt
 import logging
 import os
 import warnings
@@ -367,6 +370,50 @@ def train(df):
     
     return xgb_model, imputer, X_test_imp, y_test
 
+
+def evaluate(model, X_test, y_test)
+    """
+    This evaluates the trained XGBoost model and prints performance results.
+    """
+    logging.info("Evaluating XGBoost model on test dataset")
+    
+    y_pred = model.predict(X_test)
+    y_prob = model.predict_proba(X_test)
+   
+    # This is print classification report for the model
+    print(classification_report(
+        y_test, y_pred,
+        target_names=[STAGE_NAMES[i] for i in range(4)]
+    ))
+    
+    print(f"\nAccuracy: {accuracy_score(y_test, y_pred):.4f}")
+    
+    # This computes area under receiver operator characteristic
+    # Plotting True Positive to False Positive rates
+    auc = roc_auc_score(y_test, y_prob, multi_class='ovr', average='weighted')
+    print(f"\nAUC: {auc:.4f}")
+    
+    cm = confusion_matrix(y_test, y_pred)
+    plt.figure(figsize=(8, 6))
+    sns.heatmap(cm, annot=True, fmt='d', cmap='Blues', xticklabels=STAGE_NAMES.values(), yticklabels=STAGE_NAMES.values())
+    plt.title('Confusion Matrix')
+    plt.ylabel('True'); plt.xlabel('Predicted')
+    plt.tight_layout()
+    plt.savefig(f"{OUTPUT_DIRECTORY}/images/confusion_matrix.png", dpi=150)
+    plt.close()
+
+    importance = pd.Series(model.feature_importances_, index=FEATURES).sort_values(ascending=False)
+    plt.figure(figsize=(10, 6))
+    importance.plot(kind='bar', color='steelblue')
+    plt.title('Feature Importances')
+    plt.ylabel('Score')
+    plt.xticks(rotation=45, ha='right')
+    plt.tight_layout()
+    plt.savefig(f"{OUTPUT_DIRECTORY}/images/feature_importance.png", dpi=150)
+    plt.close()
+
+    print(f"\n  Plots saved to {OUTPUT_DIRECTORY}/images")
+    
 
 def main():
     make_output_dirs()
