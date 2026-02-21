@@ -4,11 +4,11 @@ from pydantic import BaseModel
 from typing import List, Optional
 from datetime import date
 
-import firebase_admin
-from firebase_admin import credentials
+# import firebase_admin
+# from firebase_admin import credentials
 
-cred = credentials.Certificate("/workspaces/cavista-2026-team-lightx/cavista-hackathon-ai-firebase-adminsdk-fbsvc-10c14cab91.json")
-firebase_admin.initialize_app(cred)
+# cred = credentials.Certificate("/workspaces/cavista-2026-team-lightx/cavista-hackathon-ai-firebase-adminsdk-fbsvc-10c14cab91.json")
+# firebase_admin.initialize_app(cred)
 
 
 app = FastAPI(
@@ -29,6 +29,7 @@ class OnboardingData(BaseModel):
     avg_sleep_hours: float
     stress_level: int # 1-10
     smoking_status: bool
+    diabetic_status: bool
     is_premium: bool = False
 
 class SmartwatchData(BaseModel):
@@ -66,26 +67,26 @@ def determine_hypertension_stage(systolic: int, diastolic: int) -> str:
         return "Elevated"
     return "Normal"
 
-def calculate_framingham_score(user: OnboardingData, vitals: SmartwatchData, retina_multiplier: float) -> float:
+def calculate_framingham_score(OnboardingData, vitals: SmartwatchData) -> float:
     score = 0
     # Age factor
-    if user.gender.lower() == "male":
-        score += (user.age - 30) * 0.2
+    if gender.lower() == "male":
+        score += (age - 30) * 0.2
     else:
-        score += (user.age - 30) * 0.15
+        score += (age - 30) * 0.15
     
     # BP factor
     if vitals.systolic_bp > 120:
         score += (vitals.systolic_bp - 120) * 0.1
         
     # Smoking factor
-    if user.smoking_status:
+    if smoking_status:
         score += 3.0
+    # Diabetic factor    
+    if diabetic_status:
+        score += 3.0
+        
 
-    # BMI factor
-    bmi = calculate_bmi(user.weight_kg, user.height_cm)
-    if bmi > 25:
-        score += (bmi - 25) * 0.2
 
 # API ENDPOINTS
 @app.post("/smartwatch")
@@ -101,7 +102,7 @@ async def run_analysis(
 
     # 3. Calculate metrics
     ht_stage = determine_hypertension_stage(vitals_data.systolic_bp, vitals_data.diastolic_bp)
-    risk_score = calculate_framingham_score( vitals_data, ml_results[""])
+    risk_score = calculate_framingham_score( vitals_data, ml_results[])
 
     # 4. Generate response
     response = {
@@ -114,14 +115,14 @@ async def run_analysis(
     }
 
     # Premium Gate
-    if is_premium:
-        response["progression_risk"] = {
-            "X_year_risk_percent": risk_score,
-            "chart_data_points": [10, 12, 15, risk_score]#dummy data
-        }
-    else:
-        response["progression_risk"] = "Upgrade to Premium to view progression risk charts."
-    return response
+    # if is_premium:
+    #     response["progression_risk"] = {
+    #         "X_year_risk_percent": risk_score,
+    #         "chart_data_points": [10, 12, 15, risk_score]#dummy data
+    #     }
+    # else:
+    #     response["progression_risk"] = "Upgrade to Premium to view progression risk charts."
+    # return response
 
 @app.get("/export")
 async def export_medical_data():
