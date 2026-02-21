@@ -21,7 +21,7 @@ This module implements a multi-class classifier using XGBoost with the National 
 The National Health and Nutrition Examination Survey (NHANES) collects data about the health of adults and children. We can obtain the following data sources in XPT format:
 
 | Dataset Name | Detail |
-| ---          | ---      |
+| :-          | :-     |
 | Blood Pressure | Systolic and diastolic blood pressure |
 | Demographics | Demographics data such as age and gender |
 | Body Measures | Body measures such as Body Mass Index |
