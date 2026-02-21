@@ -9,6 +9,8 @@ class AppText extends StatelessWidget {
   final TextAlign? textAlign;
   final TextOverflow? overflow;
   final bool? softWrap;
+  final double? height;
+  final double? letterSpacing;
   const AppText(
     this.data, {
     super.key,
@@ -19,6 +21,8 @@ class AppText extends StatelessWidget {
     this.textAlign,
     this.overflow,
     this.softWrap,
+    this.height,
+    this.letterSpacing,
   });
 
   @override
@@ -35,6 +39,8 @@ class AppText extends StatelessWidget {
             fontWeight: fontWeight,
             color: color,
             fontFamily: 'Manrope',
+            height: height,
+            letterSpacing: letterSpacing,
           ),
     );
   }
