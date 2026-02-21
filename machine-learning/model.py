@@ -1,3 +1,4 @@
+from sklearn.utils import compute_sample_weight
 from sklearn.metrics import classification_report, accuracy_score, roc_auc_score, confusion_matrix
 import pandas as pd
 import xgboost as xgb
@@ -8,7 +9,7 @@ import logging
 import os
 import warnings
 
-from sklearn.model_selection import train_test_split
+from sklearn.model_selection import train_test_split, GridSearchCV
 from sklearn.impute import SimpleImputer
 
 warnings.filterwarnings('ignore')
@@ -27,19 +28,15 @@ FEATURES = [
     "gender", 
     "smoking_status",
     "bmi",
-    "systolic_bp",
-    "diastolic_bp",
     "heart_rate",
-    "pulse_pressure",
-    "map",
     "total_cholesterol",
     "hdl_cholesterol",
     "fasting_glucose",
     "creatinine",
     "chol_ratio",
-    "avg_sleep_hours",
-    "stress_level",
-    "breathing_rate",
+    # "avg_sleep_hours",
+    # "stress_level",
+    # "breathing_rate",
 ]
 
 STAGE_NAMES = {
@@ -249,10 +246,6 @@ def build_dataset(xpt_files):
     df['map']            = df['diastolic_bp'] + (df['pulse_pressure'] / 3)
     df['chol_ratio']     = df['total_cholesterol'] / df['hdl_cholesterol'].replace(0, np.nan) 
     
-    # For now, these are NaN on training
-    for col in ['avg_sleep_hours', 'stress_level', 'breathing_rate']:
-        df[col] = np.nan
-    
     logging.info("Finished building dataset")
     print("\n\n", df, "\n\n")
     
@@ -324,7 +317,16 @@ def train(df):
     imputer = SimpleImputer(strategy='median')
     X_train_imp = imputer.fit_transform(X_train)
     X_test_imp  = imputer.transform(X_test)
-   
+    
+    param_grid = {
+        'n_estimators': [200, 300, 400],
+        'max_depth': [4, 6, 8],
+        'learning_rate': [0.01, 0.05, 0.1],
+        'min_child_weight': [3, 5, 7],
+        'subsample': [0.7, 0.8],
+        'colsample_bytree': [0.7, 0.8],
+    }
+  
     # Extreme Gradient Boosting (XGBoost)
     # 
     # We are using decision trees as our base learners, then we combine
@@ -346,32 +348,34 @@ def train(df):
     xgb_model = xgb.XGBClassifier(
         objective='multi:softprob',
         num_class=4,
-        n_estimators=300,
-        max_depth=6,
-        learning_rate=0.05,
-        subsample=0.8,
-        colsample_bytree=0.8,
-        min_child_weight=5,
-        gamma=0.1,
         reg_alpha=0.1,
         reg_lambda=1.0,
+        gamma=0.1,
         eval_metric='mlogloss',
         random_state=RANDOM_STATE,
         n_jobs=-1
     )
     
-    xgb_model.fit(
-        X_train_imp, y_train,
-        eval_set=[(X_test_imp, y_test)],
-        verbose=50
+    grid_search = GridSearchCV(
+        estimator=xgb_model,
+        param_grid=param_grid,
+        scoring='roc_auc_ovr_weighted',
+        cv=5,
+        verbose=2,
+        n_jobs=-1
     )
     
-    logging.info("XGBoost model finished training")
+    grid_search.fit(X_train_imp, y_train)
     
-    return xgb_model, imputer, X_test_imp, y_test
+    logging.info(f"Best params: {grid_search.best_params_}")
+    logging.info(f"Best CV AUC: {grid_search.best_score_:.4f}")
+    
+    xgb_model = grid_search.best_estimator_
+    
+    return xgb_model, imputer, X_test, y_test
 
 
-def evaluate(model, X_test, y_test)
+def evaluate(model, X_test, y_test):
     """
     This evaluates the trained XGBoost model and prints performance results.
     """
@@ -393,23 +397,26 @@ def evaluate(model, X_test, y_test)
     auc = roc_auc_score(y_test, y_prob, multi_class='ovr', average='weighted')
     print(f"\nAUC: {auc:.4f}")
     
+    output_path = f"{OUTPUT_DIRECTORY}/images"
+    os.makedirs(output_path, exist_ok=True)
+    
     cm = confusion_matrix(y_test, y_pred)
     plt.figure(figsize=(8, 6))
     sns.heatmap(cm, annot=True, fmt='d', cmap='Blues', xticklabels=STAGE_NAMES.values(), yticklabels=STAGE_NAMES.values())
     plt.title('Confusion Matrix')
     plt.ylabel('True'); plt.xlabel('Predicted')
     plt.tight_layout()
-    plt.savefig(f"{OUTPUT_DIRECTORY}/images/confusion_matrix.png", dpi=150)
+    plt.savefig(f"{output_path}/confusion_matrix.png", dpi=150)
     plt.close()
 
-    importance = pd.Series(model.feature_importances_, index=FEATURES).sort_values(ascending=False)
+    importance = pd.Series(model.feature_importances_, index=model.get_booster().feature_names).sort_values(ascending=False)
     plt.figure(figsize=(10, 6))
     importance.plot(kind='bar', color='steelblue')
     plt.title('Feature Importances')
     plt.ylabel('Score')
     plt.xticks(rotation=45, ha='right')
     plt.tight_layout()
-    plt.savefig(f"{OUTPUT_DIRECTORY}/images/feature_importance.png", dpi=150)
+    plt.savefig(f"{output_path}/feature_importance.png", dpi=150)
     plt.close()
 
     print(f"\n  Plots saved to {OUTPUT_DIRECTORY}/images")
@@ -423,6 +430,8 @@ def main():
     
     df = label_hypertension_stages(dataset, save=True)
     model, imputer, X_test, y_test = train(df)
+    
+    evaluate(model, X_test, y_test)
 
 
 main()
