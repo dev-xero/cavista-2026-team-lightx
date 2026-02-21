@@ -1,132 +1,213 @@
+import datetime
+import time
+import json
+import joblib
+import xgboost as xgb
+import numpy as np
+import pandas as pd
+import datetime as dt
+
+from pydantic.v1 import validator
 from fastapi import FastAPI
 from fastapi import FastAPI, HTTPException, UploadFile, File, Form, Depends
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from typing import List, Optional
 from datetime import date
 
-import firebase_admin
-from firebase_admin import credentials
+app = FastAPI(title="Team LightX API", description="Swagger Open API Specification")
 
-cred = credentials.Certificate("/workspaces/cavista-2026-team-lightx/cavista-hackathon-ai-firebase-adminsdk-fbsvc-10c14cab91.json")
-firebase_admin.initialize_app(cred)
+model = xgb.XGBClassifier()
+model.load_model("models/hypertension_model.json")
+imputer = joblib.load("models/imputer.pkl")
+schema = json.load(open("models/feature_schema.json"))
 
+FEATURES = schema["features"]
 
-app = FastAPI(
-    title="FastAPI-Health",
-    description="This is a backend API for handling the health application.",
-)
+STAGE_ADVICE = {
+    0: "Blood pressure is healthy. You may maintain your current lifestyle. Be sure to check-in annually.",
+    1: "Slightly elevated. Reduce sodium, increase and gradually increase exercise. Recheck in 3-6 months.",
+    2: "Stage 1 Hypertension, we recommend consulting a physician. Lifestyle changes required at this stage.",
+    3: "Stage 2 Hypertension, we recommend seeking medical attention promptly. Medication is likely needed."
+}
 
+STAGE_NAMES = {
+    0: "Normal",
+    1: "Elevated",
+    2: "Stage 1 HTN",
+    3: "Stage 2 HTN"
+}
 
-app = FastAPI(title="Health-AI-API", description="Backend for Hypertension Tracking Application")
-
-
-# PYDANTIC MODELS 
-class OnboardingData(BaseModel):
-    age: int
-    gender: str 
-    weight_kg: float
-    height_cm: float
-    avg_sleep_hours: float
-    stress_level: int # 1-10
-    smoking_status: bool
-    is_premium: bool = False
-
-class SmartwatchData(BaseModel):
-    systolic_bp: int
-    diastolic_bp: int
-    blood_oxygen_percent: float
-    heart_rate_bpm: int
-    breathing_rate_rpm: int
 
 class SymptomsData(BaseModel):
-    
     anxiety: bool = False
     headaches: bool = False
     chest_pain: bool = False
     nausea: bool = False
     shortness_of_breath: bool = False
 
-class ExportData(BaseModel):
-    latest_vitals: dict
-    latest_analysis: dict
 
-# HELPER FUNCTIONS 
-def calculate_bmi(weight: float, height_cm: float) -> float:
+class UserData(BaseModel):
+    # These values are gotten from onboarding
+    age:            int     = Field(..., ge=1,   le=120, description="Age in years")
+    gender:         int     = Field(..., ge=0,   le=1,   description="0=Male, 1=Female")
+    smoking_status: int     = Field(..., ge=0,   le=2,   description="0=Never, 1=Former, 2=Current")
+    bmi:            float   = Field(..., gt=0,   lt=100, description="Body Mass Index")
+    avg_sleep_hours:float   = Field(..., ge=0,   le=24,  description="Average sleep hours per night")
+    stress_level:   int     = Field(..., ge=1,   le=10,  description="Self-reported stress level 1-10")
+    diabetic:       int     = Field(..., ge=0,   le=1,  description="Self-reported diabetic status level 0-1")
+
+    # These values are gotten from the smart watch
+    systolic_bp:    float   = Field(..., gt=0,   description="Average systolic BP (mmHg)")
+    diastolic_bp:   float   = Field(..., gt=0,   description="Average diastolic BP (mmHg)") 
+    heart_rate:     float   = Field(..., gt=0,   description="Resting heart rate (BPM)")
+    spo2:           float   = Field(..., ge=50,  le=100, description="Blood oxygen saturation (%)")
+    breathing_rate: float   = Field(..., gt=0,   description="Breathing rate (breaths/min)") 
+    hrv:            float   = Field(..., gt=0,   description="Heart rate variability (ms)")
+
+    # These values are optional to include, default values provided
+    total_cholesterol: float = Field(180.0, gt=0, description="Total cholesterol (mg/dL)")
+    hdl_cholesterol:   float = Field(50.0,  gt=0, description="HDL cholesterol (mg/dL)")
+    fasting_glucose:   float = Field(90.0,  gt=0, description="Fasting blood glucose (mg/dL)")
+    creatinine:        float = Field(1.0,   gt=0, description="Serum creatinine (mg/dL)")
+
+    @validator('systolic_bp')
+    def systolic_must_exceed_diastolic(cls, v, values):
+        if 'diastolic_bp' in values and v <= values['diastolic_bp']:
+            raise ValueError("systolic_bp must be greater than diastolic_bp")
+        return v
+
+
+class PredictionResult(BaseModel):
+    stage:          int
+    stage_name:     str
+    confidence:     float
+    probabilities:  dict
+    advice:         str
+    derived:        dict
+    
+
+def calculate_bmi(weight: float, height_cm: float):
+    """
+    This helper function calculates the Body-Mass Index.
+    """
     height_m = height_cm / 100
     return round(weight / (height_m * height_m), 1)
 
-def determine_hypertension_stage(systolic: int, diastolic: int) -> str:
-    if systolic >= 180 or diastolic >= 120:
-        return "Hypertensive Crisis"
-    elif systolic >= 140 or diastolic >= 90:
-        return "Stage 2 Hypertension"
-    elif systolic >= 130 or diastolic >= 80:
-        return "Stage 1 Hypertension"
-    elif systolic >= 120 and diastolic < 80:
-        return "Elevated"
-    return "Normal"
 
-def calculate_framingham_score(user: OnboardingData, vitals: SmartwatchData, retina_multiplier: float) -> float:
-    score = 0
-    # Age factor
-    if user.gender.lower() == "male":
-        score += (user.age - 30) * 0.2
-    else:
-        score += (user.age - 30) * 0.15
+def calculate_framingham_score(data: UserData):
+    """
+    This helper function calculates framingham risk score based on onboarding and
+    smart watch data.
+    """
+    age_factor = (data.age - 20) / 10
+    chol_factor = (data.total_cholesterol - 160) / 40
     
-    # BP factor
-    if vitals.systolic_bp > 120:
-        score += (vitals.systolic_bp - 120) * 0.1
-        
-    # Smoking factor
-    if user.smoking_status:
-        score += 3.0
+    hdl = data.hdl_cholesterol
+    hdl_factor = (hdl - (40 if data.gender == 0 else 50)) / 10
+    
+    sbp_factor = (data.systolic_bp - 120) / 10
+    smoker_factor = 0 if data.smoking_status == 0 else 1
+    diabetic_factor = data.diabetic
+    
+    return age_factor + chol_factor + hdl_factor + sbp_factor + smoker_factor + diabetic_factor
 
-    # BMI factor
-    bmi = calculate_bmi(user.weight_kg, user.height_cm)
-    if bmi > 25:
-        score += (bmi - 25) * 0.2
 
-# API ENDPOINTS
-@app.post("/smartwatch")
-async def append_smartwatch_data(data: SmartwatchData):
-    ["vitals"] = data.dict()
-    return {"message": "Smartwatch data synced"}
-
-@app.post("/analyze")
-async def run_analysis(
-    symptoms: str = Form(...)
-):
-    vitals_data = SmartwatchData(["vitals"])
-
-    # 3. Calculate metrics
-    ht_stage = determine_hypertension_stage(vitals_data.systolic_bp, vitals_data.diastolic_bp)
-    risk_score = calculate_framingham_score( vitals_data, ml_results[""])
-
-    # 4. Generate response
-    response = {
-        "hypertension_stage": ht_stage,
-        "preventive_measures": [
-            "Maintain a low-sodium diet.",
-            "Schedule a routine check-up within 2 weeks." if "Stage 2" in ht_stage else "Exercise 30 mins daily."
-        ],
-        "ml_insights": ml_results
+def run_inference(data: UserData):
+    pulse_pressure = data.systolic_bp - data.diastolic_bp
+    map_value      = data.diastolic_bp + (pulse_pressure / 3)
+    chol_ratio     = (
+        data.total_cholesterol / data.hdl_cholesterol
+        if data.total_cholesterol and data.hdl_cholesterol
+        else np.nan
+    )
+    row = {
+        "age":               data.age,
+        "gender":            data.gender,
+        "smoking_status":    data.smoking_status,
+        "bmi":               data.bmi,
+        "systolic_bp":       data.systolic_bp,
+        "diastolic_bp":      data.diastolic_bp,
+        "heart_rate":        data.heart_rate,
+        "pulse_pressure":    pulse_pressure,
+        "map":               map_value,
+        "total_cholesterol": data.total_cholesterol if data.total_cholesterol else np.nan,
+        "hdl_cholesterol":   data.hdl_cholesterol   if data.hdl_cholesterol   else np.nan,
+        "fasting_glucose":   data.fasting_glucose   if data.fasting_glucose   else np.nan,
+        "creatinine":        data.creatinine         if data.creatinine        else np.nan,
+        "chol_ratio":        chol_ratio,
+        "avg_sleep_hours":   data.avg_sleep_hours,
+        "stress_level":      data.stress_level,
+        "spo2":              data.spo2,
+        "breathing_rate":    data.breathing_rate,
+        "hrv":               data.hrv,
     }
-
-    # Premium Gate
-    if is_premium:
-        response["progression_risk"] = {
-            "X_year_risk_percent": risk_score,
-            "chart_data_points": [10, 12, 15, risk_score]#dummy data
+    
+    X = pd.DataFrame([row])[FEATURES]
+    X_imp = imputer.transform(X)
+    
+    stage = int(model.predict(X_imp)[0])
+    probs = model.predict_proba(X_imp)[0].tolist()
+    
+    return PredictionResult(
+        stage = stage,
+        stage_name = STAGE_NAMES[stage],
+        confidence = round(max(probs) * 100, 1),
+        probabilities = {STAGE_NAMES[i]: round(p * 100, 1) for i, p in enumerate(probs)},
+        advice = STAGE_ADVICE[stage],
+        derived = {
+            "pulse_pressure": round(pulse_pressure, 1),
+            "map":            round(map_value, 1),
+            "chol_ratio":     round(chol_ratio, 2) if not np.isnan(chol_ratio) else None
         }
-    else:
-        response["progression_risk"] = "Upgrade to Premium to view progression risk charts."
-    return response
+    )
 
-@app.get("/export")
-async def export_medical_data():
+
+@app.get("/", tags=["Health"])
+async def base():
+    """
+    This is the base endpoint.
+    """
     return {
-        
-        "latest_vitals": ["vitals"],
-        "latest_analysis": ["analyses"][-1] if ["analyses"] else None
+        "data": None,
+        "message": "API is healthy. Use /docs for swagger documentation",
+        "timestamp": dt.datetime.now()
     }
+
+
+@app.post("/predict", tags=["Health"])
+async def run_analysis(data: UserData):
+    """
+    This endpoint runs inference on the Machine Learning model using smartwatch and
+    onboarding data.
+    """
+    try:
+        result = run_inference(data)
+        framingham_score = calculate_framingham_score(data)
+        return {
+            "data": {
+                **result.dict(),
+                "risk_score": framingham_score,
+            },
+            "message": "Prediction complete",
+            "timestamp": dt.datetime.now()
+        }
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.post("/suggest", tags=["Health"])
+async def suggest_tips(symptoms: SymptomsData):
+    """
+    This endpoint will suggest health tips based on previous health data and current
+    symptoms.
+    """
+    pass
+    
+
+@app.post("/chat", tags=["Health"])
+async def chat():
+    """
+    This endpoint uses the LLM chat interface.
+    """
+    pass

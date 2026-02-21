@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:light_x/core/assets/assets.gen.dart';
 import 'package:light_x/core/constants/constants.dart';
+import 'package:light_x/routes/app_router.dart';
 import 'package:light_x/shared/components/buttons/app_back_button.dart';
 import 'package:light_x/shared/components/buttons/app_button.dart';
 import 'package:light_x/shared/components/indicators/app_linear_progress_indicator.dart';
@@ -68,7 +69,9 @@ class _Onboarding2State extends State<Onboarding2> {
             AppButton(
               label: "Continue",
               trailing: Icon(Icons.arrow_right_alt, color: Colors.white, size: 20),
-              onPressed: () {},
+              onPressed: () {
+                Routes.home.push(context);
+              },
               size: const Size(double.infinity, 56),
             ),
 
