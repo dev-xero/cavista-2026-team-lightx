@@ -1,8 +1,12 @@
 import pandas as pd
+import xgboost as xgb
 import numpy as np
 import logging
 import os
 import warnings
+
+from sklearn.model_selection import train_test_split
+from sklearn.impute import SimpleImputer
 
 warnings.filterwarnings('ignore')
 logging.basicConfig(
@@ -294,10 +298,74 @@ def label_hypertension_stages(df, save=False):
     return df
 
 
-def train():
+def train(df):
     """
+    This trains an XGBoost classifier model on our dataset
     """
     logging.info("Beginning model training")
+    
+    X = df[FEATURES]
+    y = df["hypertension_stage"]
+    
+    # Here, we split our dataset into train and test set, with stratified
+    # sampling on hypertension.
+    X_train, X_test, y_train, y_test = train_test_split(
+        X,
+        y,
+        test_size=TEST_SIZE,
+        random_state=RANDOM_STATE,
+        stratify=y
+    )
+    
+    # This imputer will replace missing values using median data.
+    imputer = SimpleImputer(strategy='median')
+    X_train_imp = imputer.fit_transform(X_train)
+    X_test_imp  = imputer.transform(X_test)
+   
+    # Extreme Gradient Boosting (XGBoost)
+    # 
+    # We are using decision trees as our base learners, then we combine
+    # them sequentially to improve performance.
+    # Each decision tree is trained on the mistakes of the previous learner trees.
+    # 
+    # We use multi-class soft-max as the objective function.
+    # We are also predicting 4 hypertension classes.
+    # Each decision tree may grow to a max depth of 6, with a learning rate at 0.05.
+    # 
+    # Each tree may only use 80% of samples and training rows, to prevent over-fitting.
+    # 
+    # Alpha (L1 / Lasso) and Lambda (L2 / Ridge) regularization are used to improve model accuracy.
+    # L1 will push small weights towards 0, L2 will punish large weights.
+    # 
+    # Logarithmic loss as the performance metric.
+    # 
+    # Finally we set n_job to -1 to utilize all CPU cores.
+    xgb_model = xgb.XGBClassifier(
+        objective='multi:softprob',
+        num_class=4,
+        n_estimators=300,
+        max_depth=6,
+        learning_rate=0.05,
+        subsample=0.8,
+        colsample_bytree=0.8,
+        min_child_weight=5,
+        gamma=0.1,
+        reg_alpha=0.1,
+        reg_lambda=1.0,
+        eval_metric='mlogloss',
+        random_state=RANDOM_STATE,
+        n_jobs=-1
+    )
+    
+    xgb_model.fit(
+        X_train_imp, y_train,
+        eval_set=[(X_test_imp, y_test)],
+        verbose=50
+    )
+    
+    logging.info("XGBoost model finished training")
+    
+    return xgb_model, imputer, X_test_imp, y_test
 
 
 def main():
@@ -306,7 +374,8 @@ def main():
     xpt_files = load_xpt_files()
     dataset = build_dataset(xpt_files)
     
-    label_hypertension_stages(dataset, save=True)
+    df = label_hypertension_stages(dataset, save=True)
+    model, imputer, X_test, y_test = train(df)
 
 
 main()
