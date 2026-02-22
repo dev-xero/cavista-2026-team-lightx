@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:light_x/core/constants/constants.dart';
 import 'package:light_x/features/onboarding/providers/onboarding_provider.dart';
@@ -60,8 +62,11 @@ class Onboarding1 extends StatelessWidget {
                       child: _OptionCard(
                         title: option.title,
                         subtitle: option.subtitle,
-                        isSelected: provider.sleepTimeIndex == index,
-                        onTap: () => provider.setCurrentIndex(index),
+                        isSelected: provider.sleepIndex == index,
+                        onTap: () {
+                          provider.setCurrentSleepTime(index);
+                          log("Selected sleep time: ${provider.sleepTime} hours", name: "Onboarding1");
+                        },
                       ),
                     );
                   }),

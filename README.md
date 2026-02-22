@@ -184,4 +184,4 @@ Full terms are available at the [NHANES Data Use Restrictions](https://www.cdc.g
 
 ## AI Use, Privacy, and Compliance
 
-No AI agents or vibe coding platforms were used in developing this project. We used Anthropic's Claude AI for some initial research and Google's Gemini's AI for AI features. Finally, no personally identifiable data is exposed to unethical use.
+No AI agents or vibe coding platforms were used in developing this project. We used Anthropic's Claude AI for some initial research and Google's Gemini AI for a few of our AI features. Finally, no personally identifiable data is exposed to unethical use.

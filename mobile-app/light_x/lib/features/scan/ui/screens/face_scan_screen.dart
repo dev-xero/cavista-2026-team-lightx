@@ -1,4 +1,6 @@
+import 'package:custom_widgets_toolkit/custom_widgets_toolkit.dart';
 import 'package:flutter/material.dart';
+import 'package:light_x/core/utils/nav_utils.dart';
 import 'package:light_x/features/scan/logic/api_functions/face_analyzer_api_funtions.dart';
 import 'package:light_x/features/scan/logic/face_scan_service.dart';
 import 'package:light_x/features/scan/providers/face_scanner_provider.dart';
@@ -166,6 +168,7 @@ class _FaceScannerScreenState extends State<FaceScannerScreen> {
                       provider.retry();
                     } else if (provider.state == FaceScanState.complete) {
                       if (provider.snapshot != null) {
+                        CustomDialog.showLoadingDialog(context);
                         final result = await FaceAnalyzerApiFunctions.analyzeFacial(provider.snapshot!);
                         if (result.data == null || result.data!.isEmpty) {
                           provider.setBackendError({
@@ -173,8 +176,12 @@ class _FaceScannerScreenState extends State<FaceScannerScreen> {
                             'details': ['Ensure your face is fully visible and well-lit, then try again.'],
                           });
                         } else {
-                          if (context.mounted) Routes.faceScanResult.push(context);
+                          provider.setSuccess(result.data!);
+                          if (context.mounted) {
+                            Routes.faceScanResult.push(context);
+                          }
                         }
+                        NavUtils.popGlobal();
                       }
                     }
                   },

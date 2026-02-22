@@ -10,6 +10,7 @@ import 'package:light_x/shared/components/buttons/build_icon_button.dart';
 import 'package:light_x/shared/components/indicators/app_linear_progress_indicator.dart';
 import 'package:light_x/shared/components/layout/app_padding.dart';
 import 'package:light_x/shared/components/layout/app_text.dart';
+import 'package:light_x/shared/helpers/formatter.dart';
 import 'package:light_x/shared/theme/src/app_colors.dart';
 import 'package:remixicon/remixicon.dart';
 
@@ -71,17 +72,17 @@ class _HomeState extends State<Home> {
                     ),
                     12.inRow,
                     Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const AppText(
-                            "Good Morning",
-                            fontSize: 20,
-                            fontWeight: FontWeight.w800,
-                            color: Color(0xFF0F172A),
-                          ),
-                          AppText("Tuesday, Oct 24", fontSize: 12, color: AppColors.neutralBlack200),
-                        ],
+                      child: Builder(
+                        builder: (context) {
+                          final f = Formatter.getGreetingAndDate();
+                          return Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              AppText(f.greeting, fontSize: 20, fontWeight: FontWeight.w800, color: Color(0xFF0F172A)),
+                              AppText(f.date, fontSize: 12, color: AppColors.neutralBlack200),
+                            ],
+                          );
+                        },
                       ),
                     ),
                     SizedBox.square(

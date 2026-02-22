@@ -25,7 +25,7 @@ class _IconBadge extends StatelessWidget {
   const _IconBadge({required this.icon, required this.iconColor});
 
   // bg is the icon color at 10 % opacity
-  Color get _bg => iconColor.withOpacity(0.1);
+  Color get _bg => iconColor.withValues(alpha: 0.1);
 
   @override
   Widget build(BuildContext context) {

@@ -21,7 +21,7 @@ final scanRoutes = [
     builder: (context, state) => const FaceScannerScreen(),
   ),
   GoRoute(
-    name: Routes.faceScanResult.path,
+    name: Routes.faceScanResult.name,
     path: Routes.faceScanResult.path,
     builder: (context, state) => const ScanResultScreen(),
   ),

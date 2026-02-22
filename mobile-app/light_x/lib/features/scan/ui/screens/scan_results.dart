@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:light_x/features/scan/providers/face_scanner_provider.dart';
+import 'package:light_x/routes/app_router.dart';
 import 'package:light_x/shared/components/buttons/app_button.dart';
+import 'package:light_x/shared/components/layout/app_scaffold.dart';
 import 'package:light_x/shared/components/layout/app_text.dart';
 import 'package:light_x/shared/theme/src/app_colors.dart';
 import 'package:light_x/shared/theme/src/app_text_styles.dart';
@@ -13,7 +15,7 @@ class ScanResultScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final provider = context.watch<FaceScannerProvider>();
 
-    return Scaffold(
+    return AppScaffold(
       backgroundColor: AppColors.white,
       body: SafeArea(
         child: switch (provider.state) {
@@ -122,7 +124,7 @@ class _SuccessBody extends StatelessWidget {
                   label: 'Done',
                   color: AppColors.primary,
                   borderRadius: 24,
-                  onPressed: () => Navigator.of(context).pop(),
+                  onPressed: () => Routes.home.go(context),
                 ),
               ),
             ],
@@ -414,11 +416,13 @@ class _PrivacyPill extends StatelessWidget {
           children: [
             const Icon(Icons.lock_outline_rounded, color: Color(0xFF94A3B8), size: 12),
             const SizedBox(width: 8),
-            AppText(
-              'Your data is encrypted and never shared',
-              fontWeight: FontWeight.w400,
-              fontSize: 12,
-              color: const Color(0xFF94A3B8),
+            Expanded(
+              child: AppText(
+                'Your data is encrypted and never shared',
+                fontWeight: FontWeight.w400,
+                fontSize: 12,
+                color: const Color(0xFF94A3B8),
+              ),
             ),
           ],
         ),

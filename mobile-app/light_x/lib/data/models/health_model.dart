@@ -15,7 +15,7 @@ class HealthModel {
   final int totalCholesterol;
   final int hdlCholesterol;
   final int fastingGlucose;
-  final int creatinine;
+  final double creatinine;
 
   const HealthModel({
     required this.age,
@@ -55,7 +55,30 @@ class HealthModel {
       totalCholesterol: json['total_cholesterol'] as int,
       hdlCholesterol: json['hdl_cholesterol'] as int,
       fastingGlucose: json['fasting_glucose'] as int,
-      creatinine: json['creatinine'] as int,
+      creatinine: json['creatinine'] as double,
+    );
+  }
+
+  factory HealthModel.empty() {
+    return HealthModel(
+      age: 1,
+      bmi: 1,
+      smokingStatus: 1,
+      gender: 1,
+      avgSleepHours: 1,
+
+      stressLevel: 1,
+      spo2: 1,
+      heartRate: 1,
+      diabetic: 1,
+      systolicBp: 1,
+      diastolicBp: 1,
+      breathingRate: 1,
+      hrv: 18,
+      totalCholesterol: 240,
+      hdlCholesterol: 35,
+      fastingGlucose: 118,
+      creatinine: 1.4,
     );
   }
 
@@ -98,7 +121,7 @@ class HealthModel {
     int? totalCholesterol,
     int? hdlCholesterol,
     int? fastingGlucose,
-    int? creatinine,
+    double? creatinine,
   }) {
     return HealthModel(
       age: age ?? this.age,
@@ -117,7 +140,7 @@ class HealthModel {
       totalCholesterol: totalCholesterol ?? this.totalCholesterol,
       hdlCholesterol: hdlCholesterol ?? this.hdlCholesterol,
       fastingGlucose: fastingGlucose ?? this.fastingGlucose,
-      creatinine: creatinine ?? this.creatinine,
+      creatinine: (creatinine ?? this.creatinine).toDouble(),
     );
   }
 

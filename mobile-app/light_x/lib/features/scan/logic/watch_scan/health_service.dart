@@ -256,8 +256,12 @@ class WatchHealthService {
 
   Future<void> dispose() async {
     _disposed = true;
-    for (final t in _timers) t.cancel();
-    for (final s in _subs) await s.cancel();
+    for (final t in _timers) {
+      t.cancel();
+    }
+    for (final s in _subs) {
+      await s.cancel();
+    }
     await _controller.close();
     try {
       await device.disconnect();

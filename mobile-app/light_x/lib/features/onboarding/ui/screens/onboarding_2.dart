@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:light_x/core/assets/assets.gen.dart';
 import 'package:light_x/core/constants/constants.dart';
+import 'package:light_x/features/onboarding/providers/onboarding_provider.dart';
 import 'package:light_x/routes/app_router.dart';
 import 'package:light_x/shared/components/buttons/app_back_button.dart';
 import 'package:light_x/shared/components/buttons/app_button.dart';
@@ -11,6 +13,7 @@ import 'package:light_x/shared/components/layout/app_scaffold.dart';
 import 'package:light_x/shared/components/layout/app_text.dart';
 import 'package:light_x/shared/components/layout/texts.dart';
 import 'package:light_x/shared/theme/src/app_colors.dart';
+import 'package:provider/provider.dart';
 
 class _MetricInput extends StatelessWidget {
   final String label;
@@ -25,6 +28,7 @@ class _MetricInput extends StatelessWidget {
       titleText: label,
       contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 18),
       hintText: hint,
+      inputFormatters: [FilteringTextInputFormatter.digitsOnly],
       suffix: SizedBox(
         width: 40,
         child: Center(child: AppText(unit, fontSize: 16, color: AppColors.lightGray)),
@@ -71,6 +75,7 @@ class _Onboarding2State extends State<Onboarding2> {
               trailing: Icon(Icons.arrow_right_alt, color: Colors.white, size: 20),
               onPressed: () {
                 Routes.home.push(context);
+                context.read<OnboardingProvider>().completeOnboarding();
               },
               size: const Size(double.infinity, 56),
             ),
