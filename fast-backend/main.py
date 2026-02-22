@@ -101,6 +101,7 @@ class ChatRequest(BaseModel):
     message: str
     context: Optional[str] = "No previous context found."
     
+    
 def calculate_bmi(weight: float, height_cm: float):
     """
     This helper function calculates the Body-Mass Index.
@@ -189,8 +190,8 @@ async def base():
     }
 
 
-@app.post("/predict", tags=["Health"])
-async def run_analysis(data: UserData):
+@app.post("/analyse-vitals", tags=["Health"])
+async def analyse_vitals(data: UserData):
     """
     This endpoint runs inference on the Machine Learning model using smartwatch and
     onboarding data.
@@ -209,6 +210,14 @@ async def run_analysis(data: UserData):
         
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.post("/analyse-facial", tags=["Health"])
+async def analyse_facial():
+    """
+    Oti sun mi
+    """
+    pass
 
 @app.post("/suggest", tags=["Health"])
 async def suggest_tips(symptoms: SymptomsData):
