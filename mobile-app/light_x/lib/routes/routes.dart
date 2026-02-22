@@ -30,6 +30,8 @@ enum Routes {
 
   aiChat,
   faceScan,
+  pricing,
+  faceScanResult,
 }
 
 extension RoutesExtension on Routes {

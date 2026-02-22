@@ -145,4 +145,9 @@ class AppColors {
   static const sleepBadgeTxt = Color(0xFF4F46E5);
   static const syncBtn = Color(0xCF1C4D8D);
   static const surfaceBorder = Color(0xFFF1F5F9);
+
+  static const textBody = Color(0xFF475569);
+  static const navy = Color(0xFF09357C);
+  static const primaryShadow = Color(0x661C58D9); // 40%
+  static const featuredShadow = Color(0x4D4D1C8D);
 }

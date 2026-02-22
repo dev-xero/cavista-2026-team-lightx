@@ -5,7 +5,6 @@ import 'package:flutter_blue_plus/flutter_blue_plus.dart';
 import 'package:light_x/features/scan/logic/watch_scan/health_service.dart';
 import 'package:light_x/features/scan/logic/models/health_data_snapshot.dart';
 import 'package:light_x/features/scan/providers/health_provider.dart';
-import 'package:light_x/routes/app_router.dart';
 import 'package:light_x/shared/components/buttons/app_back_button.dart';
 import 'package:light_x/shared/components/layout/app_scaffold.dart';
 import 'package:light_x/shared/components/layout/app_text.dart';
@@ -122,21 +121,21 @@ class _HealthScreenState extends State<HealthScreen> with SingleTickerProviderSt
     );
   }
 
-  Widget _buildDisconnected() => Center(
-    child: Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Icon(Icons.bluetooth_disabled_rounded, size: 64, color: Colors.white.withValues(alpha: 0.12)),
-        const SizedBox(height: 16),
-        const Text('Device disconnected', style: TextStyle(color: Color(0xFF6B7A99), fontSize: 16)),
-        const SizedBox(height: 8),
-        TextButton(
-          onPressed: () => context.pop(),
-          child: const Text('Go back', style: TextStyle(color: AppColors.primary)),
-        ),
-      ],
-    ),
-  );
+  // Widget _buildDisconnected() => Center(
+  //   child: Column(
+  //     mainAxisSize: MainAxisSize.min,
+  //     children: [
+  //       Icon(Icons.bluetooth_disabled_rounded, size: 64, color: Colors.white.withValues(alpha: 0.12)),
+  //       const SizedBox(height: 16),
+  //       const Text('Device disconnected', style: TextStyle(color: Color(0xFF6B7A99), fontSize: 16)),
+  //       const SizedBox(height: 8),
+  //       TextButton(
+  //         onPressed: () => context.pop(),
+  //         child: const Text('Go back', style: TextStyle(color: AppColors.primary)),
+  //       ),
+  //     ],
+  //   ),
+  // );
 }
 
 // ── Heart Rate ─────────────────────────────────────────────────────────────────

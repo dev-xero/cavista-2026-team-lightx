@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:light_x/core/utils/nav_utils.dart';
+import 'package:light_x/routes/app_router.dart';
 import 'package:light_x/shared/components/buttons/build_icon_button.dart';
 import 'package:light_x/shared/components/layout/app_scaffold.dart';
 import 'package:light_x/shared/components/layout/texts.dart';
@@ -79,12 +81,17 @@ const _metrics = [
   ),
 ];
 
-const _premiumData = PremiumLockedData(
+final _premiumData = PremiumLockedData(
   title: '5 Year Risk Prediction.',
   description:
       'See how your hypertension risk might evolve over the next 5 years '
       'based on current trends.',
   ctaLabel: 'Unlock Premium',
+  onTap: () {
+    NavUtils.withContext((context) {
+      Routes.pricing.push(context);
+    });
+  },
 );
 
 // ─────────────────────────────────────────────

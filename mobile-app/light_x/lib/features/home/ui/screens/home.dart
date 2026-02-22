@@ -59,10 +59,15 @@ class _HomeState extends State<Home> {
                 padding: const EdgeInsets.symmetric(vertical: 24),
                 child: Row(
                   children: [
-                    const CircleAvatar(
-                      radius: 20,
-                      backgroundColor: AppColors.primary,
-                      child: Icon(Icons.person, color: Colors.white),
+                    GestureDetector(
+                      onTap: () {
+                        Routes.pricing.push(context);
+                      },
+                      child: const CircleAvatar(
+                        radius: 20,
+                        backgroundColor: AppColors.primary,
+                        child: Icon(Icons.person, color: Colors.white),
+                      ),
                     ),
                     12.inRow,
                     Expanded(
@@ -96,7 +101,7 @@ class _HomeState extends State<Home> {
         // Hypertension Risk Card
         SliverToBoxAdapter(
           child: Container(
-            height: 328,
+            height: 340,
             padding: const EdgeInsets.all(32),
             decoration: BoxDecoration(
               color: Colors.white,
