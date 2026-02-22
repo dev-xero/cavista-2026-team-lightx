@@ -129,4 +129,20 @@ class AppColors {
   // Scanner screen
   static const scannerRingTrack = Color(0x331C58D9); // 20% opacity
   static const progressTrack = Color(0x1A1C58D9);
+
+  static const pageBg = Color(0xFFF6F6F8);
+  static const connectedBg = Color(0xFFD1FAE5);
+  static const connectedDot = Color(0xFF10B981);
+  static const connectedGlow = Color(0xBF34D399); // 75% opacity
+  static const connectedText = Color(0xFF059669);
+  static const heartBg = Color(0xFFFFF1F2);
+  static const heartIcon = Color(0xFFF43F5E);
+  static const heartBar1 = Color(0xFFFECDD3);
+  static const heartBar2 = Color(0xFFFDA4AF);
+  static const heartBar3 = Color(0xFFF43F5E);
+  static const sleepBg = Color(0xFFEEF2FF);
+  static const sleepIcon = Color(0xFF6366F1);
+  static const sleepBadgeTxt = Color(0xFF4F46E5);
+  static const syncBtn = Color(0xCF1C4D8D);
+  static const surfaceBorder = Color(0xFFF1F5F9);
 }

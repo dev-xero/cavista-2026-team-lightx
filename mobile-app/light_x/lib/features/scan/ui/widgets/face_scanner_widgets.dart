@@ -29,39 +29,6 @@ class ScannerHeader extends StatelessWidget {
   }
 }
 
-// ── Scanning viewfinder ───────────────────────
-
-/// Painter for the spinning progress arc drawn over the viewfinder ring.
-class _ScanArcPainter extends CustomPainter {
-  final double fraction; // 0.0 – 1.0
-  final double rotation; // radians – drives spin animation
-
-  _ScanArcPainter({required this.fraction, required this.rotation});
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    const strokeWidth = 12.8;
-    final center = Offset(size.width / 2, size.height / 2);
-    // 2% inset on each side, matching Figma "left:2% right:2%"
-    final radius = size.width / 2 - strokeWidth / 2 - size.width * 0.02;
-
-    final arcPaint = Paint()
-      ..color = AppColors.primary
-      ..style = PaintingStyle.stroke
-      ..strokeCap = StrokeCap.round
-      ..strokeWidth = strokeWidth;
-
-    // Start at top (−π/2), rotated by animation value
-    final startAngle = -3.14159265 / 2 + rotation;
-    final sweep = 2 * 3.14159265 * fraction;
-
-    canvas.drawArc(Rect.fromCircle(center: center, radius: radius), startAngle, sweep, false, arcPaint);
-  }
-
-  @override
-  bool shouldRepaint(_ScanArcPainter old) => old.fraction != fraction || old.rotation != rotation;
-}
-
 /// Animated circular viewfinder with a progress arc and a face placeholder.
 class ScanningViewfinder extends StatefulWidget {
   /// Scan completion fraction 0.0–1.0.
@@ -96,7 +63,16 @@ class _ScanningViewfinderState extends State<ScanningViewfinder> with SingleTick
     return SizedBox(
       width: 320,
       height: 320,
-      child: SvgPicture.asset(Assets.svgs.scanningViewfinder, width: 320, height: 320),
+      child: Stack(
+        children: [
+          SizedBox.square(
+            dimension: 320,
+            child: Center(child: Image.asset(Assets.images.faceRecognition, width: 300, height: 300)),
+          ),
+
+          Positioned.fill(child: SvgPicture.asset(Assets.svgs.scanningViewfinder, width: 320, height: 320)),
+        ],
+      ),
     );
   }
 }

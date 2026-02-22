@@ -17,8 +17,8 @@ final GlobalKey<NavigatorState> rootNavigatorKey = GlobalKey<NavigatorState>();
 class AppRouter {
   static final GoRouter router = GoRouter(
     debugLogDiagnostics: true,
-    initialLocation: Routes.home.path,
+    initialLocation: Routes.watchScan.path,
     navigatorKey: rootNavigatorKey,
-    routes: [splashRoute, ...onboardingRoutes, mainRoutes, ...scanRoutes, ...aiChatRoutes],
+    routes: [splashRoute, ...onboardingRoutes, ...mainRoutes, ...scanRoutes, ...aiChatRoutes],
   );
 }

@@ -13,7 +13,7 @@ class FaceScannerScreen extends StatelessWidget {
   ];
 
   static const _progressData = ScanProgressData(
-    stepLabel: 'Step 2 of 3',
+    stepLabel: 'Scanning Vitals',
     percentLabel: '65%',
     fraction: 0.65,
     caption: 'Hold still, almost done…',

@@ -194,4 +194,77 @@ class AppTextStyles {
     height: 20 / 14,
     color: AppColors.textSecondary,
   );
+
+  static const navLabel = TextStyle(fontWeight: FontWeight.w700, fontSize: 10, height: 15 / 10);
+
+  static const connBadge = TextStyle(
+    fontWeight: FontWeight.w700,
+    fontSize: 12,
+    height: 16 / 12,
+    letterSpacing: 0.6,
+    color: AppColors.connectedText,
+  );
+
+  static const syncValue = TextStyle(
+    fontWeight: FontWeight.w400,
+    fontSize: 30,
+    height: 36 / 30,
+    color: AppColors.textPrimary,
+  );
+
+  static const syncTitle = TextStyle(
+    fontWeight: FontWeight.w700,
+    fontSize: 18,
+    height: 28 / 18,
+    color: AppColors.textPrimary,
+  );
+
+  static const syncSubtitle = TextStyle(
+    fontWeight: FontWeight.w400,
+    fontSize: 14,
+    height: 20 / 14,
+    color: AppColors.textSecondary,
+  );
+
+  static const statLabel = TextStyle(
+    fontWeight: FontWeight.w500,
+    fontSize: 14,
+    height: 20 / 14,
+    color: AppColors.textSecondary,
+  );
+
+  static const statValue = TextStyle(
+    fontWeight: FontWeight.w400,
+    fontSize: 24,
+    height: 32 / 24,
+    color: AppColors.textPrimary,
+  );
+
+  static const statUnit = TextStyle(
+    fontWeight: FontWeight.w700,
+    fontSize: 12,
+    height: 16 / 12,
+    color: AppColors.textMuted,
+  );
+
+  static const statProgress = TextStyle(
+    fontWeight: FontWeight.w700,
+    fontSize: 12,
+    height: 16 / 12,
+    color: AppColors.primary,
+  );
+
+  static const sleepBadge = TextStyle(
+    fontWeight: FontWeight.w700,
+    fontSize: 10,
+    height: 15 / 10,
+    color: AppColors.sleepBadgeTxt,
+  );
+
+  static const syncBtnLabel = TextStyle(
+    fontWeight: FontWeight.w700,
+    fontSize: 16,
+    height: 24 / 16,
+    color: AppColors.white,
+  );
 }

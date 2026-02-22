@@ -28,7 +28,7 @@ class BottomNavBar extends StatelessWidget {
           BottomNavigationBarItem(icon: Icon(RemixIcons.home_2_line), label: "HOME", tooltip: "HOME"),
           BottomNavigationBarItem(icon: Icon(Icons.trending_up), label: "TRENDS", tooltip: "Your health trends"),
           BottomNavigationBarItem(icon: Icon(Icons.watch), label: "DEVICES", tooltip: "your connected devices"),
-          BottomNavigationBarItem(icon: Icon(RemixIcons.user_2_line), label: "PROFILE", tooltip: "Your profile"),
+          // BottomNavigationBarItem(icon: Icon(RemixIcons.user_2_line), label: "PROFILE", tooltip: "Your profile"),
         ],
       ),
     );

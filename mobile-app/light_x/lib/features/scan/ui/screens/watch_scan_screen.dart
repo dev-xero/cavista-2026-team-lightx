@@ -10,14 +10,14 @@ import 'package:light_x/shared/components/layout/texts.dart';
 import 'package:light_x/shared/theme/src/app_colors.dart';
 import 'package:provider/provider.dart';
 
-class ScanScreen extends StatefulWidget {
-  const ScanScreen({super.key});
+class WatchScanScreen extends StatefulWidget {
+  const WatchScanScreen({super.key});
 
   @override
-  State<ScanScreen> createState() => _ScanScreenState();
+  State<WatchScanScreen> createState() => _WatchScanScreenState();
 }
 
-class _ScanScreenState extends State<ScanScreen> {
+class _WatchScanScreenState extends State<WatchScanScreen> {
   final _scanner = BleScanner();
   bool _connecting = false;
   String? _connectingId;
