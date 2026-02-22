@@ -1,3 +1,4 @@
+import asyncio
 import os
 import datetime
 import time
@@ -7,7 +8,7 @@ import xgboost as xgb
 import numpy as np
 import pandas as pd
 import datetime as dt
-import google.generativeai as genAi
+import google.generativeai as genai
 
 from fastapi.responses import StreamingResponse
 from dotenv import load_dotenv
@@ -17,11 +18,14 @@ from fastapi import FastAPI, HTTPException, UploadFile, File, Form, Depends
 from pydantic import BaseModel, Field
 from typing import List, Optional
 from datetime import date
+from dotenv import load_dotenv
+
+load_dotenv()
 
 app = FastAPI(title="Team LightX API", description="Swagger Open API Specification")
 
-genAi_key = os.getenv("GEMINI_API_KEY")
-llm = genAi.GenerativeModel('gemini-1.5-flash')
+genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
+llm = genai.GenerativeModel('gemini-3-flash-preview')
 
 model = xgb.XGBClassifier()
 model.load_model("models/hypertension_model.json")
@@ -94,7 +98,7 @@ class PredictionResult(BaseModel):
     
 
 class ChatRequest(BaseModel):
-    msg: str
+    message: str
     context: Optional[str] = "No previous context found."
     
 def calculate_bmi(weight: float, height_cm: float):
@@ -255,17 +259,21 @@ async def chat_streamer(prompt: str):
 @app.post("/chat", tags=["Health"])
 async def chat(req: ChatRequest):
     """
-    This endpoint uses the LLM chat interface via Server-Sent Events (SSE) 
+    This endpoint uses the LLM chat interface via Server-Sent Events (SSE)
     for instant streaming responses to the mobile app.
     """
     system_prompt = f"""
     You are a helpful medical assistant for a cardiovascular health app.
     Here is the user's recent health context: {req.context}
-    
+
     User message: {req.message}
     """
-    
+
     return StreamingResponse(
-        chat_streamer(system_prompt), 
-        media_type="text/event-stream"
+        chat_streamer(system_prompt),
+        media_type="text/event-stream",
+        headers={
+            "Cache-Control": "no-cache",
+            "X-Accel-Buffering": "no",
+        }
     )
