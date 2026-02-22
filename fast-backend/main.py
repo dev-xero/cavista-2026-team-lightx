@@ -27,12 +27,12 @@ app = FastAPI(title="Team LightX API", description="Swagger Open API Specificati
 genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
 llm = genai.GenerativeModel('gemini-3-flash-preview')
 
-model = xgb.XGBClassifier()
-model.load_model("models/hypertension_model.json")
-imputer = joblib.load("models/imputer.pkl")
-schema = json.load(open("models/feature_schema.json"))
+vitals_model = xgb.XGBClassifier()
+vitals_model.load_model("models/vitals/hypertension_model.json")
+vitals_imputer = joblib.load("models/vitals/imputer.pkl")
+vitals_schema = json.load(open("models/vitals/feature_schema.json"))
 
-FEATURES = schema["features"]
+FEATURES = vitals_schema["features"]
 
 STAGE_ADVICE = {
     0: "Blood pressure is healthy. You may maintain your current lifestyle. Be sure to check-in annually.",
@@ -159,10 +159,10 @@ def run_inference(data: UserData):
     }
     
     X = pd.DataFrame([row])[FEATURES]
-    X_imp = imputer.transform(X)
+    X_imp = vitals_imputer.transform(X)
     
-    stage = int(model.predict(X_imp)[0])
-    probs = model.predict_proba(X_imp)[0].tolist()
+    stage = int(vitals_model.predict(X_imp)[0])
+    probs = vitals_model.predict_proba(X_imp)[0].tolist()
     
     return PredictionResult(
         stage = stage,
