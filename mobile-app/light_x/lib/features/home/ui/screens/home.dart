@@ -4,6 +4,7 @@ import 'package:light_x/core/assets/assets.dart';
 import 'package:light_x/core/constants/constants.dart';
 import 'package:light_x/features/home/ui/widgets/home/bar_chart_card.dart';
 import 'package:light_x/features/home/ui/widgets/home/health_tips_section.dart';
+import 'package:light_x/routes/app_router.dart';
 import 'package:light_x/shared/components/buttons/app_button.dart';
 import 'package:light_x/shared/components/buttons/build_icon_button.dart';
 import 'package:light_x/shared/components/indicators/app_linear_progress_indicator.dart';
@@ -141,7 +142,9 @@ class _HomeState extends State<Home> {
             padding: const EdgeInsets.symmetric(vertical: 16),
             child: AppButton(
               label: "TAKE A SCAN",
-              onPressed: () {},
+              onPressed: () {
+                Routes.faceScan.push(context);
+              },
               leading: SvgPicture.asset(
                 Assets.svgs.newScan,
                 colorFilter: const ColorFilter.mode(Colors.white, BlendMode.srcIn),
