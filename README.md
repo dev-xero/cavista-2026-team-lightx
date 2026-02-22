@@ -1,4 +1,4 @@
-# PulseAid - Team LightX - Cavista 2026 Submission
+# PulseAid - Team LightX
 
 PulseAid is a hypertension and cardiovascular risk monitoring app built with Flutter, FastAPI, and XGBoost trained on NHANES data. This is Team LightX's hackathon submission for the Cavista 2026 Hackathon.
 
