@@ -2,13 +2,18 @@
 // Face Scanner Widgets
 // ─────────────────────────────────────────────
 
+import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:light_x/core/assets/assets.gen.dart';
+import 'package:light_x/features/scan/providers/face_scanner_provider.dart';
 import 'package:light_x/shared/components/buttons/app_button.dart';
 import 'package:light_x/shared/components/layout/app_text.dart';
+import 'package:light_x/shared/helpers/extensions/extensions.dart';
 import 'package:light_x/shared/theme/src/app_colors.dart';
 import 'package:light_x/shared/theme/src/app_text_styles.dart';
+import 'package:provider/provider.dart';
 
 /// Instructional heading + subtitle shown at the top of the scanner.
 class ScannerHeader extends StatelessWidget {
@@ -29,7 +34,8 @@ class ScannerHeader extends StatelessWidget {
   }
 }
 
-/// Animated circular viewfinder with a progress arc and a face placeholder.
+/// Animated circular viewfinder with a progress arc and a live camera preview.
+/// Drop-in replacement for the original ScanningViewfinder in face_scanner_widgets.dart
 class ScanningViewfinder extends StatefulWidget {
   /// Scan completion fraction 0.0–1.0.
   final double fraction;
@@ -60,19 +66,64 @@ class _ScanningViewfinderState extends State<ScanningViewfinder> with SingleTick
 
   @override
   Widget build(BuildContext context) {
+    final provider = context.watch<FaceScannerProvider>();
+    final controller = provider.controller;
+
+    // Build the centre content: live preview while scanning, snapshot when done,
+    // fallback to the face-recognition placeholder asset otherwise.
+    Widget centre;
+
+    if (controller != null && controller.value.isInitialized && provider.state == FaceScanState.scanning) {
+      // Live camera feed, clipped to a circle to sit inside the viewfinder ring.
+      centre = ClipOval(
+        child: SizedBox(
+          width: 280,
+          height: 280,
+          child: FittedBox(
+            fit: BoxFit.cover,
+            child: SizedBox(
+              width: controller.value.previewSize?.height ?? 280,
+              height: controller.value.previewSize?.width ?? 280,
+              child: CameraPreview(controller),
+            ),
+          ),
+        ),
+      );
+    } else if (provider.snapshot != null) {
+      // Captured snapshot after scan completes.
+      centre = ClipOval(
+        child: SizedBox(width: 280, height: 280, child: Image.memory(provider.snapshot!, fit: BoxFit.cover)),
+      );
+    } else {
+      // Placeholder — shown during init or error.
+      centre = Image.asset(Assets.images.faceRecognition, width: 280, height: 280);
+    }
+
     return SizedBox(
       width: 320,
       height: 320,
       child: Stack(
+        alignment: Alignment.center,
         children: [
+          // Outer viewfinder ring SVG
           SvgPicture.asset(Assets.svgs.scanningViewfinder, width: 320, height: 320),
-          Positioned.fill(
-            left: 20,
-            right: 20,
-            top: 20,
-            bottom: 20,
-            child: Image.asset(Assets.images.faceRecognition, width: 300, height: 300),
-          ),
+
+          // Centre content (camera / snapshot / placeholder)
+          centre,
+
+          // Fade-out overlay of the placeholder asset (original animation kept)
+          if (provider.state != FaceScanState.scanning)
+            Positioned.fill(
+              left: 20,
+              right: 20,
+              top: 20,
+              bottom: 20,
+              child: Image.asset(
+                Assets.images.faceRecognition,
+                width: 280,
+                height: 280,
+              ).animate().fade(begin: 1.0, end: 0, duration: 2.inSeconds),
+            ),
         ],
       ),
     );

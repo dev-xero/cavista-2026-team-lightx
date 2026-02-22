@@ -1,8 +1,14 @@
 import 'package:flutter/material.dart';
 import 'dart:math' as math;
 
+import 'package:flutter_blue_plus/flutter_blue_plus.dart';
+import 'package:light_x/features/scan/providers/health_provider.dart';
+import 'package:light_x/routes/app_router.dart';
+import 'package:light_x/shared/components/layout/app_padding.dart';
+import 'package:light_x/shared/components/layout/app_text.dart';
 import 'package:light_x/shared/theme/src/app_colors.dart';
 import 'package:light_x/shared/theme/src/app_text_styles.dart';
+import 'package:provider/provider.dart';
 
 // ─────────────────────────────────────────────
 // Header
@@ -22,16 +28,7 @@ class WatchSyncHeader extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(
-            title,
-            style: const TextStyle(
-              fontFamily: 'Manrope',
-              fontWeight: FontWeight.w700,
-              fontSize: 20,
-              height: 28 / 20,
-              color: AppColors.textPrimary,
-            ),
-          ),
+          AppText(title, fontWeight: FontWeight.w700, fontSize: 20, height: 28 / 20, color: AppColors.textPrimary),
           if (trailing != null) trailing!,
         ],
       ),
@@ -43,16 +40,17 @@ class WatchSyncHeader extends StatelessWidget {
 // Connection Badge
 // ─────────────────────────────────────────────
 
-/// Animated pulsing dot + "Connected" label pill.
+/// Animated pulsing dot + label pill.
 class ConnectionBadge extends StatefulWidget {
   final String label;
-  const ConnectionBadge({super.key, this.label = 'Connected'});
+  final bool connected;
+  const ConnectionBadge({super.key, this.label = 'Connected', this.connected = true});
 
   @override
-  State<ConnectionBadge> createState() => AppColorsonnectionBadgeState();
+  State<ConnectionBadge> createState() => _ConnectionBadgeState();
 }
 
-class AppColorsonnectionBadgeState extends State<ConnectionBadge> with SingleTickerProviderStateMixin {
+class _ConnectionBadgeState extends State<ConnectionBadge> with SingleTickerProviderStateMixin {
   late final AnimationController _pulse;
   late final Animation<double> _scale;
 
@@ -71,15 +69,18 @@ class AppColorsonnectionBadgeState extends State<ConnectionBadge> with SingleTic
 
   @override
   Widget build(BuildContext context) {
+    final dotColor = widget.connected ? AppColors.connectedDot : const Color(0xFFFF4D6D);
+    final glowColor = widget.connected ? AppColors.connectedGlow : const Color(0xFFFF4D6D).withValues(alpha: 0.3);
+    final bgColor = widget.connected ? AppColors.connectedBg : const Color(0xFFFF4D6D).withValues(alpha: 0.1);
+
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-        decoration: BoxDecoration(color: AppColors.connectedBg, borderRadius: BorderRadius.circular(9999)),
+        decoration: BoxDecoration(color: bgColor, borderRadius: BorderRadius.circular(9999)),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            // Pulsing glow ring + solid dot
             SizedBox(
               width: 12,
               height: 12,
@@ -91,19 +92,22 @@ class AppColorsonnectionBadgeState extends State<ConnectionBadge> with SingleTic
                     child: Container(
                       width: 12,
                       height: 12,
-                      decoration: BoxDecoration(color: AppColors.connectedGlow, shape: BoxShape.circle),
+                      decoration: BoxDecoration(color: glowColor, shape: BoxShape.circle),
                     ),
                   ),
                   Container(
                     width: 8,
                     height: 8,
-                    decoration: BoxDecoration(color: AppColors.connectedDot, shape: BoxShape.circle),
+                    decoration: BoxDecoration(color: dotColor, shape: BoxShape.circle),
                   ),
                 ],
               ),
             ),
             const SizedBox(width: 8),
-            Text(widget.label.toUpperCase(), style: AppTextStyles.connBadge),
+            Text(
+              widget.label.toUpperCase(),
+              style: AppTextStyles.connBadge.copyWith(color: widget.connected ? null : const Color(0xFFFF4D6D)),
+            ),
           ],
         ),
       ),
@@ -112,10 +116,9 @@ class AppColorsonnectionBadgeState extends State<ConnectionBadge> with SingleTic
 }
 
 // ─────────────────────────────────────────────
-// Sync Hub (dashed ring + central icon + label)
+// Sync Hub
 // ─────────────────────────────────────────────
 
-/// Painter: static grey track ring + rotating dashed blue ring.
 class _SyncRingPainter extends CustomPainter {
   final double rotation;
 
@@ -124,18 +127,15 @@ class _SyncRingPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final center = Offset(size.width / 2, size.height / 2);
-    // 4.17% inset on each side
     final inset = size.width * 0.0417;
-    final radius = size.width / 2 - inset - 4; // 4 = half stroke
+    final radius = size.width / 2 - inset - 4;
 
-    // Track ring
     final trackPaint = Paint()
       ..color = const Color(0xFFE2E8F0)
       ..style = PaintingStyle.stroke
       ..strokeWidth = 8;
     canvas.drawCircle(center, radius, trackPaint);
 
-    // Dashed ring
     final dashPaint = Paint()
       ..color = AppColors.primary
       ..style = PaintingStyle.stroke
@@ -161,9 +161,8 @@ class _SyncRingPainter extends CustomPainter {
   bool shouldRepaint(_SyncRingPainter old) => old.rotation != rotation;
 }
 
-/// Animated sync hub: spinning dashed ring, central watch icon, title + subtitle.
 class SyncHub extends StatefulWidget {
-  final String valueLabel; // e.g. "98%"
+  final String valueLabel;
   final String title;
   final String subtitle;
 
@@ -193,7 +192,6 @@ class _SyncHubState extends State<SyncHub> with SingleTickerProviderStateMixin {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        // Ring + icon
         SizedBox(
           width: 192,
           height: 192,
@@ -219,7 +217,6 @@ class _SyncHubState extends State<SyncHub> with SingleTickerProviderStateMixin {
 
         const SizedBox(height: 24),
 
-        // Title + subtitle
         Text(widget.title, textAlign: TextAlign.center, style: AppTextStyles.syncTitle),
         const SizedBox(height: 4),
         Text(widget.subtitle, textAlign: TextAlign.center, style: AppTextStyles.syncSubtitle),
@@ -232,7 +229,6 @@ class _SyncHubState extends State<SyncHub> with SingleTickerProviderStateMixin {
 // Stat Cards
 // ─────────────────────────────────────────────
 
-/// Mini bar-chart sparkline for heart rate.
 class _Sparkline extends StatelessWidget {
   static const _bars = [
     (height: 12.0, color: AppColors.heartBar1),
@@ -269,7 +265,6 @@ class _Sparkline extends StatelessWidget {
   }
 }
 
-/// Mini horizontal progress bar used in the Steps card.
 class _MiniProgressBar extends StatelessWidget {
   final double fraction;
   final String label;
@@ -305,7 +300,6 @@ class _MiniProgressBar extends StatelessWidget {
   }
 }
 
-/// Base card layout shared by all stat cards.
 class _StatCard extends StatelessWidget {
   final Widget leading;
   final String label;
@@ -348,7 +342,6 @@ class _StatCard extends StatelessWidget {
   }
 }
 
-/// Icon tile used as the leading element in every stat card.
 class _StatIconTile extends StatelessWidget {
   final IconData icon;
   final Color bg;
@@ -367,7 +360,6 @@ class _StatIconTile extends StatelessWidget {
   }
 }
 
-/// Value + unit inline (e.g. "72  BPM").
 class _StatValueRow extends StatelessWidget {
   final String value;
   final String? unit;
@@ -387,7 +379,6 @@ class _StatValueRow extends StatelessWidget {
   }
 }
 
-/// Heart rate card with sparkline.
 class HeartRateCard extends StatelessWidget {
   final String value;
   const HeartRateCard({super.key, required this.value});
@@ -403,11 +394,10 @@ class HeartRateCard extends StatelessWidget {
   }
 }
 
-/// Steps card with mini progress bar.
 class StepsCard extends StatelessWidget {
   final String value;
   final double fraction;
-  final String progressLabel; // e.g. "84% done"
+  final String progressLabel;
 
   const StepsCard({super.key, required this.value, required this.fraction, required this.progressLabel});
 
@@ -426,10 +416,9 @@ class StepsCard extends StatelessWidget {
   }
 }
 
-/// Sleep card with a coloured badge.
 class SleepCard extends StatelessWidget {
-  final String value; // e.g. "7h 42m"
-  final String badgeText; // e.g. "Deep Sleep"
+  final String value;
+  final String badgeText;
 
   const SleepCard({super.key, required this.value, required this.badgeText});
 
@@ -448,7 +437,55 @@ class SleepCard extends StatelessWidget {
   }
 }
 
-/// Vertical stack of stat cards with 16px gaps.
+class BloodOxygenCard extends StatelessWidget {
+  final String value;
+  final String badgeText; // e.g. "Normal", "Low", "Critical"
+
+  const BloodOxygenCard({super.key, required this.value, required this.badgeText});
+
+  Color get _badgeColor {
+    switch (badgeText.toLowerCase()) {
+      case 'normal':
+        return const Color(0xFF22C55E);
+      case 'low':
+        return const Color(0xFFF59E0B);
+      default:
+        return const Color(0xFFEF4444);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return _StatCard(
+      leading: const _StatIconTile(
+        icon: Icons.water_drop_rounded,
+        bg: AppColors.primaryLight,
+        color: AppColors.primary,
+      ),
+      label: 'Blood Oxygen',
+      valueRow: _StatValueRow(value: value, unit: '%'),
+      trailing: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+        decoration: BoxDecoration(
+          color: _badgeColor.withValues(alpha: 0.12),
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(color: _badgeColor.withValues(alpha: 0.4)),
+        ),
+        child: Text(
+          badgeText.toUpperCase(),
+          style: TextStyle(
+            color: _badgeColor,
+            fontSize: 10,
+            fontWeight: FontWeight.w700,
+            fontFamily: 'Manrope',
+            letterSpacing: 0.5,
+          ),
+        ),
+      ),
+    );
+  }
+}
+
 class StatsGrid extends StatelessWidget {
   final List<Widget> cards;
   const StatsGrid({super.key, required this.cards});
@@ -470,7 +507,6 @@ class StatsGrid extends StatelessWidget {
 // Action Button
 // ─────────────────────────────────────────────
 
-/// Full-width navy sync action button.
 class SyncActionButton extends StatelessWidget {
   final String label;
   final VoidCallback? onTap;
@@ -498,7 +534,6 @@ class SyncActionButton extends StatelessWidget {
 // Bottom Navigation Bar
 // ─────────────────────────────────────────────
 
-/// Data model for a single nav item.
 class NavItem {
   final IconData icon;
   final String label;
@@ -506,7 +541,6 @@ class NavItem {
   const NavItem({required this.icon, required this.label});
 }
 
-/// Custom bottom nav bar matching the Figma spec.
 class WatchSyncNavBar extends StatelessWidget {
   final List<NavItem> items;
   final int selectedIndex;
@@ -561,6 +595,59 @@ class _NavItemView extends StatelessWidget {
 }
 
 // ─────────────────────────────────────────────
+// No Device State
+// ─────────────────────────────────────────────
+
+/// Shown in place of the SyncHub when no device is connected yet.
+class _NoDeviceHub extends StatelessWidget {
+  final VoidCallback onConnect;
+
+  const _NoDeviceHub({required this.onConnect});
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Container(
+          width: 192,
+          height: 192,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            border: Border.all(color: const Color(0xFFE2E8F0), width: 8),
+            color: AppColors.white,
+          ),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(Icons.watch_off_rounded, color: AppColors.textMuted, size: 36),
+              const SizedBox(height: 8),
+              Text(
+                'No Device',
+                style: TextStyle(
+                  fontFamily: 'Manrope',
+                  fontWeight: FontWeight.w600,
+                  fontSize: 13,
+                  color: AppColors.textMuted,
+                ),
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 24),
+        Text('No Watch Connected', textAlign: TextAlign.center, style: AppTextStyles.syncTitle),
+        const SizedBox(height: 4),
+        Text(
+          'Tap "Connect a Watch" to scan for nearby devices.',
+          textAlign: TextAlign.center,
+          style: AppTextStyles.syncSubtitle,
+        ),
+      ],
+    );
+  }
+}
+
+// ─────────────────────────────────────────────
 // Screen
 // ─────────────────────────────────────────────
 
@@ -572,55 +659,121 @@ class Devices extends StatefulWidget {
 }
 
 class _DevicesState extends State<Devices> {
+  /// Navigates to the scan screen and waits; on return the provider
+  /// will already hold the newly connected service if the user connected.
+  Future<void> _goToScan() async {
+    Routes.watchScan.push(context);
+  }
+
+  /// Opens the health data screen for the currently connected device.
+  void _viewHealth() {
+    Routes.healthDataResult.push(context);
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AppColors.pageBg,
-      body: SafeArea(
-        child: Column(
-          children: [
-            // Header
-            WatchSyncHeader(
-              title: 'Sync',
-              trailing: IconButton(
-                icon: const Icon(Icons.more_horiz_rounded, color: AppColors.textSecondary),
-                onPressed: () {},
-              ),
-            ),
+    return Consumer<HealthProvider>(
+      builder: (context, hp, _) {
+        final service = hp.healthService;
 
-            // Connection badge
-            const SizedBox(height: 8),
-            const Align(alignment: Alignment.centerLeft, child: ConnectionBadge()),
-
-            // Scrollable content
-            Expanded(
-              child: SingleChildScrollView(
-                child: Column(
-                  children: [
-                    // Sync hub
-                    const Padding(
-                      padding: EdgeInsets.symmetric(vertical: 32),
-                      child: SyncHub(valueLabel: '98%', title: 'Apple Watch', subtitle: 'Smart Watch is connecting...'),
-                    ),
-
-                    // Stats grid
-                    StatsGrid(
-                      cards: const [
-                        HeartRateCard(value: '72'),
-                        StepsCard(value: '8,431', fraction: 0.84, progressLabel: '84% done'),
-                        SleepCard(value: '7h 42m', badgeText: 'Deep Sleep'),
-                      ],
-                    ),
-
-                    // Action button
-                    SyncActionButton(label: 'Sync Now', onTap: () {}),
-                  ],
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
+        // Determine connection state reactively when a service exists
+        return service != null
+            ? StreamBuilder<BluetoothConnectionState>(
+                stream: service.connectionState,
+                builder: (_, connSnap) {
+                  final connected = connSnap.data == BluetoothConnectionState.connected;
+                  return _buildBody(hp, service, connected);
+                },
+              )
+            : _buildBody(hp, null, false);
+      },
     );
   }
+
+  Widget _buildBody(HealthProvider hp, dynamic service, bool connected) {
+    final deviceName = hp.currDeviceName ?? 'Smart Watch';
+    final snapshot = hp.latestSnapshot;
+
+    // Derived display values
+    final hrValue = snapshot?.heartRate != null ? '${snapshot!.heartRate}' : '--';
+    final spo2Value = snapshot?.spo2 != null ? snapshot!.spo2!.toStringAsFixed(0) : '--';
+    final batteryValue = snapshot?.battery;
+
+    // Steps / sleep are not provided by the BLE health service currently,
+    // so we keep them as placeholder until that data source is integrated.
+    const stepsValue = '--';
+    const stepsFraction = 0.0;
+    const stepsLabel = '0% done';
+    const sleepValue = '--';
+    const sleepBadge = 'No data';
+
+    return Column(
+      children: [
+        TopPadding(),
+        // ── Header ────────────────────────────────────────────
+        WatchSyncHeader(
+          title: 'Sync',
+          trailing: IconButton(
+            icon: const Icon(Icons.more_horiz_rounded, color: AppColors.textSecondary),
+            onPressed: service != null ? _viewHealth : null,
+          ),
+        ),
+
+        // ── Connection badge ───────────────────────────────────
+        const SizedBox(height: 8),
+        Align(
+          alignment: Alignment.centerLeft,
+          child: service == null
+              ? const ConnectionBadge(label: 'Not Connected', connected: false)
+              : ConnectionBadge(label: connected ? 'Connected' : 'Disconnected', connected: connected),
+        ),
+
+        // ── Scrollable body ────────────────────────────────────
+        Expanded(
+          child: SingleChildScrollView(
+            child: Column(
+              children: [
+                // Hub — real device or empty state
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 32),
+                  child: service == null
+                      ? _NoDeviceHub(onConnect: _goToScan)
+                      : SyncHub(
+                          valueLabel: batteryValue != null ? '$batteryValue%' : '--',
+                          title: deviceName,
+                          subtitle: connected ? 'Smart Watch is connected' : 'Reconnecting…',
+                        ),
+                ),
+
+                // Stats grid — always shown; "--" when no data yet
+                StatsGrid(
+                  cards: [
+                    HeartRateCard(value: hrValue),
+                    BloodOxygenCard(
+                      value: snapshot?.spo2 != null ? snapshot!.spo2!.toStringAsFixed(1) : '--',
+                      badgeText: _spo2Badge(snapshot?.spo2),
+                    ),
+                    const StepsCard(value: stepsValue, fraction: stepsFraction, progressLabel: stepsLabel),
+                  ],
+                ),
+
+                // Action button — context-aware label & destination
+                SyncActionButton(
+                  label: service == null ? 'Connect a Watch' : 'View Health Data',
+                  onTap: service == null ? _goToScan : _viewHealth,
+                ),
+              ],
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+String _spo2Badge(double? spo2) {
+  if (spo2 == null) return 'No Data';
+  if (spo2 >= 95) return 'Normal';
+  if (spo2 >= 90) return 'Low';
+  return 'Critical';
 }

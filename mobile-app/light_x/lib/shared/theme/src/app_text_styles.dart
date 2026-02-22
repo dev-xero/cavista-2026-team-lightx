@@ -267,4 +267,120 @@ class AppTextStyles {
     height: 24 / 16,
     color: AppColors.white,
   );
+
+  static const heroTitle = TextStyle(
+    fontWeight: FontWeight.w800,
+    fontSize: 30,
+    height: 36 / 30,
+    letterSpacing: -0.75,
+    color: AppColors.textPrimary,
+    textBaseline: TextBaseline.alphabetic,
+  );
+
+  static const heroSubtitle = TextStyle(
+    fontWeight: FontWeight.w400,
+    fontSize: 18,
+    height: 29 / 18,
+    color: AppColors.bodyText,
+  );
+
+  static const planName = TextStyle(
+    fontWeight: FontWeight.w700,
+    fontSize: 20,
+    height: 28 / 20,
+    color: AppColors.textPrimary,
+  );
+
+  static const planPrice = TextStyle(
+    fontWeight: FontWeight.w900,
+    fontSize: 36,
+    height: 40 / 36,
+    color: AppColors.textPrimary,
+  );
+
+  static const planPeriod = TextStyle(
+    fontWeight: FontWeight.w400,
+    fontSize: 14,
+    height: 20 / 14,
+    color: AppColors.textSecondary,
+  );
+
+  static const featureBasic = TextStyle(
+    fontWeight: FontWeight.w400,
+    fontSize: 16,
+    height: 24 / 16,
+    color: AppColors.bodyText,
+  );
+
+  static const featurePremium = TextStyle(
+    fontWeight: FontWeight.w500,
+    fontSize: 16,
+    height: 24 / 16,
+    color: AppColors.textPrimary,
+  );
+
+  static const ctaDisabled = TextStyle(
+    fontWeight: FontWeight.w700,
+    fontSize: 14,
+    height: 20 / 14,
+    color: AppColors.textMuted,
+  );
+
+  static const ctaPrimary = TextStyle(
+    fontWeight: FontWeight.w700,
+    fontSize: 16,
+    height: 24 / 16,
+    color: AppColors.white,
+  );
+
+  static const ctaNote = TextStyle(
+    fontWeight: FontWeight.w400,
+    fontSize: 10,
+    height: 15 / 10,
+    color: AppColors.textSecondary,
+  );
+
+  static const savingsBadge = TextStyle(
+    fontWeight: FontWeight.w700,
+    fontSize: 12,
+    height: 16 / 12,
+    color: AppColors.primary,
+  );
+
+  static const highlightBadge = TextStyle(
+    fontWeight: FontWeight.w700,
+    fontSize: 10,
+    height: 15 / 10,
+    letterSpacing: 1,
+    color: AppColors.white,
+  );
+
+  static const trustHeading = TextStyle(
+    fontWeight: FontWeight.w700,
+    fontSize: 14,
+    height: 20 / 14,
+    letterSpacing: 1.4,
+    color: AppColors.textMuted,
+  );
+
+  static const trustTitle = TextStyle(
+    fontWeight: FontWeight.w700,
+    fontSize: 16,
+    height: 24 / 16,
+    color: AppColors.textPrimary,
+  );
+
+  static const trustBody = TextStyle(
+    fontWeight: FontWeight.w400,
+    fontSize: 14,
+    height: 23 / 14,
+    color: AppColors.textSecondary,
+  );
+
+  static const faqLabel = TextStyle(
+    fontWeight: FontWeight.w700,
+    fontSize: 14,
+    height: 20 / 14,
+    color: AppColors.primary,
+  );
 }
