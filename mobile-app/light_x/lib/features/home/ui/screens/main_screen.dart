@@ -20,8 +20,10 @@ class MainScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final mainScreenProvider = context.watch<MainScreenProvider>();
     return AppScaffold(
+      canPop: false,
       appBar: const SizedBox(),
       appBarPadding: (_) => EdgeInsets.zero,
+      viewPadding: EdgeInsets.symmetric(horizontal: 24),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           Routes.aiChat.push(context);
@@ -36,7 +38,7 @@ class MainScreen extends StatelessWidget {
           context.read<MainScreenProvider>().setCurrentIndex(index);
         },
       ),
-      body: Home(),
+      body: tabs[mainScreenProvider.currentIndex],
     );
   }
 }

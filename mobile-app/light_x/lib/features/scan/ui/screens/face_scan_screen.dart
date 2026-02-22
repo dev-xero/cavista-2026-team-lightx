@@ -29,6 +29,7 @@ class FaceScannerScreen extends StatelessWidget {
         onPressed: () {},
         icon: Icon(Icons.info_outline, color: Colors.black, size: 24),
       ),
+      appBarPadding: (apply) => apply.copyWith(bottom: 8),
       body: SingleChildScrollView(
         padding: EdgeInsets.zero,
         child: Column(

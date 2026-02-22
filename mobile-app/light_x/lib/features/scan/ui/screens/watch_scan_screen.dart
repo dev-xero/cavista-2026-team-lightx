@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_blue_plus/flutter_blue_plus.dart';
-import 'package:light_x/features/scan/logic/ble_connector.dart';
-import 'package:light_x/features/scan/logic/ble_scanner.dart';
-import 'package:light_x/features/scan/logic/health_service.dart';
+import 'package:light_x/features/scan/logic/watch_scan/ble_connector.dart';
+import 'package:light_x/features/scan/logic/watch_scan/ble_scanner.dart';
+import 'package:light_x/features/scan/logic/watch_scan/health_service.dart';
 import 'package:light_x/features/scan/providers/health_provider.dart';
 import 'package:light_x/routes/app_router.dart';
 import 'package:light_x/shared/components/layout/app_scaffold.dart';

@@ -7,14 +7,16 @@ import 'package:provider/provider.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
-  runApp(
-    MultiProvider(
-      providers: [
-        ChangeNotifierProvider(create: (_) => MainScreenProvider()),
-        ChangeNotifierProvider(create: (c) => OnboardingProvider()),
-        ChangeNotifierProvider(create: (c) => HealthProvider()),
-      ],
-      child: const App(),
-    ),
+  runApp(_providerWrapper());
+}
+
+MultiProvider _providerWrapper() {
+  return MultiProvider(
+    providers: [
+      ChangeNotifierProvider(create: (_) => MainScreenProvider()),
+      ChangeNotifierProvider(create: (c) => OnboardingProvider()),
+      ChangeNotifierProvider(create: (c) => HealthProvider()),
+    ],
+    child: const App(),
   );
 }
