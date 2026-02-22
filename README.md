@@ -10,6 +10,7 @@ PulseAid is a hypertension and cardiovascular risk monitoring app built with Flu
 - [Mobile App](#mobile-app)
 - [Backend API](#backend-api)
 - [Hypertension Classification Model](#hypertension-classification-model)
+- [AI Use Disclosure](#ai-use-disclosure)
 
 ## User Flow
 
@@ -175,3 +176,7 @@ The following conditions should be observed when using NHANES data:
 - **Analytical guidelines:** NHANES employs a complex, stratified, multistage probability sampling design. This module trains a classification model and does not produce population-level estimates, so survey weights are not applied. If adapting this work to produce prevalence estimates, consult the [NHANES analytic guidelines](https://wwwn.cdc.gov/nchs/nhanes/analyticguidelines.aspx).
 
 Full terms are available at the [NHANES Data Use Restrictions](https://www.cdc.gov/nchs/nhanes/about/data-use-restrictions.html) page.
+
+## AI Use, Privacy, and Compliance
+
+No AI agents or vibe coding platforms were used in developing this project. We used Anthropic's Claude AI for some initial research and Google's Gemini's AI for AI features. Finally, no personally identifiable data is exposed to unethical use.
