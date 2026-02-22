@@ -14,8 +14,13 @@ PulseAid is a hypertension and cardiovascular risk monitoring app built with Flu
 
 ## User Flow
 
-The user starts with an onboarding screen where they enter physiological data: weight, height, average sleep time, stress levels, gender, and smoking status. They then link a smartwatch, which feeds in real-time biometrics including blood pressure, blood oxygen, breathing rate, and heart rate.
+The user starts with an onboarding screen where they enter physiological data: weight, height, average sleep time, stress levels, gender, and smoking status. 
+
+They then link a smartwatch, which feeds in real-time biometrics including blood pressure, blood oxygen, breathing rate, and heart rate.
+
 From there, the user can optionally enrich the analysis by uploading facial and eye images (for skin and ocular indicators) and providing natural language input via speech or text describing symptoms like dizziness or anxiety.
+
+
 Once data collection is complete, the backend returns a hypertension stage classification, a progression risk likelihood, and personalized preventive measures such as daily health tips, lifestyle changes, and check-up reminders. The user can then export the full report in a format suitable for medical professionals.
 
 ## Hypertension Classification
