@@ -50,7 +50,7 @@ This module implements a multi-class classifier using XGBoost with the National 
 
 |         Architecture Overview           |
 |       :---------------:       |
-| ![ml_flow](../docs/ml_flow.png)  |
+| ![ml_flow](./docs/ml_flow.png)  |
 
 The model is a multi-class XGBoost classifier trained to predict hypertension stage (Normal, Elevated, Stage 1, Stage 2) per ACC/AHA 2017 guidelines.
 
@@ -140,7 +140,7 @@ This data is eventually combined into a single cohesive data set with computed/d
 
 | Metric | Notes |
 | :-     | :-         |
-| ![confusion_matrix](../docs/confusion_matrix.png)  |  The XGBoost model classifies 4 blood pressure categories: Normal, Elevated, Stage 1 HTN, and Stage 2 HTN. Overall pattern: The model has a strong bias toward predicting Normal and Stage 2 HTN, almost ignoring the middle classes (Elevated and Stage 1 HTN). |
+| ![confusion_matrix](./docs/confusion_matrix.png)  |  The XGBoost model classifies 4 blood pressure categories: Normal, Elevated, Stage 1 HTN, and Stage 2 HTN. Overall pattern: The model has a strong bias toward predicting Normal and Stage 2 HTN, almost ignoring the middle classes (Elevated and Stage 1 HTN). |
 
 ### Fair Use Policy (NHANES)
 
