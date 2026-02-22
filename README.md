@@ -1,6 +1,6 @@
 # Team LightX - Cavista 2026 Submission
 
-This repository is Team LightX's hackathon submission for Cavista 2026 Hackathon.
+This repository is Team LightX's hackathon submission for the Cavista 2026 Hackathon.
 
 ## Overview
 
