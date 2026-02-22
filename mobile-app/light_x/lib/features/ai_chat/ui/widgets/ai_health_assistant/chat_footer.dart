@@ -4,16 +4,10 @@ import 'package:light_x/shared/theme/src/app_colors.dart';
 import 'package:light_x/shared/theme/src/app_text_styles.dart';
 import 'package:remixicon/remixicon.dart';
 
-const suggestedActions = [
-  QuickAction(icon: Icons.bar_chart_rounded, label: 'View Deep Sleep'),
-  QuickAction(icon: Icons.favorite_rounded, label: 'Heart Rate Zones'),
-  QuickAction(icon: Icons.flag_rounded, label: 'Set Goals'),
-];
 // ─────────────────────────────────────────────
-// Footer Widgets
+// Quick action model
 // ─────────────────────────────────────────────
 
-/// Model for a quick-action chip shown above the input bar.
 class QuickAction {
   final IconData icon;
   final String label;
@@ -22,7 +16,10 @@ class QuickAction {
   const QuickAction({required this.icon, required this.label, this.onTap});
 }
 
-/// A single pill-shaped quick-action chip.
+// ─────────────────────────────────────────────
+// Quick action chip
+// ─────────────────────────────────────────────
+
 class QuickActionChip extends StatelessWidget {
   final QuickAction action;
 
@@ -53,7 +50,10 @@ class QuickActionChip extends StatelessWidget {
   }
 }
 
-/// Horizontally scrollable row of [QuickActionChip]s.
+// ─────────────────────────────────────────────
+// Suggested actions row
+// ─────────────────────────────────────────────
+
 class SuggestedActionsRow extends StatelessWidget {
   final List<QuickAction> actions;
 
@@ -74,71 +74,76 @@ class SuggestedActionsRow extends StatelessWidget {
   }
 }
 
-/// The send button inside the input bar.
+// ─────────────────────────────────────────────
+// Send button
+// ─────────────────────────────────────────────
+
 class _SendButton extends StatelessWidget {
   final VoidCallback? onTap;
+  final bool isLoading;
 
-  const _SendButton({this.onTap});
+  const _SendButton({this.onTap, this.isLoading = false});
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: onTap,
-      child: Container(
+      onTap: isLoading ? null : onTap,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
         width: 48,
         height: 40,
         decoration: BoxDecoration(
-          color: AppColors.sendBtnBg,
+          color: isLoading ? AppColors.sendBtnBg.withValues(alpha: 0.5) : AppColors.sendBtnBg,
           borderRadius: BorderRadius.circular(16),
-          boxShadow: const [
-            BoxShadow(color: AppColors.sendBtnShadowStrong, blurRadius: 15, offset: Offset(0, 10)),
-            BoxShadow(color: AppColors.sendBtnShadowStrong, blurRadius: 6, offset: Offset(0, 4)),
-          ],
+          boxShadow: isLoading
+              ? null
+              : const [
+                  BoxShadow(color: AppColors.sendBtnShadowStrong, blurRadius: 15, offset: Offset(0, 10)),
+                  BoxShadow(color: AppColors.sendBtnShadowStrong, blurRadius: 6, offset: Offset(0, 4)),
+                ],
         ),
-        child: const Center(child: Icon(Icons.send_rounded, color: AppColors.white, size: 18)),
+        child: Center(
+          child: isLoading
+              ? const SizedBox(
+                  width: 16,
+                  height: 16,
+                  child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+                )
+              : const Icon(Icons.send_rounded, color: AppColors.white, size: 18),
+        ),
       ),
     );
   }
 }
 
-/// The text field + send button row.
-class ChatInputBar extends StatefulWidget {
+// ─────────────────────────────────────────────
+// Chat input bar
+// ─────────────────────────────────────────────
+
+class ChatInputBar extends StatelessWidget {
+  /// Owned by [AiHealthAssProvider] — do not create locally.
+  final TextEditingController controller;
   final ValueChanged<String>? onSubmitted;
+  final bool isLoading;
 
-  const ChatInputBar({super.key, this.onSubmitted});
-
-  @override
-  State<ChatInputBar> createState() => _ChatInputBarState();
-}
-
-class _ChatInputBarState extends State<ChatInputBar> {
-  final _controller = TextEditingController();
+  const ChatInputBar({super.key, required this.controller, this.onSubmitted, this.isLoading = false});
 
   void _submit() {
-    final text = _controller.text.trim();
-    if (text.isNotEmpty) {
-      widget.onSubmitted?.call(text);
-      _controller.clear();
+    final text = controller.text.trim();
+    if (text.isNotEmpty && !isLoading) {
+      onSubmitted?.call(text);
     }
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return AppTextFormField(
-      controller: _controller,
+      controller: controller,
       fillColor: AppColors.inputBg,
       borderColor: AppColors.border,
-
-      contentPadding: EdgeInsets.symmetric(vertical: 8),
-      hintText: 'Ask Pulse8 anything...',
+      contentPadding: const EdgeInsets.symmetric(vertical: 8),
+      hintText: 'Ask PulseAid anything...',
       onFieldSubmitted: (_) => _submit(),
-
       prefixIcon: SizedBox(
         width: 40,
         height: 40,
@@ -149,8 +154,7 @@ class _ChatInputBarState extends State<ChatInputBar> {
         child: Row(
           children: [
             const SizedBox(width: 4),
-            // Send button
-            _SendButton(onTap: _submit),
+            _SendButton(onTap: _submit, isLoading: isLoading),
             const SizedBox(width: 4),
           ],
         ),
@@ -159,15 +163,32 @@ class _ChatInputBarState extends State<ChatInputBar> {
   }
 }
 
-/// The full frosted-glass footer: suggested actions + input bar.
+// ─────────────────────────────────────────────
+// Chat footer
+// ─────────────────────────────────────────────
+
 class ChatFooter extends StatelessWidget {
   final List<QuickAction> suggestedActions;
   final ValueChanged<String>? onSubmitted;
 
-  const ChatFooter({super.key, required this.suggestedActions, this.onSubmitted});
+  /// Pass [AiHealthAssProvider.inputController] here.
+  final TextEditingController? inputController;
+
+  /// Pass [AiHealthAssProvider.isLoading] here.
+  final bool isLoading;
+
+  const ChatFooter({
+    super.key,
+    required this.suggestedActions,
+    this.onSubmitted,
+    this.inputController,
+    this.isLoading = false,
+  });
 
   @override
   Widget build(BuildContext context) {
+    final ctrl = inputController ?? TextEditingController();
+
     return ClipRect(
       child: BackdropFilter(
         filter: ColorFilter.mode(AppColors.footerBg, BlendMode.srcOver),
@@ -182,7 +203,7 @@ class ChatFooter extends StatelessWidget {
             children: [
               SuggestedActionsRow(actions: suggestedActions),
               const SizedBox(height: 16),
-              ChatInputBar(onSubmitted: onSubmitted),
+              ChatInputBar(controller: ctrl, onSubmitted: onSubmitted, isLoading: isLoading),
             ],
           ),
         ),

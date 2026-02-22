@@ -166,9 +166,13 @@ double? _sfloat(int lsb, int msb) {
   }
   double result = 1.0;
   if (exponent >= 0) {
-    for (int i = 0; i < exponent; i++) result *= 10;
+    for (int i = 0; i < exponent; i++) {
+      result *= 10;
+    }
   } else {
-    for (int i = 0; i < -exponent; i++) result /= 10;
+    for (int i = 0; i < -exponent; i++) {
+      result /= 10;
+    }
   }
   return mantissa * result;
 }

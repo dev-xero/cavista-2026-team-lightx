@@ -3,4 +3,6 @@ class ApiPaths {
 
   static const predict = '$baseUrl/predict';
   static const faceAnalysis = '$baseUrl/analyse-facial';
+  static const chat = '$baseUrl/chat';
+  static const analyzeVitals = '$baseUrl/analyse-vitals';
 }

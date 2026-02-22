@@ -96,7 +96,7 @@ class AiHealthAssHeader extends StatelessWidget implements PreferredSizeWidget {
 
   const AiHealthAssHeader({
     super.key,
-    this.appName = 'Pulse8 Ai',
+    this.appName = 'PulseAid Ai',
     this.statusLabel = 'AI Active',
     this.onMenuTap,
     this.onNotificationTap,

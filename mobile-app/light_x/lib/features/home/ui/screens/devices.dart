@@ -696,7 +696,6 @@ class _DevicesState extends State<Devices> {
 
     // Derived display values
     final hrValue = snapshot?.heartRate != null ? '${snapshot!.heartRate}' : '--';
-    final spo2Value = snapshot?.spo2 != null ? snapshot!.spo2!.toStringAsFixed(0) : '--';
     final batteryValue = snapshot?.battery;
 
     // Steps / sleep are not provided by the BLE health service currently,
@@ -704,8 +703,6 @@ class _DevicesState extends State<Devices> {
     const stepsValue = '--';
     const stepsFraction = 0.0;
     const stepsLabel = '0% done';
-    const sleepValue = '--';
-    const sleepBadge = 'No data';
 
     return Column(
       children: [

@@ -6,6 +6,9 @@ enum SharedPrefKeys {
 
   /// Type: bool
   isUserSignedIn,
+
+  /// Type: json
+  onboardingData,
 }
 
 extension SharedPrefKeysExtension on SharedPrefKeys {

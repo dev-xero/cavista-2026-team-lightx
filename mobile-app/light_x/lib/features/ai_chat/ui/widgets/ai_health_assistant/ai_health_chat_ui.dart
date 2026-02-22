@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:light_x/routes/app_router.dart';
 import 'package:light_x/shared/theme/src/app_colors.dart';
 import 'package:light_x/shared/theme/src/app_text_styles.dart';
 
@@ -48,45 +49,83 @@ class UserAvatar extends StatelessWidget {
 }
 
 /// A small card embedded inside an AI message bubble, e.g. a report reference.
+/// Tap it to navigate — pass either [onTap] for full control or [route] for
+/// a simple push via named routes.
 class AnalysisContextCard extends StatelessWidget {
   final String title;
   final String subtitle;
 
-  const AnalysisContextCard({super.key, required this.title, required this.subtitle});
+  /// Custom icon for the leading tile. Defaults to [Icons.bedtime].
+  final IconData icon;
+
+  /// Called when the card is tapped. Takes priority over [route].
+  final VoidCallback? onTap;
+
+  /// Named route to push when tapped (used if [onTap] is null).
+  final String? route;
+
+  /// Arguments forwarded to [route] via [Navigator.pushNamed].
+  final Object? routeArguments;
+
+  const AnalysisContextCard({
+    super.key,
+    required this.title,
+    required this.subtitle,
+    this.icon = Icons.bedtime,
+    this.onTap,
+    this.route,
+    this.routeArguments,
+  });
+
+  bool get _tappable => onTap != null || route != null;
+
+  void _handleTap(BuildContext context) {
+    if (onTap != null) {
+      onTap!();
+      return;
+    }
+    if (route != null) {
+      context.push(route!, extra: routeArguments);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.fromLTRB(12, 12, 12, 11),
-      decoration: BoxDecoration(
-        color: AppColors.surface,
-        border: Border.all(color: AppColors.border),
-        borderRadius: BorderRadius.circular(24),
-      ),
-      child: Row(
-        children: [
-          // Icon container
-          Container(
-            width: 48,
-            height: 48,
-            decoration: BoxDecoration(color: AppColors.primaryLight, borderRadius: BorderRadius.circular(16)),
-            child: const Center(child: Icon(Icons.bedtime, color: AppColors.primary, size: 18)),
-          ),
-          const SizedBox(width: 12),
-          // Text column
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(title, style: AppTextStyles.cardTitle),
-                const SizedBox(height: 2),
-                Text(subtitle, style: AppTextStyles.cardSubtitle),
-              ],
+    return GestureDetector(
+      onTap: _tappable ? () => _handleTap(context) : null,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 150),
+        padding: const EdgeInsets.fromLTRB(12, 12, 12, 11),
+        decoration: BoxDecoration(
+          color: AppColors.surface,
+          border: Border.all(color: AppColors.border),
+          borderRadius: BorderRadius.circular(24),
+        ),
+        child: Row(
+          children: [
+            // Icon tile
+            Container(
+              width: 48,
+              height: 48,
+              decoration: BoxDecoration(color: AppColors.primaryLight, borderRadius: BorderRadius.circular(16)),
+              child: Center(child: Icon(icon, color: AppColors.primary, size: 18)),
             ),
-          ),
-          // Chevron
-          const Icon(Icons.chevron_right, color: AppColors.textMuted, size: 16),
-        ],
+            const SizedBox(width: 12),
+            // Text column
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(title, style: AppTextStyles.cardTitle),
+                  const SizedBox(height: 2),
+                  Text(subtitle, style: AppTextStyles.cardSubtitle),
+                ],
+              ),
+            ),
+            // Chevron — highlighted when tappable
+            Icon(Icons.chevron_right, color: _tappable ? AppColors.primary : AppColors.textMuted, size: 16),
+          ],
+        ),
       ),
     );
   }
@@ -112,7 +151,7 @@ class AiMessageBubble extends StatelessWidget {
               // Sender label with left padding
               const Padding(
                 padding: EdgeInsets.only(left: 4),
-                child: Text('Pulse8 AI', style: AppTextStyles.senderLabel),
+                child: Text('PulseAid AI', style: AppTextStyles.senderLabel),
               ),
               const SizedBox(height: 8),
               // Bubble
