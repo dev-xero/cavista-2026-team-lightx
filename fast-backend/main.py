@@ -28,9 +28,11 @@ genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
 llm = genai.GenerativeModel('gemini-3-flash-preview')
 
 vitals_model = xgb.XGBClassifier()
-vitals_model.load_model("models/vitals/hypertension_model.json")
-vitals_imputer = joblib.load("models/vitals/imputer.pkl")
-vitals_schema = json.load(open("models/vitals/feature_schema.json"))
+
+MODEL_DIRECTORY="./models/vitals"
+vitals_model.load_model(f"{MODEL_DIRECTORY}/hypertension_model.json")
+vitals_imputer = joblib.load(f"{MODEL_DIRECTORY}/imputer.pkl")
+vitals_schema = json.load(open(f"{MODEL_DIRECTORY}/feature_schema.json"))
 
 FEATURES = vitals_schema["features"]
 
@@ -211,13 +213,6 @@ async def analyse_vitals(data: UserData):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-
-@app.post("/analyse-facial", tags=["Health"])
-async def analyse_facial():
-    """
-    Oti sun mi
-    """
-    pass
 
 @app.post("/suggest", tags=["Health"])
 async def suggest_tips(symptoms: SymptomsData):

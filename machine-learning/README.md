@@ -54,7 +54,7 @@ This data is eventually combined into a single cohesive data set with computed/d
   ```
 4. Train the Multi-class XGBoost Classifier Model
   ```sh
-  python3 train.py
+  python3 ./vitals/train.py
   ```
 
 ## Fair Use Policy (NHANES)
