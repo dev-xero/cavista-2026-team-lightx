@@ -1,3 +1,4 @@
+import asyncio
 import os
 import datetime
 import time
@@ -7,7 +8,7 @@ import xgboost as xgb
 import numpy as np
 import pandas as pd
 import datetime as dt
-import google.generativeai as genAi
+import google.generativeai as genai
 
 from fastapi.responses import StreamingResponse
 from dotenv import load_dotenv
@@ -17,18 +18,23 @@ from fastapi import FastAPI, HTTPException, UploadFile, File, Form, Depends
 from pydantic import BaseModel, Field
 from typing import List, Optional
 from datetime import date
+from dotenv import load_dotenv
+
+load_dotenv()
 
 app = FastAPI(title="Team LightX API", description="Swagger Open API Specification")
 
-genAi_key = os.getenv("GEMINI_API_KEY")
-llm = genAi.GenerativeModel('gemini-1.5-flash')
+genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
+llm = genai.GenerativeModel('gemini-3-flash-preview')
 
-model = xgb.XGBClassifier()
-model.load_model("models/hypertension_model.json")
-imputer = joblib.load("models/imputer.pkl")
-schema = json.load(open("models/feature_schema.json"))
+vitals_model = xgb.XGBClassifier()
 
-FEATURES = schema["features"]
+MODEL_DIRECTORY="./models/vitals"
+vitals_model.load_model(f"{MODEL_DIRECTORY}/hypertension_model.json")
+vitals_imputer = joblib.load(f"{MODEL_DIRECTORY}/imputer.pkl")
+vitals_schema = json.load(open(f"{MODEL_DIRECTORY}/feature_schema.json"))
+
+FEATURES = vitals_schema["features"]
 
 STAGE_ADVICE = {
     0: "Blood pressure is healthy. You may maintain your current lifestyle. Be sure to check-in annually.",
@@ -94,8 +100,9 @@ class PredictionResult(BaseModel):
     
 
 class ChatRequest(BaseModel):
-    msg: str
+    message: str
     context: Optional[str] = "No previous context found."
+    
     
 def calculate_bmi(weight: float, height_cm: float):
     """
@@ -154,10 +161,10 @@ def run_inference(data: UserData):
     }
     
     X = pd.DataFrame([row])[FEATURES]
-    X_imp = imputer.transform(X)
+    X_imp = vitals_imputer.transform(X)
     
-    stage = int(model.predict(X_imp)[0])
-    probs = model.predict_proba(X_imp)[0].tolist()
+    stage = int(vitals_model.predict(X_imp)[0])
+    probs = vitals_model.predict_proba(X_imp)[0].tolist()
     
     return PredictionResult(
         stage = stage,
@@ -185,8 +192,8 @@ async def base():
     }
 
 
-@app.post("/predict", tags=["Health"])
-async def run_analysis(data: UserData):
+@app.post("/analyse-vitals", tags=["Health"])
+async def analyse_vitals(data: UserData):
     """
     This endpoint runs inference on the Machine Learning model using smartwatch and
     onboarding data.
@@ -205,6 +212,7 @@ async def run_analysis(data: UserData):
         
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
 
 @app.post("/suggest", tags=["Health"])
 async def suggest_tips(symptoms: SymptomsData):
@@ -255,17 +263,21 @@ async def chat_streamer(prompt: str):
 @app.post("/chat", tags=["Health"])
 async def chat(req: ChatRequest):
     """
-    This endpoint uses the LLM chat interface via Server-Sent Events (SSE) 
+    This endpoint uses the LLM chat interface via Server-Sent Events (SSE)
     for instant streaming responses to the mobile app.
     """
     system_prompt = f"""
     You are a helpful medical assistant for a cardiovascular health app.
     Here is the user's recent health context: {req.context}
-    
+
     User message: {req.message}
     """
-    
+
     return StreamingResponse(
-        chat_streamer(system_prompt), 
-        media_type="text/event-stream"
+        chat_streamer(system_prompt),
+        media_type="text/event-stream",
+        headers={
+            "Cache-Control": "no-cache",
+            "X-Accel-Buffering": "no",
+        }
     )
