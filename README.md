@@ -2,13 +2,19 @@
 
 This repository is Team LightX's hackathon submission for Cavista 2026 Hackathon.
 
+## Overview
+
+- [Mobile App](#mobile-app)
+- [Backend API](#backend-api)
+- [Hypertension Classification Model](#hypertension-classficiation-model)
+
 ## Mobile App
 
 ## Backend API
 
 Cj abeg na
 
-## Hypertension Classification Model (ML)
+## Hypertension Classification Model
 
 ### Overview
 
