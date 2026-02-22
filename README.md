@@ -6,7 +6,7 @@ This repository is Team LightX's hackathon submission for Cavista 2026 Hackathon
 
 - [Mobile App](#mobile-app)
 - [Backend API](#backend-api)
-- [Hypertension Classification Model](#hypertension-classficiation-model)
+- [Hypertension Classification Model](#hypertension-classification-model)
 
 ## Mobile App
 
@@ -16,12 +16,9 @@ Cj abeg na
 
 ## Hypertension Classification Model
 
-### Overview
-
 This module implements a multi-class classifier using XGBoost with the National Health And Nutrition Examination survey (NHANES) dataset.
 
 ### Training Architecture
-
 
 |         Architecture Overview           |
 |       :---------------:       |
