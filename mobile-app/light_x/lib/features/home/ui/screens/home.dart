@@ -4,6 +4,7 @@ import 'package:light_x/core/assets/assets.dart';
 import 'package:light_x/core/constants/constants.dart';
 import 'package:light_x/features/home/ui/widgets/home/bar_chart_card.dart';
 import 'package:light_x/features/home/ui/widgets/home/health_tips_section.dart';
+import 'package:light_x/routes/app_router.dart';
 import 'package:light_x/shared/components/buttons/app_button.dart';
 import 'package:light_x/shared/components/buttons/build_icon_button.dart';
 import 'package:light_x/shared/components/indicators/app_linear_progress_indicator.dart';
@@ -58,10 +59,15 @@ class _HomeState extends State<Home> {
                 padding: const EdgeInsets.symmetric(vertical: 24),
                 child: Row(
                   children: [
-                    const CircleAvatar(
-                      radius: 20,
-                      backgroundColor: AppColors.primary,
-                      child: Icon(Icons.person, color: Colors.white),
+                    GestureDetector(
+                      onTap: () {
+                        Routes.pricing.push(context);
+                      },
+                      child: const CircleAvatar(
+                        radius: 20,
+                        backgroundColor: AppColors.primary,
+                        child: Icon(Icons.person, color: Colors.white),
+                      ),
                     ),
                     12.inRow,
                     Expanded(
@@ -95,7 +101,7 @@ class _HomeState extends State<Home> {
         // Hypertension Risk Card
         SliverToBoxAdapter(
           child: Container(
-            height: 260,
+            height: 340,
             padding: const EdgeInsets.all(32),
             decoration: BoxDecoration(
               color: Colors.white,
@@ -116,7 +122,23 @@ class _HomeState extends State<Home> {
                     mainAxisAlignment: MainAxisAlignment.end,
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      AppText("12%", fontSize: 48, fontWeight: FontWeight.w800, color: Colors.black),
+                      Stack(
+                        children: [
+                          SvgPicture.asset(Assets.svgs.semiCircle, width: 240, height: 120),
+                          Positioned(
+                            bottom: 20,
+                            left: 0,
+                            top: 0,
+                            right: 50,
+                            child: SvgPicture.asset(
+                              Assets.svgs.needle,
+                              colorFilter: ColorFilter.mode(Colors.black.withAlpha(40), BlendMode.srcATop),
+                            ),
+                          ),
+                        ],
+                      ),
+                      8.inColumn,
+                      AppText("12%", fontSize: 24, fontWeight: FontWeight.w800, color: Colors.black),
                       AppText("Low Risk", fontSize: 14, fontWeight: FontWeight.w600, color: const Color(0xFF14B8A6)),
                     ],
                   ),
@@ -141,7 +163,9 @@ class _HomeState extends State<Home> {
             padding: const EdgeInsets.symmetric(vertical: 16),
             child: AppButton(
               label: "TAKE A SCAN",
-              onPressed: () {},
+              onPressed: () {
+                Routes.faceScan.push(context);
+              },
               leading: SvgPicture.asset(
                 Assets.svgs.newScan,
                 colorFilter: const ColorFilter.mode(Colors.white, BlendMode.srcIn),
@@ -215,7 +239,7 @@ class _HomeState extends State<Home> {
 
         SliverToBoxAdapter(child: HealthTipsSection(tips: tips)),
 
-        100.inSliverColumn, // Bottom spacer
+        88.inSliverColumn,
       ],
     );
   }

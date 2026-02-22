@@ -1,10 +1,13 @@
+import 'dart:developer' as dev;
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter_blue_plus/flutter_blue_plus.dart';
-import 'package:light_x/features/scan/logic/health_service.dart';
+import 'package:light_x/features/scan/logic/watch_scan/health_service.dart';
 import 'package:light_x/features/scan/logic/models/health_data_snapshot.dart';
+import 'package:light_x/features/scan/providers/health_provider.dart';
 import 'package:light_x/shared/components/buttons/app_back_button.dart';
 import 'package:light_x/shared/components/layout/app_scaffold.dart';
+import 'package:light_x/shared/components/layout/app_text.dart';
 import 'package:light_x/shared/components/layout/texts.dart';
 import 'package:light_x/shared/theme/src/app_colors.dart';
 import 'package:provider/provider.dart';
@@ -34,42 +37,45 @@ class _HealthScreenState extends State<HealthScreen> with SingleTickerProviderSt
 
   @override
   Widget build(BuildContext context) {
-    final healthService = context.watch<WatchHealthService?>();
+    final healthService = context.watch<HealthProvider>().healthService;
 
     return StreamBuilder<BluetoothConnectionState>(
       stream: healthService?.connectionState,
       builder: (_, connSnap) {
         final connected = connSnap.data == BluetoothConnectionState.connected;
+        // dev.log("connection state: ${connSnap.data}");
         return AppScaffold(
           leading: AppBackButton(),
-          title: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              AppTexts.pageAppBarTitleText(healthService?.deviceName ?? "Unknown Device"),
-              Row(
-                children: [
-                  Container(
-                    width: 6,
-                    height: 6,
-                    margin: const EdgeInsets.only(right: 5),
-                    decoration: BoxDecoration(
-                      color: connected ? const Color(0xFF00E676) : const Color(0xFFFF4D6D),
-                      shape: BoxShape.circle,
+          viewPadding: EdgeInsets.zero,
+          title: Center(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                AppTexts.pageAppBarTitleText(healthService?.deviceName ?? "Unknown Device"),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Container(
+                      width: 6,
+                      height: 6,
+                      margin: const EdgeInsets.only(right: 5),
+                      decoration: BoxDecoration(
+                        color: connected ? const Color(0xFF00E676) : const Color(0xFFFF4D6D),
+                        shape: BoxShape.circle,
+                      ),
                     ),
-                  ),
-                  Text(
-                    connected ? 'Connected' : 'Disconnected',
-                    style: TextStyle(
+                    AppText(
+                      connected ? 'Connected' : 'Disconnected',
                       fontSize: 11,
                       color: connected ? const Color(0xFF00E676) : const Color(0xFFFF4D6D),
                     ),
-                  ),
-                ],
-              ),
-            ],
+                  ],
+                ),
+              ],
+            ),
           ),
 
-          body: connected ? _buildBody(healthService) : _buildDisconnected(),
+          body: _buildBody(healthService),
         );
       },
     );
@@ -80,6 +86,7 @@ class _HealthScreenState extends State<HealthScreen> with SingleTickerProviderSt
       stream: healthService?.snapshots,
       builder: (_, snap) {
         final data = snap.data;
+        dev.log("got data: $data");
 
         if (data?.heartRate != null && data!.heartRate != _lastHr) {
           _lastHr = data.heartRate;
@@ -114,22 +121,6 @@ class _HealthScreenState extends State<HealthScreen> with SingleTickerProviderSt
       },
     );
   }
-
-  Widget _buildDisconnected() => Center(
-    child: Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Icon(Icons.bluetooth_disabled_rounded, size: 64, color: Colors.white.withValues(alpha: 0.12)),
-        const SizedBox(height: 16),
-        const Text('Device disconnected', style: TextStyle(color: Color(0xFF6B7A99), fontSize: 16)),
-        const SizedBox(height: 8),
-        TextButton(
-          onPressed: () => Navigator.of(context).pop(),
-          child: const Text('Go back', style: TextStyle(color: AppColors.primary)),
-        ),
-      ],
-    ),
-  );
 }
 
 // ── Heart Rate ─────────────────────────────────────────────────────────────────
@@ -444,7 +435,7 @@ class _MetricCard extends StatelessWidget {
     this.badgeColor,
   });
 
-  static const _card = Color(0xFF1C2438);
+  static const _card = Color(0xFFF8F8F8);
   static const _textSub = Color(0xFF6B7A99);
 
   @override

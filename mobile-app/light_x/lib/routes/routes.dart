@@ -23,10 +23,15 @@ enum Routes {
   // MAIN SCREENS
   // ============================================================================
   home,
+  healthAnalysis,
+
   watchScan,
   healthDataResult,
 
   aiChat,
+  faceScan,
+  pricing,
+  faceScanResult,
 }
 
 extension RoutesExtension on Routes {

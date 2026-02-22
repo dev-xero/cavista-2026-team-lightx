@@ -9,6 +9,16 @@
 // ignore_for_file: type=lint
 // ignore_for_file: deprecated_member_use,directives_ordering,implicit_dynamic_list_literal,unnecessary_import
 
+class $AssetsImagesGen {
+  const $AssetsImagesGen();
+
+  /// File path: assets/images/face_recognition.png
+  String get faceRecognition => 'assets/images/face_recognition.png';
+
+  /// List of all assets
+  List<String> get values => [faceRecognition];
+}
+
 class $AssetsLogoGen {
   const $AssetsLogoGen();
 
@@ -37,6 +47,9 @@ class $AssetsSvgsGen {
   /// File path: assets/svgs/new_scan.svg
   String get newScan => 'assets/svgs/new_scan.svg';
 
+  /// File path: assets/svgs/scanning_viewfinder.svg
+  String get scanningViewfinder => 'assets/svgs/scanning_viewfinder.svg';
+
   /// File path: assets/svgs/semi_circle.svg
   String get semiCircle => 'assets/svgs/semi_circle.svg';
 
@@ -50,6 +63,7 @@ class $AssetsSvgsGen {
     maleIcon,
     needle,
     newScan,
+    scanningViewfinder,
     semiCircle,
     smokingIcon,
   ];
@@ -59,6 +73,7 @@ class Assets {
   const Assets._();
 
   static const String aEnv = '.env';
+  static const $AssetsImagesGen images = $AssetsImagesGen();
   static const $AssetsLogoGen logo = $AssetsLogoGen();
   static const $AssetsSvgsGen svgs = $AssetsSvgsGen();
 

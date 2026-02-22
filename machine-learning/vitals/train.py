@@ -20,8 +20,8 @@ logging.basicConfig(
     format='%(asctime)s - %(levelname)s - %(message)s'
 )
 
-DATA_DIRECTORY="./NHANES_data"
-OUTPUT_DIRECTORY="./output"
+DATA_DIRECTORY="./vitals/NHANES_data"
+OUTPUT_DIRECTORY="./vitals/output"
 RANDOM_STATE=42
 TEST_SIZE=0.2
 

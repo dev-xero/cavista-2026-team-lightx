@@ -18,7 +18,7 @@ class AppTheme {
     //   centerTitle: true,
     //   iconTheme: IconThemeData(color: AppColors.neutralWhite50),
     // ),
-
+    splashColor: Colors.transparent,
     // Input Decoration
     inputDecorationTheme: InputDecorationTheme(
       filled: true,

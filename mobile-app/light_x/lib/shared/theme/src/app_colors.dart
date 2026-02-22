@@ -89,6 +89,20 @@ class AppColors {
   static const headerBackground = Color(0xCCFFFFFF); // rgba(255,255,255,0.8)
   static const headerBorder = Color(0xFFE2E8F0);
 
+  // Health Dashboard
+  static const amber = Color(0xFFF59E0B);
+  static const amberLight = Color(0x1AF59E0B); // 10% opacity
+  static const amberBorder = Color(0x33F59E0B); // 20% opacity
+  static const amberText = Color(0xCCF59E0B); // 80% opacity
+  static const green = Color(0xFF22C55E);
+  static const red = Color(0xFFEF4444);
+  static const gaugeTrack = Color(0xFFE2E8F0);
+  static const textBodySecondary = Color(0xFF475569);
+  static const premiumBg = Color(0xFF1C58D9);
+  static const premiumBorder = Color(0x4D1C58D9);
+  static const premiumBodyText = Color(0xFFEBEEF4);
+  static const dashedBorder = Color(0x661C58D9); // 40% opacity
+
   static const brandBlue = Color(0xFF1C58D9);
   static const statusGreen = Color(0xFF10B981);
   static const subtleText = Color(0xFF64748B);
@@ -111,4 +125,29 @@ class AppColors {
   static const sendBtnBg = Color(0xFF09357C);
   static const sendBtnShadowStrong = Color(0x4D1C58D9); // rgba(28,88,217,0.3)
   static const iconMuted = Color(0xFF94A3B8);
+
+  // Scanner screen
+  static const scannerRingTrack = Color(0x331C58D9); // 20% opacity
+  static const progressTrack = Color(0x1A1C58D9);
+
+  static const pageBg = Color(0xFFF6F6F8);
+  static const connectedBg = Color(0xFFD1FAE5);
+  static const connectedDot = Color(0xFF10B981);
+  static const connectedGlow = Color(0xBF34D399); // 75% opacity
+  static const connectedText = Color(0xFF059669);
+  static const heartBg = Color(0xFFFFF1F2);
+  static const heartIcon = Color(0xFFF43F5E);
+  static const heartBar1 = Color(0xFFFECDD3);
+  static const heartBar2 = Color(0xFFFDA4AF);
+  static const heartBar3 = Color(0xFFF43F5E);
+  static const sleepBg = Color(0xFFEEF2FF);
+  static const sleepIcon = Color(0xFF6366F1);
+  static const sleepBadgeTxt = Color(0xFF4F46E5);
+  static const syncBtn = Color(0xCF1C4D8D);
+  static const surfaceBorder = Color(0xFFF1F5F9);
+
+  static const textBody = Color(0xFF475569);
+  static const navy = Color(0xFF09357C);
+  static const primaryShadow = Color(0x661C58D9); // 40%
+  static const featuredShadow = Color(0x4D4D1C8D);
 }
