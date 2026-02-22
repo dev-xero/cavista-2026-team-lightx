@@ -40,8 +40,7 @@ class _BrandCenter extends StatelessWidget {
         // App name
         Text(
           appName,
-          style: const TextStyle(
-            fontFamily: 'Manrope',
+          style: TextStyle(
             fontWeight: FontWeight.w700,
             fontSize: 18,
             height: 22 / 18,
@@ -60,7 +59,7 @@ class _BrandCenter extends StatelessWidget {
             Container(
               width: 8,
               height: 8,
-              decoration: const BoxDecoration(color: AppColors.statusGreen, shape: BoxShape.circle),
+              decoration: BoxDecoration(color: AppColors.statusGreen, shape: BoxShape.circle),
             ),
 
             const SizedBox(width: 6),
@@ -68,8 +67,7 @@ class _BrandCenter extends StatelessWidget {
             // Status text
             Text(
               statusLabel.toUpperCase(),
-              style: const TextStyle(
-                fontFamily: 'Manrope',
+              style: TextStyle(
                 fontWeight: FontWeight.w600,
                 fontSize: 10,
                 height: 1.5,
@@ -111,7 +109,7 @@ class AiHealthAssHeader extends StatelessWidget implements PreferredSizeWidget {
       child: Container(
         height: 73,
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-        decoration: const BoxDecoration(
+        decoration: BoxDecoration(
           color: AppColors.headerBackground,
           border: Border(bottom: BorderSide(color: AppColors.headerBorder, width: 1)),
         ),

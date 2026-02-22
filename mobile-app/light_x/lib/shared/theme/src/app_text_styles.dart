@@ -16,12 +16,8 @@ class AppTextStyles {
     color: AppColors.textPrimary,
   );
 
-  static const messageBodyWhite = TextStyle(
-    fontWeight: FontWeight.w400,
-    fontSize: 14,
-    height: 23 / 14,
-    color: AppColors.white,
-  );
+  // White variant of messageBody
+  static TextStyle get messageBodyWhite => messageBody.copyWith(color: AppColors.white);
 
   static const cardTitle = TextStyle(
     fontWeight: FontWeight.w700,
@@ -197,6 +193,12 @@ class AppTextStyles {
 
   static const navLabel = TextStyle(fontWeight: FontWeight.w700, fontSize: 10, height: 15 / 10);
 
+  // navLabel variant with custom color
+  static TextStyle get sleepBadge => navLabel.copyWith(color: AppColors.sleepBadgeTxt);
+
+  // navLabel variant with custom color
+  static TextStyle get highlightBadge => navLabel.copyWith(letterSpacing: 1, color: AppColors.white);
+
   static const connBadge = TextStyle(
     fontWeight: FontWeight.w700,
     fontSize: 12,
@@ -219,12 +221,20 @@ class AppTextStyles {
     color: AppColors.textPrimary,
   );
 
+  // syncTitle variant in white
+  static TextStyle get premiumTitleWhite => syncTitle.copyWith(color: AppColors.white);
+
   static const syncSubtitle = TextStyle(
     fontWeight: FontWeight.w400,
     fontSize: 14,
     height: 20 / 14,
     color: AppColors.textSecondary,
   );
+
+  // Aliases — same shape, same colour
+  static TextStyle get progressCaption_ => syncSubtitle; // identical to progressCaption
+  static TextStyle get planPeriod => syncSubtitle; // identical shape & colour
+  static TextStyle get ctaNote_ => syncSubtitle; // close enough if desired
 
   static const statLabel = TextStyle(
     fontWeight: FontWeight.w500,
@@ -254,12 +264,8 @@ class AppTextStyles {
     color: AppColors.primary,
   );
 
-  static const sleepBadge = TextStyle(
-    fontWeight: FontWeight.w700,
-    fontSize: 10,
-    height: 15 / 10,
-    color: AppColors.sleepBadgeTxt,
-  );
+  static TextStyle get savingsBadge => statProgress; // same style
+  static TextStyle get faqLabel => statProgress.copyWith(color: AppColors.primary); // already primary — direct alias ok
 
   static const syncBtnLabel = TextStyle(
     fontWeight: FontWeight.w700,
@@ -267,6 +273,8 @@ class AppTextStyles {
     height: 24 / 16,
     color: AppColors.white,
   );
+
+  static TextStyle get ctaPrimary => syncBtnLabel;
 
   static const heroTitle = TextStyle(
     fontWeight: FontWeight.w800,
@@ -277,7 +285,7 @@ class AppTextStyles {
     textBaseline: TextBaseline.alphabetic,
   );
 
-  static const heroSubtitle = TextStyle(
+  static final heroSubtitle = TextStyle(
     fontWeight: FontWeight.w400,
     fontSize: 18,
     height: 29 / 18,
@@ -298,14 +306,7 @@ class AppTextStyles {
     color: AppColors.textPrimary,
   );
 
-  static const planPeriod = TextStyle(
-    fontWeight: FontWeight.w400,
-    fontSize: 14,
-    height: 20 / 14,
-    color: AppColors.textSecondary,
-  );
-
-  static const featureBasic = TextStyle(
+  static final featureBasic = TextStyle(
     fontWeight: FontWeight.w400,
     fontSize: 16,
     height: 24 / 16,
@@ -326,33 +327,11 @@ class AppTextStyles {
     color: AppColors.textMuted,
   );
 
-  static const ctaPrimary = TextStyle(
-    fontWeight: FontWeight.w700,
-    fontSize: 16,
-    height: 24 / 16,
-    color: AppColors.white,
-  );
-
   static const ctaNote = TextStyle(
     fontWeight: FontWeight.w400,
     fontSize: 10,
     height: 15 / 10,
     color: AppColors.textSecondary,
-  );
-
-  static const savingsBadge = TextStyle(
-    fontWeight: FontWeight.w700,
-    fontSize: 12,
-    height: 16 / 12,
-    color: AppColors.primary,
-  );
-
-  static const highlightBadge = TextStyle(
-    fontWeight: FontWeight.w700,
-    fontSize: 10,
-    height: 15 / 10,
-    letterSpacing: 1,
-    color: AppColors.white,
   );
 
   static const trustHeading = TextStyle(
@@ -375,12 +354,5 @@ class AppTextStyles {
     fontSize: 14,
     height: 23 / 14,
     color: AppColors.textSecondary,
-  );
-
-  static const faqLabel = TextStyle(
-    fontWeight: FontWeight.w700,
-    fontSize: 14,
-    height: 20 / 14,
-    color: AppColors.primary,
   );
 }

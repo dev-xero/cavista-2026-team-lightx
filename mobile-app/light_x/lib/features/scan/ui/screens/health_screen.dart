@@ -323,7 +323,7 @@ class _BpCard extends StatelessWidget {
         ),
         if (bp?.meanArterial != null) ...[
           const SizedBox(height: 6),
-          Text('Mean arterial: ${bp!.meanArterial} mmHg', style: const TextStyle(color: _textSub, fontSize: 12)),
+          Text('Mean arterial: ${bp!.meanArterial} mmHg', style: TextStyle(color: _textSub, fontSize: 12)),
         ],
         const SizedBox(height: 14),
         // Systolic range bar (60–180 mmHg displayed range)

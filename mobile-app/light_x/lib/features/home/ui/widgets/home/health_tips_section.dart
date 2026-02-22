@@ -11,7 +11,7 @@ class HealthTipItem {
   final IconData icon;
   final Color iconColor;
 
-  const HealthTipItem({required this.title, required this.description, required this.icon, required this.iconColor});
+  HealthTipItem({required this.title, required this.description, required this.icon, required this.iconColor});
 }
 
 // ─────────────────────────────────────────────
@@ -74,8 +74,7 @@ class _TipCard extends StatelessWidget {
                 // Title
                 Text(
                   item.title,
-                  style: const TextStyle(
-                    fontFamily: 'Manrope',
+                  style: TextStyle(
                     fontWeight: FontWeight.w700,
                     fontSize: 14,
                     height: 20 / 14,
@@ -90,8 +89,7 @@ class _TipCard extends StatelessWidget {
                   item.description,
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
-                    fontFamily: 'Manrope',
+                  style: TextStyle(
                     fontWeight: FontWeight.w400,
                     fontSize: 12,
                     height: 16 / 12,
@@ -129,8 +127,7 @@ class HealthTipsSection extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: 4),
             child: Text(
               sectionTitle,
-              style: const TextStyle(
-                fontFamily: 'Manrope',
+              style: TextStyle(
                 fontWeight: FontWeight.w700,
                 fontSize: 18,
                 height: 28 / 18,

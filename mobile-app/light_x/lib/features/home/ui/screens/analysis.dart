@@ -130,7 +130,7 @@ class _ErrorBody extends StatelessWidget {
             Container(
               width: 64,
               height: 64,
-              decoration: const BoxDecoration(color: Color(0xFFFEF2F2), shape: BoxShape.circle),
+              decoration: BoxDecoration(color: Color(0xFFFEF2F2), shape: BoxShape.circle),
               child: const Icon(Icons.error_outline_rounded, color: Color(0xFFEF4444), size: 32),
             ),
             const SizedBox(height: 16),
@@ -145,12 +145,7 @@ class _ErrorBody extends StatelessWidget {
                 decoration: BoxDecoration(color: AppColors.primary, borderRadius: BorderRadius.circular(24)),
                 child: const Text(
                   'Try Again',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.w600,
-                    fontFamily: 'Manrope',
-                    fontSize: 14,
-                  ),
+                  style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600, fontSize: 14),
                 ),
               ),
             ),

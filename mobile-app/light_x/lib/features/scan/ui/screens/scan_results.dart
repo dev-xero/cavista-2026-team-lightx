@@ -57,7 +57,7 @@ class _SuccessBody extends StatelessWidget {
                   child: Container(
                     width: 80,
                     height: 80,
-                    decoration: const BoxDecoration(color: Color(0xFFF0FDF4), shape: BoxShape.circle),
+                    decoration: BoxDecoration(color: Color(0xFFF0FDF4), shape: BoxShape.circle),
                     child: const Icon(Icons.check_circle_outline_rounded, color: Color(0xFF22C55E), size: 40),
                   ),
                 ),
@@ -257,7 +257,7 @@ class _ErrorBody extends StatelessWidget {
                   child: Container(
                     width: 80,
                     height: 80,
-                    decoration: const BoxDecoration(color: Color(0xFFFEF2F2), shape: BoxShape.circle),
+                    decoration: BoxDecoration(color: Color(0xFFFEF2F2), shape: BoxShape.circle),
                     child: const Icon(Icons.error_outline_rounded, color: Color(0xFFEF4444), size: 40),
                   ),
                 ),
@@ -346,11 +346,11 @@ class _ErrorCard extends StatelessWidget {
           Container(
             width: 28,
             height: 28,
-            decoration: const BoxDecoration(color: Color(0xFFFEF2F2), shape: BoxShape.circle),
+            decoration: BoxDecoration(color: Color(0xFFFEF2F2), shape: BoxShape.circle),
             alignment: Alignment.center,
             child: Text(
               '${index + 1}',
-              style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: Color(0xFFEF4444)),
+              style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: Color(0xFFEF4444)),
             ),
           ),
           const SizedBox(width: 12),
@@ -364,7 +364,7 @@ class _ErrorCard extends StatelessWidget {
                     decoration: BoxDecoration(color: const Color(0xFFF1F5F9), borderRadius: BorderRadius.circular(6)),
                     child: Text(
                       detail.locationLabel,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 11,
                         fontWeight: FontWeight.w500,
                         color: Color(0xFF64748B),
@@ -389,7 +389,7 @@ class _ErrorCard extends StatelessWidget {
                     ),
                     child: Text(
                       'Input: ${detail.input}',
-                      style: const TextStyle(fontSize: 12, color: Color(0xFF92400E), fontFamily: 'monospace'),
+                      style: TextStyle(fontSize: 12, color: Color(0xFF92400E), fontFamily: 'monospace'),
                     ),
                   ),
                 ],

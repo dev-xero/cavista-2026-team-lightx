@@ -3,6 +3,8 @@ import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:light_x/features/ai_chat/providers/ai_health_ass_provider.dart';
 import 'package:light_x/features/ai_chat/ui/widgets/ai_health_assistant/ai_health_chat_ui.dart';
 import 'package:light_x/features/ai_chat/ui/widgets/ai_health_assistant/chat_footer.dart';
+import 'package:light_x/features/ai_chat/ui/widgets/ai_health_assistant/src/streaming_cursor.dart';
+import 'package:light_x/shared/components/banners/error_banner.dart';
 import 'package:light_x/shared/components/buttons/app_back_button.dart';
 import 'package:light_x/shared/components/layout/app_scaffold.dart';
 import 'package:light_x/shared/components/layout/app_text.dart';
@@ -93,7 +95,7 @@ class _AiHealthAssistantView extends StatelessWidget {
                           ),
 
                         // Blinking cursor while streaming and no content yet
-                        if (msg.isStreaming && msg.content.isEmpty) const _StreamingCursor(),
+                        if (msg.isStreaming && msg.content.isEmpty) const StreamingCursor(),
                       ],
                     );
                   },
@@ -105,7 +107,7 @@ class _AiHealthAssistantView extends StatelessWidget {
                     top: 12,
                     left: 16,
                     right: 16,
-                    child: _ErrorBanner(message: provider.errorMessage!, onRetry: provider.retryLast),
+                    child: ErrorBanner(message: provider.errorMessage!, onRetry: provider.retryLast),
                   ),
 
                 // ── Footer pinned to bottom ────────────────────────
@@ -178,81 +180,6 @@ class _AiHealthAssistantView extends StatelessWidget {
                 color: AppColors.subtleText,
               ),
             ],
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-// ── Streaming cursor ───────────────────────────────────────────────────────────
-
-class _StreamingCursor extends StatefulWidget {
-  const _StreamingCursor();
-
-  @override
-  State<_StreamingCursor> createState() => _StreamingCursorState();
-}
-
-class _StreamingCursorState extends State<_StreamingCursor> with SingleTickerProviderStateMixin {
-  late final _ctrl = AnimationController(vsync: this, duration: const Duration(milliseconds: 500))
-    ..repeat(reverse: true);
-
-  @override
-  void dispose() {
-    _ctrl.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) => FadeTransition(
-    opacity: _ctrl,
-    child: Container(
-      width: 2,
-      height: 16,
-      decoration: BoxDecoration(color: AppColors.primary, borderRadius: BorderRadius.circular(2)),
-    ),
-  );
-}
-
-// ── Error banner ──────────────────────────────────────────────────────────────
-
-class _ErrorBanner extends StatelessWidget {
-  final String message;
-  final VoidCallback onRetry;
-
-  const _ErrorBanner({required this.message, required this.onRetry});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-      decoration: BoxDecoration(
-        color: const Color(0xFFFFF0F0),
-        border: Border.all(color: const Color(0xFFFFCDD2)),
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Row(
-        children: [
-          const Icon(Icons.error_outline_rounded, color: Color(0xFFEF4444), size: 16),
-          const SizedBox(width: 8),
-          Expanded(
-            child: Text(
-              message,
-              style: const TextStyle(fontSize: 12, color: Color(0xFFB91C1C), fontFamily: 'Manrope'),
-            ),
-          ),
-          GestureDetector(
-            onTap: onRetry,
-            child: const Text(
-              'Retry',
-              style: TextStyle(
-                fontSize: 12,
-                fontWeight: FontWeight.w700,
-                color: Color(0xFFEF4444),
-                fontFamily: 'Manrope',
-              ),
-            ),
           ),
         ],
       ),
