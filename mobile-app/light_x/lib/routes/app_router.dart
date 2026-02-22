@@ -19,6 +19,6 @@ class AppRouter {
     debugLogDiagnostics: true,
     initialLocation: Routes.home.path,
     navigatorKey: rootNavigatorKey,
-    routes: [splashRoute, ...onboardingRoutes, ...mainRoutes, scanRoute, ...aiChatRoutes],
+    routes: [splashRoute, ...onboardingRoutes, mainRoutes, ...scanRoutes, ...aiChatRoutes],
   );
 }

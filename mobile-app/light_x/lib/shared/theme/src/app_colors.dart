@@ -89,6 +89,20 @@ class AppColors {
   static const headerBackground = Color(0xCCFFFFFF); // rgba(255,255,255,0.8)
   static const headerBorder = Color(0xFFE2E8F0);
 
+  // Health Dashboard
+  static const amber = Color(0xFFF59E0B);
+  static const amberLight = Color(0x1AF59E0B); // 10% opacity
+  static const amberBorder = Color(0x33F59E0B); // 20% opacity
+  static const amberText = Color(0xCCF59E0B); // 80% opacity
+  static const green = Color(0xFF22C55E);
+  static const red = Color(0xFFEF4444);
+  static const gaugeTrack = Color(0xFFE2E8F0);
+  static const textBodySecondary = Color(0xFF475569);
+  static const premiumBg = Color(0xFF1C58D9);
+  static const premiumBorder = Color(0x4D1C58D9);
+  static const premiumBodyText = Color(0xFFEBEEF4);
+  static const dashedBorder = Color(0x661C58D9); // 40% opacity
+
   static const brandBlue = Color(0xFF1C58D9);
   static const statusGreen = Color(0xFF10B981);
   static const subtleText = Color(0xFF64748B);
@@ -111,4 +125,8 @@ class AppColors {
   static const sendBtnBg = Color(0xFF09357C);
   static const sendBtnShadowStrong = Color(0x4D1C58D9); // rgba(28,88,217,0.3)
   static const iconMuted = Color(0xFF94A3B8);
+
+  // Scanner screen
+  static const scannerRingTrack = Color(0x331C58D9); // 20% opacity
+  static const progressTrack = Color(0x1A1C58D9);
 }
