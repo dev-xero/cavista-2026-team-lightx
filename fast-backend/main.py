@@ -1,3 +1,4 @@
+import base64
 import asyncio
 import os
 import datetime
@@ -212,6 +213,44 @@ async def analyse_vitals(data: UserData):
         
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.post("/analyse-facial", tags=["Health"])
+async def analyse_facial(file: UploadFile = File(...)):
+    """
+    This endpoint gives preliminary comments of diabetic risk based on facial image.
+    """
+    try:
+        contents = await file.read()
+        image_data = base64.b64encode(contents).decode("utf-8")
+        mime_type = file.content_type or "image/jpeg"
+
+        prompt = """
+        You are a medical AI assistant for a cardiovascular health app. 
+        Analyse this facial image for visual indicators that may suggest cardiovascular 
+        or diabetic risk such as xanthelasma, facial flushing, skin pallor, or periorbital puffiness.
+        
+        Provide:
+        1. A brief observation of any visible indicators (or lack thereof)
+        2. A preliminary risk commentary (low / moderate / elevated)
+        3. A clear disclaimer that this is not a diagnosis and the user should consult a physician
+        
+        Keep the response concise and non-alarming.
+        """
+
+        response = llm.generate_content([
+            {"mime_type": mime_type, "data": image_data},
+            prompt
+        ])
+
+        return {
+            "data": {"analysis": response.text},
+            "message": "Facial analysis complete",
+            "timestamp": dt.datetime.now()
+        }
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"AI Service Error: {str(e)}")
 
 
 @app.post("/suggest", tags=["Health"])
