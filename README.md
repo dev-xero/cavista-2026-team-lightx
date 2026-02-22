@@ -1,4 +1,6 @@
-# Team LightX Hackathon Submission
+# Team LightX - Cavista 2026 Submission
+
+This repository is Team LightX's hackathon submission for Cavista 2026 Hackathon.
 
 ## Mobile App
 
