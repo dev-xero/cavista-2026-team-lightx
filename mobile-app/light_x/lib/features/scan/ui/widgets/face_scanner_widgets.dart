@@ -65,12 +65,14 @@ class _ScanningViewfinderState extends State<ScanningViewfinder> with SingleTick
       height: 320,
       child: Stack(
         children: [
-          SizedBox.square(
-            dimension: 320,
-            child: Center(child: Image.asset(Assets.images.faceRecognition, width: 300, height: 300)),
+          SvgPicture.asset(Assets.svgs.scanningViewfinder, width: 320, height: 320),
+          Positioned.fill(
+            left: 20,
+            right: 20,
+            top: 20,
+            bottom: 20,
+            child: Image.asset(Assets.images.faceRecognition, width: 300, height: 300),
           ),
-
-          Positioned.fill(child: SvgPicture.asset(Assets.svgs.scanningViewfinder, width: 320, height: 320)),
         ],
       ),
     );

@@ -9,7 +9,7 @@ import 'dart:async';
 import 'dart:developer';
 import 'package:flutter_blue_plus/flutter_blue_plus.dart';
 import 'package:light_x/features/scan/logic/data/ble_uuid.dart';
-import 'package:light_x/features/scan/logic/health_parser.dart';
+import 'package:light_x/features/scan/logic/watch_scan/health_parser.dart';
 import 'package:light_x/features/scan/logic/models/health_data_snapshot.dart';
 import 'package:light_x/features/scan/logic/models/health_profile.dart';
 

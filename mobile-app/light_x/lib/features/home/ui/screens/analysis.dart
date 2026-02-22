@@ -12,8 +12,9 @@ class Analysis extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AppScaffold(
+      leading: const SizedBox(width: 48),
       title: AppTexts.pageAppBarTitleText("Analysis Results"),
-      trailing: BuildIconButton(onPressed: () {}, icon: Icon(RemixIcons.share_2_line)),
+      trailing: BuildIconButton(onPressed: () {}, icon: Icon(RemixIcons.information_2_fill)),
       body: SingleChildScrollView(
         child: Column(
           children: [
@@ -174,7 +175,7 @@ class RiskGauge extends StatelessWidget {
         // Gauge circle
         SizedBox(
           width: 256,
-          height: 256,
+          height: 200,
           child: Stack(
             alignment: Alignment.center,
             children: [
@@ -208,7 +209,6 @@ class RiskGauge extends StatelessWidget {
             ],
           ),
         ),
-        const SizedBox(height: 16),
         // Description text
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 15.25),

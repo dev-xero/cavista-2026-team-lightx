@@ -1,7 +1,7 @@
 import 'dart:developer';
 
 import 'package:flutter/foundation.dart';
-import 'package:light_x/features/scan/logic/health_service.dart';
+import 'package:light_x/features/scan/logic/watch_scan/health_service.dart';
 
 class HealthProvider with ChangeNotifier {
   @override
@@ -19,11 +19,13 @@ class HealthProvider with ChangeNotifier {
 
   void setCurrDeviceName(String name) {
     _currDeviceName = name;
+    log("Set current device name in provider: $name");
     notifyListeners();
   }
 
   void setHealthService(WatchHealthService service) {
     currentHealthService = service;
+    log("Set health service in provider: ${service.deviceName}");
     notifyListeners();
   }
 }

@@ -96,7 +96,7 @@ class _HomeState extends State<Home> {
         // Hypertension Risk Card
         SliverToBoxAdapter(
           child: Container(
-            height: 260,
+            height: 328,
             padding: const EdgeInsets.all(32),
             decoration: BoxDecoration(
               color: Colors.white,
@@ -117,7 +117,23 @@ class _HomeState extends State<Home> {
                     mainAxisAlignment: MainAxisAlignment.end,
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      AppText("12%", fontSize: 48, fontWeight: FontWeight.w800, color: Colors.black),
+                      Stack(
+                        children: [
+                          SvgPicture.asset(Assets.svgs.semiCircle, width: 240, height: 120),
+                          Positioned(
+                            bottom: 20,
+                            left: 0,
+                            top: 0,
+                            right: 50,
+                            child: SvgPicture.asset(
+                              Assets.svgs.needle,
+                              colorFilter: ColorFilter.mode(Colors.black.withAlpha(40), BlendMode.srcATop),
+                            ),
+                          ),
+                        ],
+                      ),
+                      8.inColumn,
+                      AppText("12%", fontSize: 24, fontWeight: FontWeight.w800, color: Colors.black),
                       AppText("Low Risk", fontSize: 14, fontWeight: FontWeight.w600, color: const Color(0xFF14B8A6)),
                     ],
                   ),
@@ -218,7 +234,7 @@ class _HomeState extends State<Home> {
 
         SliverToBoxAdapter(child: HealthTipsSection(tips: tips)),
 
-        100.inSliverColumn, // Bottom spacer
+        88.inSliverColumn,
       ],
     );
   }
