@@ -1,16 +1,4 @@
-# light_x
+# codename: light_x
+# title: PulseAid
 
-A new Flutter project.
-
-## Getting Started
-
-This project is a starting point for a Flutter application.
-
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+PulseAid is a flutter app built specifically for potentially hypentensive and patients with heart conditions for easily collating, accessing and analyzing some of their revious/existing health data data which may be useful for eventual prediction and prevention of possible upcoming heart condition.
