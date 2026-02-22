@@ -1,18 +1,46 @@
-# Team LightX - Cavista 2026 Submission
+# PulseAid - Team LightX - Cavista 2026 Submission
 
-This repository is Team LightX's hackathon submission for the Cavista 2026 Hackathon.
+PulseAid is a hypertension and cardiovascular risk monitoring app built with Flutter, FastAPI, and XGBoost trained on NHANES data. This is Team LightX's hackathon submission for the Cavista 2026 Hackathon.
 
-## Overview
+## Table Of Contents
 
+- [User Flow](#user-flow)
+- [Hypertension Classification](#hypertension-classification)
+- [Core Features](#core-features)
 - [Mobile App](#mobile-app)
 - [Backend API](#backend-api)
 - [Hypertension Classification Model](#hypertension-classification-model)
 
+## User Flow
+
+The user starts with an onboarding screen where they enter physiological data: weight, height, average sleep time, stress levels, gender, and smoking status. They then link a smartwatch, which feeds in real-time biometrics including blood pressure, blood oxygen, breathing rate, and heart rate.
+From there, the user can optionally enrich the analysis by uploading facial and eye images (for skin and ocular indicators) and providing natural language input via speech or text describing symptoms like dizziness or anxiety.
+Once data collection is complete, the backend returns a hypertension stage classification, a progression risk likelihood, and personalized preventive measures such as daily health tips, lifestyle changes, and check-up reminders. The user can then export the full report in a format suitable for medical professionals.
+
+## Hypertension Classification
+
+The app follows the American College of Cardiology's four-stage framework: 
+
+- Normal (below 120/80 mmHg)
+- Elevated (120-129 / below 80 mmHg)
+- Stage 1 Hypertension (130-139 / 80-89 mmHg) 
+- and Stage 2 Hypertension (140+ / 90+ mmHg)
+
+## Core Features
+
+- Hypertension and cardiovascular risk analysis from multi-modal data (wearable, visual, conversational)
+- Contextual chat using prior analysis as memory
+- Facial scan quick analysis
+- Smartwatch sync for live biometrics
+- Report export for clinical use
+
 ## Mobile App
+
+Todo
 
 ## Backend API
 
-Cj abeg na
+Todo
 
 ## Hypertension Classification Model
 
