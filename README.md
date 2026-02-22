@@ -42,7 +42,7 @@ The app follows the American College of Cardiology's four-stage framework:
 
 ## Mobile App
 
-Todo
+On mobile, we developed a Flutter app built specifically for potentially hypentensive and patients with heart conditions for easily collating, accessing and analyzing some of their revious/existing health data from smart watches, which may be useful for eventual prediction and prevention of possible upcoming heart condition.
 
 ## Backend API
 
