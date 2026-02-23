@@ -19,7 +19,7 @@ class AiAvatar extends StatelessWidget {
       decoration: BoxDecoration(
         color: AppColors.primary,
         shape: BoxShape.circle,
-        boxShadow: const [
+        boxShadow: [
           BoxShadow(color: AppColors.primaryShadowStrong, blurRadius: 15, offset: Offset(0, 10)),
           BoxShadow(color: AppColors.primaryShadowSoft, blurRadius: 6, offset: Offset(0, 4)),
         ],
@@ -210,7 +210,7 @@ class UserMessageBubble extends StatelessWidget {
                     bottomLeft: Radius.circular(16),
                     bottomRight: Radius.circular(16),
                   ),
-                  boxShadow: const [
+                  boxShadow: [
                     BoxShadow(color: AppColors.primaryShadowStrong, blurRadius: 15, offset: Offset(0, 10)),
                     BoxShadow(color: AppColors.primaryShadowSoft, blurRadius: 6, offset: Offset(0, 4)),
                   ],
@@ -296,7 +296,7 @@ class _AiThinkingBubbleState extends State<AiThinkingBubble> with TickerProvider
                 child: Container(
                   width: 6,
                   height: 6,
-                  decoration: const BoxDecoration(color: AppColors.thinkingDot, shape: BoxShape.circle),
+                  decoration: BoxDecoration(color: AppColors.thinkingDot, shape: BoxShape.circle),
                 ),
               );
             }),

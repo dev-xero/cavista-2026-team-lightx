@@ -113,7 +113,6 @@ class _WatchScanScreenState extends State<WatchScanScreen> {
                   const Text(
                     'Nearby Devices',
                     style: TextStyle(
-                      fontFamily: 'Manrope',
                       fontWeight: FontWeight.w700,
                       fontSize: 20,
                       height: 28 / 20,
@@ -148,7 +147,6 @@ class _WatchScanScreenState extends State<WatchScanScreen> {
                                         fontSize: 10,
                                         letterSpacing: 1.4,
                                         fontWeight: FontWeight.w700,
-                                        fontFamily: 'Manrope',
                                       ),
                                     ),
                                   ],
@@ -166,12 +164,7 @@ class _WatchScanScreenState extends State<WatchScanScreen> {
               padding: const EdgeInsets.fromLTRB(20, 4, 20, 20),
               child: Text(
                 'Select a watch to connect. No pairing mode needed.',
-                style: TextStyle(
-                  fontFamily: 'Manrope',
-                  fontSize: 13,
-                  color: AppColors.textMuted,
-                  fontWeight: FontWeight.w400,
-                ),
+                style: TextStyle(fontSize: 13, color: AppColors.textMuted, fontWeight: FontWeight.w400),
               ),
             ),
 
@@ -247,13 +240,7 @@ class _ScanningBadgeState extends State<_ScanningBadge> with SingleTickerProvide
           const SizedBox(width: 4),
           Text(
             'SCANNING',
-            style: TextStyle(
-              color: AppColors.primary,
-              fontSize: 10,
-              letterSpacing: 1.4,
-              fontWeight: FontWeight.w700,
-              fontFamily: 'Manrope',
-            ),
+            style: TextStyle(color: AppColors.primary, fontSize: 10, letterSpacing: 1.4, fontWeight: FontWeight.w700),
           ),
         ],
       ),
@@ -346,7 +333,6 @@ class _DeviceTile extends StatelessWidget {
                   Text(
                     name,
                     style: TextStyle(
-                      fontFamily: 'Manrope',
                       fontWeight: FontWeight.w600,
                       fontSize: 15,
                       color: _isUnknown ? AppColors.textMuted : AppColors.textPrimary,
@@ -355,7 +341,7 @@ class _DeviceTile extends StatelessWidget {
                   const SizedBox(height: 2),
                   Text(
                     result.device.remoteId.toString(),
-                    style: const TextStyle(color: AppColors.textMuted, fontSize: 11, fontFamily: 'monospace'),
+                    style: TextStyle(color: AppColors.textMuted, fontSize: 11, fontFamily: 'monospace'),
                   ),
                 ],
               ),
@@ -376,12 +362,7 @@ class _DeviceTile extends StatelessWidget {
                   const SizedBox(height: 3),
                   Text(
                     _signalLabel,
-                    style: TextStyle(
-                      color: _signalColor,
-                      fontSize: 10,
-                      fontWeight: FontWeight.w600,
-                      fontFamily: 'Manrope',
-                    ),
+                    style: TextStyle(color: _signalColor, fontSize: 10, fontWeight: FontWeight.w600),
                   ),
                 ],
               ),
@@ -439,18 +420,13 @@ class _EmptyState extends StatelessWidget {
           const SizedBox(height: 20),
           const Text(
             'No devices found',
-            style: TextStyle(
-              fontFamily: 'Manrope',
-              color: AppColors.textPrimary,
-              fontSize: 16,
-              fontWeight: FontWeight.w600,
-            ),
+            style: TextStyle(color: AppColors.textPrimary, fontSize: 16, fontWeight: FontWeight.w600),
           ),
           const SizedBox(height: 8),
           Text(
             'Make sure your watch is awake.\nNo pairing mode needed.',
             textAlign: TextAlign.center,
-            style: TextStyle(fontFamily: 'Manrope', color: AppColors.textMuted, fontSize: 13),
+            style: TextStyle(color: AppColors.textMuted, fontSize: 13),
           ),
           const SizedBox(height: 28),
           GestureDetector(
@@ -467,12 +443,7 @@ class _EmptyState extends StatelessWidget {
                   const SizedBox(width: 8),
                   const Text(
                     'Scan Again',
-                    style: TextStyle(
-                      fontFamily: 'Manrope',
-                      color: Colors.white,
-                      fontSize: 14,
-                      fontWeight: FontWeight.w600,
-                    ),
+                    style: TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.w600),
                   ),
                 ],
               ),

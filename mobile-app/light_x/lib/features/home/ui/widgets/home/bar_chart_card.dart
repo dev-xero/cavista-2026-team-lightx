@@ -67,7 +67,6 @@ class _BarColumn extends StatelessWidget {
         Text(
           item.label,
           style: TextStyle(
-            fontFamily: 'Manrope',
             fontWeight: FontWeight.w700,
             fontSize: 10,
             height: 1.5,
@@ -116,20 +115,14 @@ class _ChartFooter extends StatelessWidget {
         Container(
           width: 32,
           height: 32,
-          decoration: const BoxDecoration(color: AppColors.footerIconBg, shape: BoxShape.circle),
+          decoration: BoxDecoration(color: AppColors.footerIconBg, shape: BoxShape.circle),
           child: Center(child: Icon(Icons.trending_up, size: 16, color: AppColors.footerIcon)),
         ),
         const SizedBox(width: 12),
         Expanded(
           child: Text(
             text,
-            style: const TextStyle(
-              fontFamily: 'Manrope',
-              fontWeight: FontWeight.w400,
-              fontSize: 12,
-              height: 1.33,
-              color: AppColors.footerText,
-            ),
+            style: TextStyle(fontWeight: FontWeight.w400, fontSize: 12, height: 1.33, color: AppColors.footerText),
           ),
         ),
       ],

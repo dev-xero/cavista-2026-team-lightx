@@ -268,7 +268,7 @@ class PremiumPlanCard extends StatelessWidget {
           right: 0,
           child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
-            decoration: const BoxDecoration(
+            decoration: BoxDecoration(
               color: AppColors.navy,
               borderRadius: BorderRadius.only(topRight: Radius.circular(22), bottomLeft: Radius.circular(16)),
             ),
@@ -305,7 +305,7 @@ class AppTextStylesrustSignalItem extends StatelessWidget {
         Container(
           width: 48,
           height: 48,
-          decoration: const BoxDecoration(color: AppColors.primaryLight, shape: BoxShape.circle),
+          decoration: BoxDecoration(color: AppColors.primaryLight, shape: BoxShape.circle),
           child: Icon(data.icon, color: AppColors.primary, size: 20),
         ),
         const SizedBox(height: 16),

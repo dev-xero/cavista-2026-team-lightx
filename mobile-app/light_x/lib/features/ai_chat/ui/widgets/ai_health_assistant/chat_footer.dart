@@ -97,7 +97,7 @@ class _SendButton extends StatelessWidget {
           borderRadius: BorderRadius.circular(16),
           boxShadow: isLoading
               ? null
-              : const [
+              : [
                   BoxShadow(color: AppColors.sendBtnShadowStrong, blurRadius: 15, offset: Offset(0, 10)),
                   BoxShadow(color: AppColors.sendBtnShadowStrong, blurRadius: 6, offset: Offset(0, 4)),
                 ],
@@ -193,7 +193,7 @@ class ChatFooter extends StatelessWidget {
       child: BackdropFilter(
         filter: ColorFilter.mode(AppColors.footerBg, BlendMode.srcOver),
         child: Container(
-          decoration: const BoxDecoration(
+          decoration: BoxDecoration(
             color: AppColors.footerBg,
             border: Border(top: BorderSide(color: AppColors.border)),
           ),

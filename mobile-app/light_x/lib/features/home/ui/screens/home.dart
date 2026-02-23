@@ -24,7 +24,7 @@ const items = [
   BarChartItem(label: 'Su', value: 44 / 80),
 ];
 
-const tips = [
+final tips = [
   HealthTipItem(
     title: 'Stay Hydrated',
     description: 'Drink at least 8 glasses of water daily to keep your body functioning optimally.',

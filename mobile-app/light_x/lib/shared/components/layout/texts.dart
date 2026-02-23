@@ -18,7 +18,6 @@ class AppTexts {
 
   static Widget compulsoryTitleText(String title) {
     const defaultTextStyle = TextStyle(
-      fontFamily: 'Manrope',
       fontSize: 14, // 0.875rem
       height: 1.429, // 1.25rem / 0.875rem
       fontWeight: FontWeight.w500,

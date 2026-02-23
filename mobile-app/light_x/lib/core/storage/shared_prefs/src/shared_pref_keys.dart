@@ -1,12 +1,6 @@
 part of '../shared_prefs.dart';
 
 enum SharedPrefKeys {
-  // AUTH
-  // ============================================================================
-
-  /// Type: bool
-  isUserSignedIn,
-
   /// Type: json
   onboardingData,
 }

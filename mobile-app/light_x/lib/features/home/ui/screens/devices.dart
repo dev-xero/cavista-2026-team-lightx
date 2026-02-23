@@ -473,13 +473,7 @@ class BloodOxygenCard extends StatelessWidget {
         ),
         child: Text(
           badgeText.toUpperCase(),
-          style: TextStyle(
-            color: _badgeColor,
-            fontSize: 10,
-            fontWeight: FontWeight.w700,
-            fontFamily: 'Manrope',
-            letterSpacing: 0.5,
-          ),
+          style: TextStyle(color: _badgeColor, fontSize: 10, fontWeight: FontWeight.w700, letterSpacing: 0.5),
         ),
       ),
     );
@@ -552,7 +546,7 @@ class WatchSyncNavBar extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       height: 76,
-      decoration: const BoxDecoration(
+      decoration: BoxDecoration(
         color: AppColors.white,
         border: Border(top: BorderSide(color: AppColors.border)),
       ),
@@ -624,12 +618,7 @@ class _NoDeviceHub extends StatelessWidget {
               const SizedBox(height: 8),
               Text(
                 'No Device',
-                style: TextStyle(
-                  fontFamily: 'Manrope',
-                  fontWeight: FontWeight.w600,
-                  fontSize: 13,
-                  color: AppColors.textMuted,
-                ),
+                style: TextStyle(fontWeight: FontWeight.w600, fontSize: 13, color: AppColors.textMuted),
               ),
             ],
           ),
