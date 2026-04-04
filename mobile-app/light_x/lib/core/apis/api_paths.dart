@@ -6,3 +6,7 @@ class ApiPaths {
   static const chat = '$baseUrl/chat';
   static const analyzeVitals = '$baseUrl/analyse-vitals';
 }
+
+extension ExtensionOnApiPathsString on String {
+  Uri toUri() => Uri.parse(this);
+}

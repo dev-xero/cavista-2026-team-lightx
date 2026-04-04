@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:light_x/core/assets/assets.gen.dart';
+import 'package:light_x/routes/app_router.dart';
 import 'package:light_x/shared/components/buttons/build_icon_button.dart';
 
 class AppBackButton extends StatelessWidget {
@@ -11,13 +12,7 @@ class AppBackButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return BuildIconButton(
       useNormalPadding: true,
-      onPressed: () {
-        if (onPressed != null) {
-          onPressed!();
-        } else {
-          Navigator.pop(context);
-        }
-      },
+      onPressed: () => onPressed != null ? onPressed!() : context.pop(),
       icon: SvgPicture.asset(Assets.svgs.leftArrow),
     );
   }

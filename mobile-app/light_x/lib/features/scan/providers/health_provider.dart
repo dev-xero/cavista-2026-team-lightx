@@ -1,38 +1,48 @@
-import 'dart:developer';
+import 'dart:async';
 
-import 'package:flutter/foundation.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:light_x/features/scan/logic/models/health_data_snapshot.dart';
 import 'package:light_x/features/scan/logic/watch_scan/health_service.dart';
 
-class HealthProvider with ChangeNotifier {
+final latestHealthSnapshotProvider = NotifierProvider<HealthSnapshotNotifier, HealthSnapshot?>(
+  () => HealthSnapshotNotifier(),
+);
+
+class HealthSnapshotNotifier extends Notifier<HealthSnapshot?> {
   @override
-  void dispose() {
-    _healthService?.dispose();
-    log("HealthProvider disposed");
-    super.dispose();
-  }
+  HealthSnapshot? build() => null;
+}
 
-  String? _currDeviceName;
-  String? get currDeviceName => _currDeviceName;
+final watchHealthServiceProvider = NotifierProvider<WatchHealthServiceNotifier, WatchHealthService?>(
+  () => WatchHealthServiceNotifier(),
+);
 
-  WatchHealthService? _healthService;
-  WatchHealthService? get healthService => _healthService;
+class WatchHealthServiceNotifier extends Notifier<WatchHealthService?> {
+  StreamSubscription<HealthSnapshot>? _snapshotSub;
 
-  void setCurrDeviceName(String name) {
-    _currDeviceName = name;
-    log("Set current device name in provider: $name");
-    notifyListeners();
-  }
-
-  HealthSnapshot? get latestSnapshot => _latestSnapshot;
-  HealthSnapshot? _latestSnapshot;
-
-  void setHealthService(WatchHealthService service) {
-    _healthService = service;
-    service.snapshots.listen((snap) {
-      _latestSnapshot = snap;
-      notifyListeners();
+  @override
+  WatchHealthService? build() {
+    ref.onDispose(() {
+      _snapshotSub?.cancel();
+      _snapshotSub = null;
     });
-    notifyListeners();
+    return null;
+  }
+
+  Future<void> setService(WatchHealthService service) async {
+    await _snapshotSub?.cancel();
+    // _snapshotSub = service.snapshots.listen((snap) {
+    //   ref.read(latestHealthSnapshotProvider.notifier).state = snap;
+    // });
+
+    // ref.read(latestHealthSnapshotProvider.notifier).state = null;
+    state = service;
+  }
+
+  Future<void> clearService() async {
+    await _snapshotSub?.cancel();
+    _snapshotSub = null;
+    // ref.read(latestHealthSnapshotProvider.notifier).state = null;
+    state = null;
   }
 }

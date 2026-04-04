@@ -30,6 +30,7 @@ class AppScaffold extends StatelessWidget {
   final EdgeInsets? viewPadding;
   final void Function()? onBackButtonPressed;
   final Widget body;
+  final Widget? footer;
   final bool isLoading;
 
   const AppScaffold({
@@ -53,6 +54,7 @@ class AppScaffold extends StatelessWidget {
     required this.body,
     this.onBackButtonPressed,
     this.appBarBackgroundColor,
+    this.footer,
     this.isLoading = false,
   });
 
@@ -76,7 +78,17 @@ class AppScaffold extends StatelessWidget {
               ? Stack(
                   fit: StackFit.expand,
                   children: [
-                    Padding(padding: viewPadding ?? defaultPadding.copyWith(bottom: 24), child: body),
+                    Padding(
+                      padding: viewPadding ?? defaultPadding.copyWith(bottom: 24),
+                      child: footer != null
+                          ? Column(
+                              children: [
+                                Expanded(child: body),
+                                if (!extendBody) ?footer,
+                              ],
+                            )
+                          : body,
+                    ),
                     Positioned(
                       top: 24,
                       left: 0,
@@ -89,23 +101,26 @@ class AppScaffold extends StatelessWidget {
                       ),
                     ),
 
+                    if (extendBody && footer != null)
+                      Positioned(
+                        bottom: 0,
+                        left: 0,
+                        right: 0,
+                        child: Padding(padding: defaultPadding.copyWith(bottom: 24, top: 0), child: footer!),
+                      ),
+
                     if (isLoading) positionedLoadingIndicator(),
                   ],
                 )
-              : Column(
-                  mainAxisSize: MainAxisSize.max,
+              : extendBody
+              ? Stack(
                   children: [
-                    Padding(
-                      padding: appBarPadding != null
-                          ? appBarPadding!(defaultPadding.copyWith(top: defaultPadding.top + 24, bottom: 24))
-                          : defaultPadding.copyWith(top: defaultPadding.top + 24, bottom: 24),
-                      child: appBar ?? _defaultAppBar,
-                    ),
-                    Flexible(
-                      child: Padding(padding: viewPadding ?? defaultPadding.copyWith(top: 0), child: body),
-                    ),
+                    buildNotExtendBodyBehindAppBar(defaultPadding),
+                    if (footer != null) Positioned(bottom: 0, left: 0, right: 0, child: footer!),
+                    if (isLoading) positionedLoadingIndicator(),
                   ],
-                ))
+                )
+              : buildNotExtendBodyBehindAppBar(defaultPadding))
         : body;
   }
 
@@ -144,6 +159,25 @@ class AppScaffold extends StatelessWidget {
         color: Colors.black.withValues(alpha: 0.1),
         child: const AppCircularLoadingIndicator(),
       ).animate().fade(),
+    );
+  }
+
+  Widget buildNotExtendBodyBehindAppBar(EdgeInsets defaultPadding) {
+    return Column(
+      mainAxisSize: MainAxisSize.max,
+      children: [
+        Padding(
+          padding: appBarPadding != null
+              ? appBarPadding!(defaultPadding.copyWith(top: defaultPadding.top + 24, bottom: 24))
+              : defaultPadding.copyWith(top: defaultPadding.top + 24, bottom: 24),
+          child: appBar ?? _defaultAppBar,
+        ),
+        Flexible(
+          child: Padding(padding: viewPadding ?? defaultPadding.copyWith(top: 0), child: body),
+        ),
+
+        if (!extendBody) ?footer,
+      ],
     );
   }
 }

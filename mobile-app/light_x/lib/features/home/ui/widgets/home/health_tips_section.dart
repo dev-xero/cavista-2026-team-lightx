@@ -1,17 +1,55 @@
 import 'package:flutter/material.dart';
+import 'package:light_x/features/home/ui/entities/health_tip_item.dart';
 import 'package:light_x/shared/theme/src/app_colors.dart';
 
 // ─────────────────────────────────────────────
-// Data model
+// Public section widget
 // ─────────────────────────────────────────────
 
-class HealthTipItem {
-  final String title;
-  final String description;
-  final IconData icon;
-  final Color iconColor;
+class HealthTipsSection extends StatelessWidget {
+  final String sectionTitle;
+  final List<HealthTipItem> tips;
 
-  HealthTipItem({required this.title, required this.description, required this.icon, required this.iconColor});
+  const HealthTipsSection({super.key, this.sectionTitle = 'Daily Health Tips for You', required this.tips});
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: 342,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Section heading
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 4),
+            child: Text(
+              sectionTitle,
+              style: TextStyle(
+                fontWeight: FontWeight.w700,
+                fontSize: 18,
+                height: 28 / 18,
+                color: AppColors.headingText,
+              ),
+            ),
+          ),
+
+          const SizedBox(height: 16),
+
+          // Tip cards
+          Column(
+            children: tips
+                .map(
+                  (tip) => Padding(
+                    padding: EdgeInsets.only(bottom: tip != tips.last ? 16 : 0),
+                    child: _TipCard(item: tip),
+                  ),
+                )
+                .toList(),
+          ),
+        ],
+      ),
+    );
+  }
 }
 
 // ─────────────────────────────────────────────
@@ -85,69 +123,22 @@ class _TipCard extends StatelessWidget {
                 const SizedBox(height: 4),
 
                 // Description
-                Text(
-                  item.description,
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
-                    fontWeight: FontWeight.w400,
-                    fontSize: 12,
-                    height: 16 / 12,
-                    color: AppColors.bodyText,
+                Tooltip(
+                  message: item.description,
+                  child: Text(
+                    item.description,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      fontWeight: FontWeight.w400,
+                      fontSize: 12,
+                      height: 16 / 12,
+                      color: AppColors.bodyText,
+                    ),
                   ),
                 ),
               ],
             ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-// ─────────────────────────────────────────────
-// Public section widget
-// ─────────────────────────────────────────────
-
-class HealthTipsSection extends StatelessWidget {
-  final String sectionTitle;
-  final List<HealthTipItem> tips;
-
-  const HealthTipsSection({super.key, this.sectionTitle = 'Daily Health Tips for You', required this.tips});
-
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox(
-      width: 342,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Section heading
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 4),
-            child: Text(
-              sectionTitle,
-              style: TextStyle(
-                fontWeight: FontWeight.w700,
-                fontSize: 18,
-                height: 28 / 18,
-                color: AppColors.headingText,
-              ),
-            ),
-          ),
-
-          const SizedBox(height: 16),
-
-          // Tip cards
-          Column(
-            children: tips
-                .map(
-                  (tip) => Padding(
-                    padding: EdgeInsets.only(bottom: tip != tips.last ? 16 : 0),
-                    child: _TipCard(item: tip),
-                  ),
-                )
-                .toList(),
           ),
         ],
       ),

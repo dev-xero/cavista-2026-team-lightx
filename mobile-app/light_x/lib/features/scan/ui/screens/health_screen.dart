@@ -2,6 +2,7 @@ import 'dart:developer' as dev;
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter_blue_plus/flutter_blue_plus.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:light_x/features/scan/logic/watch_scan/health_service.dart';
 import 'package:light_x/features/scan/logic/models/health_data_snapshot.dart';
 import 'package:light_x/features/scan/providers/health_provider.dart';
@@ -10,16 +11,15 @@ import 'package:light_x/shared/components/layout/app_scaffold.dart';
 import 'package:light_x/shared/components/layout/app_text.dart';
 import 'package:light_x/shared/components/layout/texts.dart';
 import 'package:light_x/shared/theme/src/app_colors.dart';
-import 'package:provider/provider.dart';
 
-class HealthScreen extends StatefulWidget {
+class HealthScreen extends ConsumerStatefulWidget {
   const HealthScreen({super.key});
 
   @override
-  State<HealthScreen> createState() => _HealthScreenState();
+  ConsumerState<HealthScreen> createState() => _HealthScreenState();
 }
 
-class _HealthScreenState extends State<HealthScreen> with SingleTickerProviderStateMixin {
+class _HealthScreenState extends ConsumerState<HealthScreen> with SingleTickerProviderStateMixin {
   late final AnimationController _pulseCtrl;
   int? _lastHr;
 
@@ -37,7 +37,7 @@ class _HealthScreenState extends State<HealthScreen> with SingleTickerProviderSt
 
   @override
   Widget build(BuildContext context) {
-    final healthService = context.watch<HealthProvider>().healthService;
+    final healthService = ref.watch(watchHealthServiceProvider);
 
     return StreamBuilder<BluetoothConnectionState>(
       stream: healthService?.connectionState,

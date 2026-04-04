@@ -2,13 +2,17 @@ import 'package:flutter/material.dart';
 import 'dart:math' as math;
 
 import 'package:flutter_blue_plus/flutter_blue_plus.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:light_x/core/base/src/absorber.dart';
+import 'package:light_x/features/home/providers/entities/devices_state.dart';
+import 'package:light_x/features/home/providers/main_providers.dart';
 import 'package:light_x/features/scan/providers/health_provider.dart';
 import 'package:light_x/routes/app_router.dart';
 import 'package:light_x/shared/components/layout/app_padding.dart';
 import 'package:light_x/shared/components/layout/app_text.dart';
+import 'package:light_x/shared/helpers/extensions/extensions.dart';
 import 'package:light_x/shared/theme/src/app_colors.dart';
 import 'package:light_x/shared/theme/src/app_text_styles.dart';
-import 'package:provider/provider.dart';
 
 // ─────────────────────────────────────────────
 // Header
@@ -661,10 +665,10 @@ class _DevicesState extends State<Devices> {
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<HealthProvider>(
-      builder: (context, hp, _) {
-        final service = hp.healthService;
-
+    return AbsorberWatch(
+      listenable: watchHealthServiceProvider,
+      builder: (context, service, ref, _) {
+        final hp = MainProviders.asPro.read(ref).devices.read(ref);
         // Determine connection state reactively when a service exists
         return service != null
             ? StreamBuilder<BluetoothConnectionState>(
@@ -679,7 +683,7 @@ class _DevicesState extends State<Devices> {
     );
   }
 
-  Widget _buildBody(HealthProvider hp, dynamic service, bool connected) {
+  Widget _buildBody(DevicesState hp, dynamic service, bool connected) {
     final deviceName = hp.currDeviceName ?? 'Smart Watch';
     final snapshot = hp.latestSnapshot;
 

@@ -1,18 +1,61 @@
-// ─────────────────────────────────────────────
-// Data model
-// ─────────────────────────────────────────────
-
 import 'package:flutter/material.dart';
+import 'package:light_x/features/home/ui/entities/bar_chart_item.dart';
+import 'package:light_x/shared/components/layout/app_text.dart';
 import 'package:light_x/shared/theme/src/app_colors.dart';
 
-class BarChartItem {
-  final String label;
+class BarChartCardTitle extends StatelessWidget {
+  const BarChartCardTitle({super.key});
 
-  /// Fraction of the max bar height (0.0 – 1.0)
-  final double value;
-  final bool isActive;
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        AppText("Weekly Trends", fontSize: 18, fontWeight: FontWeight.w700, color: const Color(0xFF0F172A)),
+        AppText("Full History", fontSize: 14, fontWeight: FontWeight.w700, color: const Color(0xFF1C58D9)),
+      ],
+    );
+  }
+}
 
-  const BarChartItem({required this.label, required this.value, this.isActive = false});
+class BarChartCard extends StatelessWidget {
+  final List<BarChartItem> items;
+  final String footerText;
+
+  final double barMaxHeight;
+
+  const BarChartCard({super.key, required this.items, required this.footerText, this.barMaxHeight = 80});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 342,
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: AppColors.cardBackground,
+        border: Border.all(color: AppColors.cardBorder),
+        borderRadius: BorderRadius.circular(24),
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Bar chart
+          _BarChartRow(items: items, barMaxHeight: barMaxHeight),
+
+          const SizedBox(height: 16),
+
+          // Divider
+          Container(height: 1, color: AppColors.divider),
+
+          const SizedBox(height: 16),
+
+          // Footer
+          _ChartFooter(text: footerText),
+        ],
+      ),
+    );
+  }
 }
 
 class _BarColumn extends StatelessWidget {
@@ -126,52 +169,6 @@ class _ChartFooter extends StatelessWidget {
           ),
         ),
       ],
-    );
-  }
-}
-
-// ─────────────────────────────────────────────
-// Public card widget
-// ─────────────────────────────────────────────
-
-class BarChartCard extends StatelessWidget {
-  final List<BarChartItem> items;
-  final String footerText;
-
-  /// Height of the bar track area in logical pixels.
-  /// Defaults to 80 (matches the CSS spec).
-  final double barMaxHeight;
-
-  const BarChartCard({super.key, required this.items, required this.footerText, this.barMaxHeight = 80});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: 342,
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: AppColors.cardBackground,
-        border: Border.all(color: AppColors.cardBorder),
-        borderRadius: BorderRadius.circular(24),
-      ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Bar chart
-          _BarChartRow(items: items, barMaxHeight: barMaxHeight),
-
-          const SizedBox(height: 16),
-
-          // Divider
-          Container(height: 1, color: AppColors.divider),
-
-          const SizedBox(height: 16),
-
-          // Footer
-          _ChartFooter(text: footerText),
-        ],
-      ),
     );
   }
 }

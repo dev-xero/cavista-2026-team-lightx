@@ -1,22 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_blue_plus/flutter_blue_plus.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:light_x/features/home/providers/main_providers.dart';
 import 'package:light_x/features/scan/logic/watch_scan/ble_connector.dart';
 import 'package:light_x/features/scan/logic/watch_scan/ble_scanner.dart';
 import 'package:light_x/features/scan/logic/watch_scan/health_service.dart';
-import 'package:light_x/features/scan/providers/health_provider.dart';
+import 'package:light_x/shared/helpers/extensions/extensions.dart';
 import 'package:light_x/shared/theme/src/app_colors.dart';
-import 'package:provider/provider.dart';
 
 /// Redesigned scan screen — matches the Devices screen colour palette
 /// (white cards, rounded corners, Manrope type, AppColors tokens).
-class WatchScanScreen extends StatefulWidget {
+class WatchScanScreen extends ConsumerStatefulWidget {
   const WatchScanScreen({super.key});
 
   @override
-  State<WatchScanScreen> createState() => _WatchScanScreenState();
+  ConsumerState<WatchScanScreen> createState() => _WatchScanScreenState();
 }
 
-class _WatchScanScreenState extends State<WatchScanScreen> {
+class _WatchScanScreenState extends ConsumerState<WatchScanScreen> {
   final _scanner = BleScanner();
   bool _connecting = false;
   String? _connectingId;
@@ -78,9 +79,9 @@ class _WatchScanScreenState extends State<WatchScanScreen> {
       _connectingId = null;
     });
 
-    final hp = context.read<HealthProvider>();
-    hp.setCurrDeviceName(name);
-    hp.setHealthService(service);
+    final devicesNotifier = MainProviders.asPro.read(ref).devices.self(ref);
+    devicesNotifier.setCurrDeviceName(name);
+    await devicesNotifier.setHealthService(service);
 
     // Pop back to Devices screen — it will reflect the connected state.
     if (!mounted) return;

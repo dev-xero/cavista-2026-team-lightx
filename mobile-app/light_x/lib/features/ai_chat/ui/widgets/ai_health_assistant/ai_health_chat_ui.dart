@@ -151,7 +151,7 @@ class AiMessageBubble extends StatelessWidget {
               // Sender label with left padding
               const Padding(
                 padding: EdgeInsets.only(left: 4),
-                child: Text('PulseAid AI', style: AppTextStyles.senderLabel),
+                child: Text('PulseAI AI', style: AppTextStyles.senderLabel),
               ),
               const SizedBox(height: 8),
               // Bubble

@@ -1,90 +1,74 @@
 import 'dart:convert';
-import 'dart:developer';
 
 import 'package:flutter/material.dart';
-import 'package:light_x/core/storage/shared_prefs/shared_prefs.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:light_x/core/apis/entities/analysis_result.dart';
+import 'package:light_x/core/base/src/absorber.dart';
 import 'package:light_x/core/utils/nav_utils.dart';
-import 'package:light_x/data/models/health_model.dart';
-import 'package:light_x/features/home/providers/analysis_provider.dart';
-import 'package:light_x/features/scan/providers/health_provider.dart';
+import 'package:light_x/features/home/providers/main_providers.dart';
 import 'package:light_x/routes/app_router.dart';
 import 'package:light_x/shared/components/buttons/build_icon_button.dart';
 import 'package:light_x/shared/components/layout/app_scaffold.dart';
 import 'package:light_x/shared/components/layout/app_text.dart';
 import 'package:light_x/shared/components/layout/texts.dart';
+import 'package:light_x/shared/helpers/extensions/extensions.dart';
 import 'package:light_x/shared/theme/src/app_colors.dart';
 import 'package:light_x/shared/theme/src/app_text_styles.dart';
-import 'package:provider/provider.dart';
 import 'package:remixicon/remixicon.dart';
 
-class Analysis extends StatefulWidget {
+class Analysis extends ConsumerStatefulWidget {
   const Analysis({super.key});
 
   @override
-  State<Analysis> createState() => _AnalysisState();
+  ConsumerState<Analysis> createState() => _AnalysisState();
 }
 
-class _AnalysisState extends State<Analysis> {
+class _AnalysisState extends ConsumerState<Analysis> {
   @override
   void initState() {
     super.initState();
-    // Kick off analysis as soon as the screen mounts, pulling live vitals
-    // from HealthProvider (set by the BLE watch connection).
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      try {
-        _runAnalysis();
-      } catch (e) {
-        log(" Error running analysis: $e");
+      if (MainProviders.asPro.read(ref).analysis.read(ref).result == null) {
+        MainProviders.asPro.read(ref).analysis.self(ref).analyse();
       }
     });
   }
 
-  void _runAnalysis() {
-    final hp = context.read<HealthProvider>();
-    final snap = hp.latestSnapshot;
-
-    final prev = SharedPrefs.prefs.get(SharedPrefKeys.onboardingData.name) as String?;
-
-    final request = prev == null
-        ? HealthModel.empty()
-        : HealthModel.fromJson(jsonDecode(prev)).copyWith(
-            // ── Live watch data ────────────────────────────────────────────────────
-            systolicBp: snap?.bloodPressure?.systolic ?? 120,
-            diastolicBp: snap?.bloodPressure?.diastolic ?? 80,
-            heartRate: snap?.heartRate ?? 72,
-            spo2: snap?.spo2?.toInt() ?? 98,
-
-            hrv: 18,
-            totalCholesterol: 240,
-            hdlCholesterol: 35,
-            fastingGlucose: 118,
-            creatinine: 1,
-          );
-
-    context.read<AnalysisProvider>().analyse(request);
-  }
-
   @override
   Widget build(BuildContext context) {
-    return Consumer<AnalysisProvider>(
-      builder: (context, provider, _) {
-        return AppScaffold(
-          leading: const SizedBox(width: 48),
-          title: AppTexts.pageAppBarTitleText("Analysis Results"),
-          viewPadding: EdgeInsets.zero,
-          trailing: BuildIconButton(onPressed: () {}, icon: const Icon(RemixIcons.information_2_fill)),
-          body: switch (provider.state) {
-            AnalysisState.loading || AnalysisState.idle => const _LoadingBody(),
-            AnalysisState.error => _ErrorBody(
-              message: provider.errorMessage ?? 'Something went wrong.',
-              onRetry: provider.retry,
-            ),
-            AnalysisState.success => _SuccessBody(result: provider.result!),
-          },
-        );
-      },
+    final analysisProvider = MainProviders.asPro.read(ref).analysis;
+    return AppScaffold(
+      leading: const SizedBox(width: 48),
+      title: AppTexts.pageAppBarTitleText("Analysis Results"),
+      viewPadding: EdgeInsets.zero,
+      appBarPadding: (apply) => apply.copyWith(right: 0),
+      trailing: BuildIconButton(onPressed: () {}, icon: const Icon(RemixIcons.share_circle_fill)),
+      body: AbsorberWatch(
+        listenable: analysisProvider,
+        builder: (_, state, ref, _) {
+          if (state.isLoadingAnalysis) {
+            return _LoadingBody();
+          } else if (!state.isLoadingAnalysis && state.result != null) {
+            return _SuccessBody(result: state.result!);
+          } else {
+            return _ErrorBody(
+              message: 'Unable to analyze your vitals at the moment. Please try again later.',
+              onRetry: () => analysisProvider.self(ref).analyse(),
+            );
+          }
+        },
+      ),
     );
   }
+}
+
+Color _severityToColor(SeverityLevel severity) {
+  return switch (severity) {
+    SeverityLevel.normal => AppColors.green,
+    SeverityLevel.caution => AppColors.amber,
+    SeverityLevel.warning => AppColors.red,
+    SeverityLevel.critical => AppColors.red,
+  };
 }
 
 // ─────────────────────────────────────────────
@@ -174,7 +158,7 @@ class _SuccessBody extends StatelessWidget {
       description: result.rawResponse.length > 240
           ? '${jsonDecode(result.rawResponse)['data']['advice']}…'
           : result.rawResponse,
-      arcColor: result.riskArcColor,
+      arcColor: _severityToColor(result.riskSeverity),
       fraction: result.riskFraction,
     );
 
@@ -185,7 +169,7 @@ class _SuccessBody extends StatelessWidget {
         label: 'Blood Pressure',
         value: result.bpDisplay,
         status: result.bpStatus,
-        statusColor: result.bpStatusColor,
+        statusColor: _severityToColor(result.bpSeverity),
       ),
       MetricCardData(
         icon: Icons.favorite_rounded,
@@ -194,7 +178,7 @@ class _SuccessBody extends StatelessWidget {
         value: result.hrDisplay,
         unit: 'bpm',
         status: result.hrStatus,
-        statusColor: result.hrStatusColor,
+        statusColor: _severityToColor(result.hrSeverity),
       ),
       MetricCardData(
         icon: Icons.water_drop_outlined,
@@ -203,18 +187,9 @@ class _SuccessBody extends StatelessWidget {
         value: result.spo2Display,
         unit: '%',
         status: result.spo2Status,
-        statusColor: result.spo2StatusColor,
+        statusColor: _severityToColor(result.spo2Severity),
       ),
     ];
-
-    final premiumData = PremiumLockedData(
-      title: '5 Year Risk Prediction.',
-      description:
-          'See how your cardiovascular risk might evolve over the next 5 years '
-          'based on current trends.',
-      ctaLabel: 'Unlock Premium',
-      onTap: () => NavUtils.withContext((ctx) => Routes.pricing.push(ctx)),
-    );
 
     return SingleChildScrollView(
       child: Column(
@@ -228,7 +203,7 @@ class _SuccessBody extends StatelessWidget {
           MetricsGrid(metrics: metrics),
           const SizedBox(height: 16),
 
-          PremiumLockedCard(data: premiumData),
+          PremiumLockedCard(data: PremiumLockedData.sample()),
           const SizedBox(height: 16),
 
           LifestyleTipCard(title: 'Recommendation', body: result.lifestyleTip),
@@ -385,6 +360,35 @@ class MetricCardData {
     required this.status,
     required this.statusColor,
   });
+
+  static List<MetricCardData> get samples => const [
+    MetricCardData(
+      icon: Icons.water_drop_rounded,
+      iconColor: AppColors.primary,
+      label: 'Blood Pressure',
+      value: '120/80',
+      status: 'Normal',
+      statusColor: AppColors.green,
+    ),
+    MetricCardData(
+      icon: Icons.favorite_rounded,
+      iconColor: AppColors.red,
+      label: 'Heart Rate',
+      value: '72',
+      unit: 'bpm',
+      status: 'Normal',
+      statusColor: AppColors.green,
+    ),
+    MetricCardData(
+      icon: Icons.water_drop_outlined,
+      iconColor: AppColors.primary,
+      label: 'SpO₂',
+      value: '98',
+      unit: '%',
+      status: 'Normal',
+      statusColor: AppColors.green,
+    ),
+  ];
 }
 
 class MetricCard extends StatelessWidget {
@@ -497,6 +501,15 @@ class PremiumLockedData {
   final VoidCallback? onTap;
 
   const PremiumLockedData({required this.title, required this.description, required this.ctaLabel, this.onTap});
+
+  factory PremiumLockedData.sample() => PremiumLockedData(
+    title: '5 Year Risk Prediction.',
+    description:
+        'See how your cardiovascular risk might evolve over the next 5 years '
+        'based on current trends.',
+    ctaLabel: 'Unlock Premium',
+    onTap: () => NavUtils.withContext((ctx) => Routes.pricing.push(ctx)),
+  );
 }
 
 class PremiumLockedCard extends StatelessWidget {

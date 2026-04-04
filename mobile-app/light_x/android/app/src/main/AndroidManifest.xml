@@ -31,7 +31,7 @@ https://developer.android.com/about/versions/12/features/bluetooth-permissions -
         </intent>
     </queries>
     <application
-        android:label="light_x"
+        android:label="Pulse AI"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity

@@ -1,6 +1,52 @@
 import 'package:flutter/material.dart';
 import 'package:light_x/shared/theme/src/app_colors.dart';
 
+class AiHealthAssHeader extends StatelessWidget implements PreferredSizeWidget {
+  final String title;
+  final String statusLabel;
+  final VoidCallback? onMenuTap;
+  final VoidCallback? onNotificationTap;
+
+  const AiHealthAssHeader({
+    super.key,
+    this.title = 'PulseAI Ai',
+    this.statusLabel = 'AI Active',
+    this.onMenuTap,
+    this.onNotificationTap,
+  });
+
+  @override
+  Size get preferredSize => const Size.fromHeight(73);
+
+  @override
+  Widget build(BuildContext context) {
+    return ClipRect(
+      child: Container(
+        height: 73,
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+        decoration: BoxDecoration(
+          color: AppColors.headerBackground,
+          border: Border(bottom: BorderSide(color: AppColors.headerBorder, width: 1)),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            // Left: menu / hamburger button
+            _HeaderIconButton(icon: Icons.menu, onTap: onMenuTap),
+
+            // Center: brand + status
+            _BrandCenter(title: title, statusLabel: statusLabel),
+
+            // Right: notification / bell button
+            _HeaderIconButton(icon: Icons.notifications_outlined, onTap: onNotificationTap),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
 class _HeaderIconButton extends StatelessWidget {
   final IconData icon;
   final VoidCallback? onTap;
@@ -27,10 +73,10 @@ class _HeaderIconButton extends StatelessWidget {
 // ─────────────────────────────────────────────
 
 class _BrandCenter extends StatelessWidget {
-  final String appName;
+  final String title;
   final String statusLabel;
 
-  const _BrandCenter({required this.appName, required this.statusLabel});
+  const _BrandCenter({required this.title, required this.statusLabel});
 
   @override
   Widget build(BuildContext context) {
@@ -39,7 +85,7 @@ class _BrandCenter extends StatelessWidget {
       children: [
         // App name
         Text(
-          appName,
+          title,
           style: TextStyle(
             fontWeight: FontWeight.w700,
             fontSize: 18,
@@ -78,56 +124,6 @@ class _BrandCenter extends StatelessWidget {
           ],
         ),
       ],
-    );
-  }
-}
-
-// ─────────────────────────────────────────────
-// Public header widget
-// ─────────────────────────────────────────────
-
-class AiHealthAssHeader extends StatelessWidget implements PreferredSizeWidget {
-  final String appName;
-  final String statusLabel;
-  final VoidCallback? onMenuTap;
-  final VoidCallback? onNotificationTap;
-
-  const AiHealthAssHeader({
-    super.key,
-    this.appName = 'PulseAid Ai',
-    this.statusLabel = 'AI Active',
-    this.onMenuTap,
-    this.onNotificationTap,
-  });
-
-  @override
-  Size get preferredSize => const Size.fromHeight(73);
-
-  @override
-  Widget build(BuildContext context) {
-    return ClipRect(
-      child: Container(
-        height: 73,
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-        decoration: BoxDecoration(
-          color: AppColors.headerBackground,
-          border: Border(bottom: BorderSide(color: AppColors.headerBorder, width: 1)),
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            // Left: menu / hamburger button
-            _HeaderIconButton(icon: Icons.menu, onTap: onMenuTap),
-
-            // Center: brand + status
-            _BrandCenter(appName: appName, statusLabel: statusLabel),
-
-            // Right: notification / bell button
-            _HeaderIconButton(icon: Icons.notifications_outlined, onTap: onNotificationTap),
-          ],
-        ),
-      ),
     );
   }
 }

@@ -142,7 +142,7 @@ class ChatInputBar extends StatelessWidget {
       fillColor: AppColors.inputBg,
       borderColor: AppColors.border,
       contentPadding: const EdgeInsets.symmetric(vertical: 8),
-      hintText: 'Ask PulseAid anything...',
+      hintText: 'Ask PulseAI anything...',
       onFieldSubmitted: (_) => _submit(),
       prefixIcon: SizedBox(
         width: 40,

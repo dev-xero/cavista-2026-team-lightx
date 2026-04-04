@@ -8,7 +8,7 @@ class App extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp.router(
-      title: 'PulseAid',
+      title: 'PulseAI',
       theme: AppTheme.lightTheme,
       debugShowCheckedModeBanner: false,
       routerConfig: AppRouter.router,
