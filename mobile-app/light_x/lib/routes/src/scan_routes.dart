@@ -1,6 +1,6 @@
-import 'package:light_x/features/scan/ui/screens/face_scan_screen.dart';
+import 'package:light_x/features/face_scan/ui/screens/face_scan_screen.dart';
 import 'package:light_x/features/scan/ui/screens/health_screen.dart';
-import 'package:light_x/features/scan/ui/screens/scan_results.dart';
+import 'package:light_x/features/face_scan/ui/screens/face_scan_results_screen.dart';
 import 'package:light_x/features/scan/ui/screens/watch_scan_screen.dart';
 import 'package:light_x/routes/app_router.dart';
 
@@ -23,6 +23,6 @@ final scanRoutes = [
   GoRoute(
     name: Routes.faceScanResult.name,
     path: Routes.faceScanResult.path,
-    builder: (context, state) => const ScanResultScreen(),
+    builder: (context, state) => const FaceScanResultScreen(),
   ),
 ];

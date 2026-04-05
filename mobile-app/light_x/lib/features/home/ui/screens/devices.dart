@@ -4,9 +4,10 @@ import 'dart:math' as math;
 import 'package:flutter_blue_plus/flutter_blue_plus.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:light_x/core/base/src/absorber.dart';
+import 'package:light_x/core/constants/constants.dart';
 import 'package:light_x/features/home/providers/entities/devices_state.dart';
 import 'package:light_x/features/home/providers/main_providers.dart';
-import 'package:light_x/features/scan/providers/health_provider.dart';
+import 'package:light_x/features/scan/providers/watch_health_provider.dart';
 import 'package:light_x/routes/app_router.dart';
 import 'package:light_x/shared/components/layout/app_padding.dart';
 import 'package:light_x/shared/components/layout/app_text.dart';
@@ -28,7 +29,7 @@ class WatchSyncHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 24, 16, 0),
+      padding: const EdgeInsets.fromLTRB(0, 24, 0, 0),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
@@ -78,7 +79,7 @@ class _ConnectionBadgeState extends State<ConnectionBadge> with SingleTickerProv
     final bgColor = widget.connected ? AppColors.connectedBg : const Color(0xFFFF4D6D).withValues(alpha: 0.1);
 
     return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
+      padding: const EdgeInsets.fromLTRB(0, 0, 0, 8),
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
         decoration: BoxDecoration(color: bgColor, borderRadius: BorderRadius.circular(9999)),
@@ -169,8 +170,9 @@ class SyncHub extends StatefulWidget {
   final String valueLabel;
   final String title;
   final String subtitle;
+  final void Function()? onTapRing;
 
-  const SyncHub({super.key, required this.valueLabel, required this.title, required this.subtitle});
+  const SyncHub({super.key, required this.valueLabel, required this.title, required this.subtitle, this.onTapRing});
 
   @override
   State<SyncHub> createState() => _SyncHubState();
@@ -196,26 +198,29 @@ class _SyncHubState extends State<SyncHub> with SingleTickerProviderStateMixin {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        SizedBox(
-          width: 192,
-          height: 192,
-          child: Stack(
-            alignment: Alignment.center,
-            children: [
-              AnimatedBuilder(
-                animation: _spin,
-                builder: (_, __) =>
-                    CustomPaint(size: const Size(192, 192), painter: _SyncRingPainter(_spin.value * 2 * math.pi)),
-              ),
-              Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  const Icon(Icons.watch_rounded, color: AppColors.primary, size: 32),
-                  const SizedBox(height: 4),
-                  Text(widget.valueLabel, style: AppTextStyles.syncValue),
-                ],
-              ),
-            ],
+        GestureDetector(
+          onTap: widget.onTapRing,
+          child: SizedBox(
+            width: 192,
+            height: 192,
+            child: Stack(
+              alignment: Alignment.center,
+              children: [
+                AnimatedBuilder(
+                  animation: _spin,
+                  builder: (_, __) =>
+                      CustomPaint(size: const Size(192, 192), painter: _SyncRingPainter(_spin.value * 2 * math.pi)),
+                ),
+                Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Icon(Icons.watch_rounded, color: AppColors.primary, size: 32),
+                    const SizedBox(height: 4),
+                    Text(widget.valueLabel, style: AppTextStyles.syncValue),
+                  ],
+                ),
+              ],
+            ),
           ),
         ),
 
@@ -490,13 +495,10 @@ class StatsGrid extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16),
-      child: Column(
-        children: [
-          for (int i = 0; i < cards.length; i++) ...[if (i > 0) const SizedBox(height: 16), cards[i]],
-        ],
-      ),
+    return Column(
+      children: [
+        for (int i = 0; i < cards.length; i++) ...[if (i > 0) const SizedBox(height: 16), cards[i]],
+      ],
     );
   }
 }
@@ -514,7 +516,7 @@ class SyncActionButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.symmetric(vertical: 16),
       child: GestureDetector(
         onTap: onTap,
         child: Container(
@@ -607,24 +609,27 @@ class _NoDeviceHub extends StatelessWidget {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Container(
-          width: 192,
-          height: 192,
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            border: Border.all(color: const Color(0xFFE2E8F0), width: 8),
-            color: AppColors.white,
-          ),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(Icons.watch_off_rounded, color: AppColors.textMuted, size: 36),
-              const SizedBox(height: 8),
-              Text(
-                'No Device',
-                style: TextStyle(fontWeight: FontWeight.w600, fontSize: 13, color: AppColors.textMuted),
-              ),
-            ],
+        GestureDetector(
+          onTap: onConnect,
+          child: Container(
+            width: 192,
+            height: 192,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              border: Border.all(color: const Color(0xFFE2E8F0), width: 8),
+              color: AppColors.white,
+            ),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(Icons.watch_off_rounded, color: AppColors.textMuted, size: 36),
+                const SizedBox(height: 8),
+                Text(
+                  'No Device',
+                  style: TextStyle(fontWeight: FontWeight.w600, fontSize: 13, color: AppColors.textMuted),
+                ),
+              ],
+            ),
           ),
         ),
         const SizedBox(height: 24),
@@ -697,63 +702,68 @@ class _DevicesState extends State<Devices> {
     const stepsFraction = 0.0;
     const stepsLabel = '0% done';
 
-    return Column(
-      children: [
-        TopPadding(),
+    return CustomScrollView(
+      slivers: [
+        // TopPadding(),
         // ── Header ────────────────────────────────────────────
-        WatchSyncHeader(
-          title: 'Sync',
-          trailing: IconButton(
-            icon: const Icon(Icons.more_horiz_rounded, color: AppColors.textSecondary),
-            onPressed: service != null ? _viewHealth : null,
+        PinnedHeaderSliver(
+          child: WatchSyncHeader(
+            title: 'Sync',
+            trailing: IconButton(
+              icon: const Icon(Icons.more_horiz_rounded, color: AppColors.textSecondary),
+              onPressed: service != null ? _viewHealth : null,
+            ),
           ),
         ),
 
         // ── Connection badge ───────────────────────────────────
-        const SizedBox(height: 8),
-        Align(
-          alignment: Alignment.centerLeft,
-          child: service == null
-              ? const ConnectionBadge(label: 'Not Connected', connected: false)
-              : ConnectionBadge(label: connected ? 'Connected' : 'Disconnected', connected: connected),
+        8.inSliverColumn,
+
+        SliverFloatingHeader(
+          child: Align(
+            alignment: Alignment.centerLeft,
+            child: service == null
+                ? const ConnectionBadge(label: 'Not Connected', connected: false)
+                : ConnectionBadge(label: connected ? 'Connected' : 'Disconnected', connected: connected),
+          ),
         ),
 
         // ── Scrollable body ────────────────────────────────────
-        Expanded(
-          child: SingleChildScrollView(
-            child: Column(
-              children: [
-                // Hub — real device or empty state
-                Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 32),
-                  child: service == null
-                      ? _NoDeviceHub(onConnect: _goToScan)
-                      : SyncHub(
-                          valueLabel: batteryValue != null ? '$batteryValue%' : '--',
-                          title: deviceName,
-                          subtitle: connected ? 'Smart Watch is connected' : 'Reconnecting…',
-                        ),
-                ),
+        SliverToBoxAdapter(
+          child: Column(
+            children: [
+              // Hub — real device or empty state
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 32),
+                child: service == null
+                    ? _NoDeviceHub(onConnect: _goToScan)
+                    : SyncHub(
+                        valueLabel: batteryValue != null ? '$batteryValue%' : '--',
+                        title: deviceName,
+                        subtitle: connected ? 'Smart Watch is connected' : 'Reconnecting…',
+                      ),
+              ),
 
-                // Stats grid — always shown; "--" when no data yet
-                StatsGrid(
-                  cards: [
-                    HeartRateCard(value: hrValue),
-                    BloodOxygenCard(
-                      value: snapshot?.spo2 != null ? snapshot!.spo2!.toStringAsFixed(1) : '--',
-                      badgeText: _spo2Badge(snapshot?.spo2),
-                    ),
-                    const StepsCard(value: stepsValue, fraction: stepsFraction, progressLabel: stepsLabel),
-                  ],
-                ),
+              // Stats grid — always shown; "--" when no data yet
+              StatsGrid(
+                cards: [
+                  HeartRateCard(value: hrValue),
+                  BloodOxygenCard(
+                    value: snapshot?.spo2 != null ? snapshot!.spo2!.toStringAsFixed(1) : '--',
+                    badgeText: _spo2Badge(snapshot?.spo2),
+                  ),
+                  const StepsCard(value: stepsValue, fraction: stepsFraction, progressLabel: stepsLabel),
+                ],
+              ),
+            ],
+          ),
+        ),
 
-                // Action button — context-aware label & destination
-                SyncActionButton(
-                  label: service == null ? 'Connect a Watch' : 'View Health Data',
-                  onTap: service == null ? _goToScan : _viewHealth,
-                ),
-              ],
-            ),
+        SliverFloatingHeader(
+          child: // Action button — context-aware label & destination
+          SyncActionButton(
+            label: service == null ? 'Connect a Watch' : 'View Health Data',
+            onTap: service == null ? _goToScan : _viewHealth,
           ),
         ),
       ],

@@ -3,11 +3,11 @@ import 'dart:developer';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:light_x/core/apis/api.dart';
-import 'package:light_x/core/apis/entities/health_model.dart';
+import 'package:light_x/core/apis/entities/health_details_response.dart';
 import 'package:light_x/core/storage/shared_prefs/shared_prefs.dart';
 import 'package:light_x/core/utils/app_logger.dart';
 import 'package:light_x/features/home/providers/entities/analysis_state.dart';
-import 'package:light_x/features/scan/providers/health_provider.dart';
+import 'package:light_x/features/scan/providers/watch_health_provider.dart';
 
 const _tag = 'VitalsAnalysis';
 
@@ -39,9 +39,9 @@ class AnalysisNotifier extends Notifier<AnalysisState> {
     state = AnalysisState.d();
   }
 
-  HealthModel _buildRequest() {
+  HealthDetails _buildRequest() {
     final rawOnboarding = SharedPrefKeys.onboardingData.get<String>();
-    final base = rawOnboarding == null ? HealthModel.empty() : HealthModel.fromJson(jsonDecode(rawOnboarding));
+    final base = rawOnboarding == null ? HealthDetails.empty() : HealthDetails.fromJson(jsonDecode(rawOnboarding));
 
     final snapshot = ref.read(latestHealthSnapshotProvider);
 

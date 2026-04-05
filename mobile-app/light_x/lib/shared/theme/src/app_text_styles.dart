@@ -186,7 +186,7 @@ class AppTextStyles {
 
   static const progressCaption = TextStyle(
     fontWeight: FontWeight.w400,
-    fontSize: 14,
+    fontSize: 13,
     height: 20 / 14,
     color: AppColors.textSecondary,
   );

@@ -1,4 +1,4 @@
-class HealthModel {
+class HealthDetails {
   final int age;
   final int gender;
   final int smokingStatus;
@@ -17,7 +17,7 @@ class HealthModel {
   final int fastingGlucose;
   final double creatinine;
 
-  const HealthModel({
+  const HealthDetails({
     required this.age,
     required this.gender,
     required this.smokingStatus,
@@ -37,8 +37,8 @@ class HealthModel {
     required this.creatinine,
   });
 
-  factory HealthModel.fromJson(Map<String, dynamic> json) {
-    return HealthModel(
+  factory HealthDetails.fromJson(Map<String, dynamic> json) {
+    return HealthDetails(
       age: json['age'] as int,
       gender: json['gender'] as int,
       smokingStatus: json['smoking_status'] as int,
@@ -59,8 +59,8 @@ class HealthModel {
     );
   }
 
-  factory HealthModel.empty() {
-    return HealthModel(
+  factory HealthDetails.empty() {
+    return HealthDetails(
       age: 1,
       bmi: 1,
       smokingStatus: 1,
@@ -104,7 +104,7 @@ class HealthModel {
     };
   }
 
-  HealthModel copyWith({
+  HealthDetails copyWith({
     int? age,
     int? gender,
     int? smokingStatus,
@@ -123,7 +123,7 @@ class HealthModel {
     int? fastingGlucose,
     double? creatinine,
   }) {
-    return HealthModel(
+    return HealthDetails(
       age: age ?? this.age,
       gender: gender ?? this.gender,
       smokingStatus: smokingStatus ?? this.smokingStatus,
@@ -147,7 +147,7 @@ class HealthModel {
   @override
   bool operator ==(Object other) {
     if (identical(this, other)) return true;
-    return other is HealthModel &&
+    return other is HealthDetails &&
         other.age == age &&
         other.gender == gender &&
         other.smokingStatus == smokingStatus &&

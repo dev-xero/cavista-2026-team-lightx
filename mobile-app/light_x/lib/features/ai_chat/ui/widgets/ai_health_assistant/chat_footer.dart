@@ -1,34 +1,24 @@
 import 'package:flutter/material.dart';
+import 'package:light_x/features/ai_chat/ui/entities/quick_action_item.dart';
 import 'package:light_x/shared/components/inputs/app_text_form_field.dart';
 import 'package:light_x/shared/theme/src/app_colors.dart';
 import 'package:light_x/shared/theme/src/app_text_styles.dart';
 import 'package:remixicon/remixicon.dart';
 
 // ─────────────────────────────────────────────
-// Quick action model
-// ─────────────────────────────────────────────
-
-class QuickAction {
-  final IconData icon;
-  final String label;
-  final VoidCallback? onTap;
-
-  const QuickAction({required this.icon, required this.label, this.onTap});
-}
-
-// ─────────────────────────────────────────────
 // Quick action chip
 // ─────────────────────────────────────────────
 
 class QuickActionChip extends StatelessWidget {
-  final QuickAction action;
+  final QuickActionItem action;
+  final VoidCallback? onTap;
 
-  const QuickActionChip({super.key, required this.action});
+  const QuickActionChip({super.key, required this.action, this.onTap});
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: action.onTap,
+      onTap: onTap,
       child: Container(
         height: 36,
         padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -55,9 +45,10 @@ class QuickActionChip extends StatelessWidget {
 // ─────────────────────────────────────────────
 
 class SuggestedActionsRow extends StatelessWidget {
-  final List<QuickAction> actions;
+  final List<QuickActionItem> actions;
+  final ValueChanged<QuickActionItem>? onActionTap;
 
-  const SuggestedActionsRow({super.key, required this.actions});
+  const SuggestedActionsRow({super.key, required this.actions, this.onActionTap});
 
   @override
   Widget build(BuildContext context) {
@@ -68,7 +59,10 @@ class SuggestedActionsRow extends StatelessWidget {
         scrollDirection: Axis.horizontal,
         itemCount: actions.length,
         separatorBuilder: (_, __) => const SizedBox(width: 11),
-        itemBuilder: (context, i) => QuickActionChip(action: actions[i]),
+        itemBuilder: (context, i) {
+          final action = actions[i];
+          return QuickActionChip(action: action, onTap: onActionTap == null ? null : () => onActionTap!(action));
+        },
       ),
     );
   }
@@ -121,7 +115,7 @@ class _SendButton extends StatelessWidget {
 // ─────────────────────────────────────────────
 
 class ChatInputBar extends StatelessWidget {
-  /// Owned by [AiHealthAssProvider] — do not create locally.
+  /// Owned by the ai chat notifier — do not create locally.
   final TextEditingController controller;
   final ValueChanged<String>? onSubmitted;
   final bool isLoading;
@@ -168,45 +162,40 @@ class ChatInputBar extends StatelessWidget {
 // ─────────────────────────────────────────────
 
 class ChatFooter extends StatelessWidget {
-  final List<QuickAction> suggestedActions;
+  final List<QuickActionItem> suggestedActions;
   final ValueChanged<String>? onSubmitted;
+  final ValueChanged<QuickActionItem>? onQuickActionTap;
 
-  /// Pass [AiHealthAssProvider.inputController] here.
-  final TextEditingController? inputController;
+  /// Pass notifier-owned [TextEditingController] here.
+  final TextEditingController inputController;
 
-  /// Pass [AiHealthAssProvider.isLoading] here.
+  /// Loading flag from chat state.
   final bool isLoading;
 
   const ChatFooter({
     super.key,
     required this.suggestedActions,
     this.onSubmitted,
-    this.inputController,
+    this.onQuickActionTap,
+    required this.inputController,
     this.isLoading = false,
   });
 
   @override
   Widget build(BuildContext context) {
-    final ctrl = inputController ?? TextEditingController();
-
-    return ClipRect(
-      child: BackdropFilter(
-        filter: ColorFilter.mode(AppColors.footerBg, BlendMode.srcOver),
-        child: Container(
-          decoration: BoxDecoration(
-            color: AppColors.footerBg,
-            border: Border(top: BorderSide(color: AppColors.border)),
-          ),
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              SuggestedActionsRow(actions: suggestedActions),
-              const SizedBox(height: 16),
-              ChatInputBar(controller: ctrl, onSubmitted: onSubmitted, isLoading: isLoading),
-            ],
-          ),
-        ),
+    return Container(
+      decoration: BoxDecoration(
+        color: AppColors.footerBg,
+        border: Border(top: BorderSide(color: AppColors.border)),
+      ),
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          SuggestedActionsRow(actions: suggestedActions, onActionTap: onQuickActionTap),
+          const SizedBox(height: 16),
+          ChatInputBar(controller: inputController, onSubmitted: onSubmitted, isLoading: isLoading),
+        ],
       ),
     );
   }

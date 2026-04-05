@@ -18,8 +18,8 @@ final GlobalKey<NavigatorState> rootNavigatorKey = GlobalKey<NavigatorState>();
 class AppRouter {
   static final GoRouter router = GoRouter(
     debugLogDiagnostics: true,
-    initialLocation: Routes.home.path,
+    initialLocation: Routes.splash.path,
     navigatorKey: rootNavigatorKey,
-    routes: [splashRoute, ...onboardingRoutes, ...mainRoutes, ...scanRoutes, pricingRoute],
+    routes: [splashRoute, ...onboardingRoutes, ...mainRoutes, ...aiChatRoutes, ...scanRoutes, pricingRoute],
   );
 }

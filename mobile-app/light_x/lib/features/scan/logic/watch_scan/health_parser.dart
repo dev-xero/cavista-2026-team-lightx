@@ -5,7 +5,7 @@
 library;
 
 import 'dart:developer';
-import 'package:light_x/features/scan/logic/models/health_data_snapshot.dart';
+import 'package:light_x/features/scan/logic/entities/health_data_snapshot.dart';
 
 const _tag = 'HealthParser';
 

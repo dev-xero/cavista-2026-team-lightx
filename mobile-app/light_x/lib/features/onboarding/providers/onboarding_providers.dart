@@ -1,7 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:light_x/core/apis/entities/health_model.dart';
+import 'package:light_x/core/apis/entities/health_details_response.dart';
 import 'package:light_x/core/storage/shared_prefs/shared_prefs.dart';
 import 'package:light_x/features/onboarding/providers/src/onboarding_1_notifier.dart';
 import 'package:light_x/features/onboarding/providers/src/onboarding_2_notifier.dart';
@@ -35,7 +35,7 @@ class OnboardingProviders {
     await SharedPrefs.set(
       SharedPrefKeys.onboardingData,
       jsonEncode(
-        HealthModel(
+        HealthDetails(
           age: o2.age,
           bmi: o2.weight.toInt(),
           smokingStatus: o2.isSmoking ? 1 : 1,

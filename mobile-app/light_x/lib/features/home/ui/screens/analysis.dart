@@ -1,13 +1,16 @@
 import 'dart:convert';
+import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:light_x/core/apis/entities/analysis_result.dart';
+import 'package:light_x/core/apis/entities/analysis_response.dart';
 import 'package:light_x/core/base/src/absorber.dart';
+import 'package:light_x/core/constants/constants.dart';
 import 'package:light_x/core/utils/nav_utils.dart';
 import 'package:light_x/features/home/providers/main_providers.dart';
 import 'package:light_x/routes/app_router.dart';
 import 'package:light_x/shared/components/buttons/build_icon_button.dart';
+import 'package:light_x/shared/components/layout/app_padding.dart';
 import 'package:light_x/shared/components/layout/app_scaffold.dart';
 import 'package:light_x/shared/components/layout/app_text.dart';
 import 'package:light_x/shared/components/layout/texts.dart';
@@ -37,27 +40,54 @@ class _AnalysisState extends ConsumerState<Analysis> {
   @override
   Widget build(BuildContext context) {
     final analysisProvider = MainProviders.asPro.read(ref).analysis;
-    return AppScaffold(
-      leading: const SizedBox(width: 48),
-      title: AppTexts.pageAppBarTitleText("Analysis Results"),
-      viewPadding: EdgeInsets.zero,
-      appBarPadding: (apply) => apply.copyWith(right: 0),
-      trailing: BuildIconButton(onPressed: () {}, icon: const Icon(RemixIcons.share_circle_fill)),
-      body: AbsorberWatch(
-        listenable: analysisProvider,
-        builder: (_, state, ref, _) {
-          if (state.isLoadingAnalysis) {
-            return _LoadingBody();
-          } else if (!state.isLoadingAnalysis && state.result != null) {
-            return _SuccessBody(result: state.result!);
-          } else {
-            return _ErrorBody(
-              message: 'Unable to analyze your vitals at the moment. Please try again later.',
-              onRetry: () => analysisProvider.self(ref).analyse(),
-            );
-          }
-        },
-      ),
+    return CustomScrollView(
+      slivers: [
+        PinnedHeaderSliver(
+          child: ClipRRect(
+            child: BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 2, sigmaY: 2),
+              child: ColoredBox(
+                color: context.scaffoldBackgroundColor.withValues(alpha: 0.92),
+                child: Column(
+                  children: [
+                    const TopPadding(withHeight: 16),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        AppTexts.pageAppBarTitleText("Analysis Results"),
+                        12.inRow,
+                        BuildIconButton(
+                          onPressed: () {},
+                          useNormalPadding: false,
+                          icon: const Icon(RemixIcons.share_circle_fill),
+                        ),
+                      ],
+                    ),
+                    16.inColumn,
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ),
+        AbsorberWatch(
+          listenable: analysisProvider,
+          builder: (_, state, ref, _) {
+            if (state.isLoadingAnalysis) {
+              return SliverFillRemaining(child: _LoadingBody());
+            } else if (!state.isLoadingAnalysis && state.result != null) {
+              return SliverToBoxAdapter(child: _SuccessBody(result: state.result!));
+            } else {
+              return SliverToBoxAdapter(
+                child: _ErrorBody(
+                  message: 'Unable to analyze your vitals at the moment. Please try again later.',
+                  onRetry: () => analysisProvider.self(ref).analyse(),
+                ),
+              );
+            }
+          },
+        ),
+      ],
     );
   }
 }
@@ -145,7 +175,7 @@ class _ErrorBody extends StatelessWidget {
 // ─────────────────────────────────────────────
 
 class _SuccessBody extends StatelessWidget {
-  final AnalysisResult result;
+  final AnalysisResponse result;
 
   const _SuccessBody({required this.result});
 
@@ -191,26 +221,24 @@ class _SuccessBody extends StatelessWidget {
       ),
     ];
 
-    return SingleChildScrollView(
-      child: Column(
-        children: [
-          const TimestampLabel(text: 'Today · Just now'),
-          const SizedBox(height: 40),
+    return Column(
+      children: [
+        const TimestampLabel(text: 'Today · Just now'),
+        const SizedBox(height: 40),
 
-          RiskGauge(data: gaugeData),
-          const SizedBox(height: 32),
+        RiskGauge(data: gaugeData),
+        const SizedBox(height: 32),
 
-          MetricsGrid(metrics: metrics),
-          const SizedBox(height: 16),
+        MetricsGrid(metrics: metrics),
+        const SizedBox(height: 16),
 
-          PremiumLockedCard(data: PremiumLockedData.sample()),
-          const SizedBox(height: 16),
+        PremiumLockedCard(data: PremiumLockedData.sample()),
+        const SizedBox(height: 16),
 
-          LifestyleTipCard(title: 'Recommendation', body: result.lifestyleTip),
+        LifestyleTipCard(title: 'Recommendation', body: result.lifestyleTip),
 
-          const SizedBox(height: 32),
-        ],
-      ),
+        const SizedBox(height: 32),
+      ],
     );
   }
 }
@@ -448,14 +476,26 @@ class MetricsGrid extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      children: [
-        for (int i = 0; i < metrics.length; i++) ...[
-          if (i > 0) const SizedBox(width: 16),
-          Expanded(child: MetricCard(data: metrics[i])),
-        ],
-      ],
+    return Wrap(
+      spacing: 16,
+      runSpacing: 16,
+      children: metrics
+          .map(
+            (data) => SizedBox(
+              width: (context.deviceWidth - 64 - 16) / 2,
+              child: MetricCard(data: data),
+            ),
+          )
+          .toList(),
     );
+    // return Row(
+    //   children: [
+    //     for (int i = 0; i < metrics.length; i++) ...[
+    //       if (i > 0) const SizedBox(width: 16),
+    //       Expanded(child: MetricCard(data: metrics[i])),
+    //     ],
+    //   ],
+    // );
   }
 }
 

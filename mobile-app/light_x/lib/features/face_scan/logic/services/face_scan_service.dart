@@ -3,40 +3,16 @@ import 'package:camera/camera.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_mlkit_face_detection/google_mlkit_face_detection.dart';
-
-// ─────────────────────────────────────────────
-// Enums / result types
-// ─────────────────────────────────────────────
-
-enum LightingStatus { tooDark, optimal, tooBright, unknown }
-
-enum DistanceStatus { tooFar, okay, perfect, tooClose, unknown }
-
-class FaceScanResult {
-  final LightingStatus lighting;
-  final DistanceStatus distance;
-  final String lightingMessage;
-  final String distanceMessage;
-  final bool isAcceptable;
-
-  const FaceScanResult({
-    required this.lighting,
-    required this.distance,
-    required this.lightingMessage,
-    required this.distanceMessage,
-    required this.isAcceptable,
-  });
-}
+import 'package:light_x/features/face_scan/providers/entities/face_scan_result.dart';
 
 // ─────────────────────────────────────────────
 // FaceScanService
 // ─────────────────────────────────────────────
 
 class FaceScanService {
-  FaceScanService({required this.previewWidth, required this.previewHeight});
+  FaceScanService({required this.previewSize});
 
-  final double previewWidth;
-  final double previewHeight;
+  final Size previewSize;
 
   // Progress tracking ─────────────────────────
   final StreamController<double> _progressController = StreamController<double>.broadcast();
@@ -61,18 +37,12 @@ class FaceScanService {
     ),
   );
 
-  // FIX: track whether a frame is already being processed so we don't
-  // queue up dozens of concurrent ML Kit calls (causes the ImageReader
-  // "unable to acquire buffer" spam and keeps running after dispose).
   bool _processingFrame = false;
   bool _disposed = false;
-
-  // ─── Public API ────────────────────────────
 
   Future<FaceScanResult> analyzeFrame(CameraImage cameraImage) async {
     if (_disposed) throw StateError('FaceScanService has been disposed.');
 
-    // FIX: drop frames that arrive while the previous one is still processing.
     if (_processingFrame) {
       return const FaceScanResult(
         lighting: LightingStatus.unknown,
@@ -105,7 +75,7 @@ class FaceScanService {
       final face = faces.first;
       final lighting = _analyzeLighting(cameraImage);
       final distance = _analyzeDistance(face.boundingBox);
-      final isAcceptable = _lightingAcceptable(lighting) && _distanceAcceptable(distance);
+      final isAcceptable = lighting == LightingStatus.optimal && _distanceAcceptable(distance);
 
       final result = FaceScanResult(
         lighting: lighting,
@@ -151,8 +121,7 @@ class FaceScanService {
   // ─── Lighting ──────────────────────────────
 
   LightingStatus _analyzeLighting(CameraImage image) {
-    final yPlane = image.planes.first;
-    final bytes = yPlane.bytes;
+    final bytes = image.planes.first.bytes;
     if (bytes.isEmpty) return LightingStatus.unknown;
 
     int sum = 0;
@@ -167,8 +136,6 @@ class FaceScanService {
     if (avg > 210) return LightingStatus.tooBright;
     return LightingStatus.optimal;
   }
-
-  bool _lightingAcceptable(LightingStatus s) => s == LightingStatus.optimal;
 
   String _lightingMessage(LightingStatus s) {
     switch (s) {
@@ -188,7 +155,7 @@ class FaceScanService {
   DistanceStatus _analyzeDistance(Rect boundingBox) {
     // Use the longer preview dimension as the reference so portrait/landscape
     // orientation differences don't skew the ratio.
-    final refDimension = previewWidth > previewHeight ? previewWidth : previewHeight;
+    final refDimension = previewSize.width > previewSize.height ? previewSize.width : previewSize.height;
     final ratio = boundingBox.width / refDimension;
 
     if (ratio < 0.20) return DistanceStatus.tooFar;

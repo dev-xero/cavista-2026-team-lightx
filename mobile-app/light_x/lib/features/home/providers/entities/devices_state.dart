@@ -1,4 +1,4 @@
-import 'package:light_x/features/scan/logic/models/health_data_snapshot.dart';
+import 'package:light_x/features/scan/logic/entities/health_data_snapshot.dart';
 
 class DevicesState {
   final String? currDeviceName;

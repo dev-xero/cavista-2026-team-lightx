@@ -31,6 +31,7 @@ class AppScaffold extends StatelessWidget {
   final void Function()? onBackButtonPressed;
   final Widget body;
   final Widget? footer;
+  final EdgeInsets? footerPadding;
   final bool isLoading;
 
   const AppScaffold({
@@ -55,6 +56,7 @@ class AppScaffold extends StatelessWidget {
     this.onBackButtonPressed,
     this.appBarBackgroundColor,
     this.footer,
+    this.footerPadding,
     this.isLoading = false,
   });
 
@@ -106,7 +108,10 @@ class AppScaffold extends StatelessWidget {
                         bottom: 0,
                         left: 0,
                         right: 0,
-                        child: Padding(padding: defaultPadding.copyWith(bottom: 24, top: 0), child: footer!),
+                        child: Padding(
+                          padding: footerPadding ?? defaultPadding.copyWith(bottom: 24, top: 0),
+                          child: footer!,
+                        ),
                       ),
 
                     if (isLoading) positionedLoadingIndicator(),

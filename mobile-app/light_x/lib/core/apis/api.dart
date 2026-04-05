@@ -1,13 +1,13 @@
 import 'dart:convert';
+import 'dart:typed_data';
 
 import 'package:dio/dio.dart';
-import 'package:light_x/core/apis/api.dart';
 import 'package:light_x/core/apis/api_paths.dart';
 import 'package:light_x/core/apis/api_response.dart';
-import 'package:light_x/core/apis/entities/analysis_result.dart';
-import 'package:light_x/core/apis/entities/health_model.dart';
+import 'package:light_x/core/apis/entities/analysis_response.dart';
+import 'package:light_x/core/apis/entities/health_details_response.dart';
 import 'package:light_x/core/utils/app_logger.dart';
-import 'package:light_x/data/models/health_model.dart';
+import 'package:light_x/core/utils/result.dart';
 import 'package:light_x/shared/helpers/extensions/extensions.dart';
 
 part 'src/chat_api.dart';

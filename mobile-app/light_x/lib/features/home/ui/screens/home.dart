@@ -6,6 +6,7 @@ import 'package:light_x/core/assets/assets.dart';
 import 'package:light_x/core/constants/constants.dart';
 import 'package:light_x/features/home/ui/entities/bar_chart_item.dart';
 import 'package:light_x/features/home/ui/entities/health_tip_item.dart';
+import 'package:light_x/features/home/ui/screens/analysis.dart';
 import 'package:light_x/features/home/ui/widgets/home/bar_chart_card.dart';
 import 'package:light_x/features/home/ui/widgets/home/daily_analysis_card.dart';
 import 'package:light_x/features/home/ui/widgets/home/health_tips_section.dart';
@@ -69,6 +70,10 @@ class _HomeState extends State<Home> {
         24.inSliverColumn,
 
         SliverToBoxAdapter(child: HealthTipsSection(tips: HealthTipItem.items)),
+
+        24.inSliverColumn,
+
+        SliverToBoxAdapter(child: PremiumLockedCard(data: PremiumLockedData.sample())),
 
         88.inSliverColumn,
       ],

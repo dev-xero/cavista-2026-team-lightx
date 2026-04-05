@@ -2,7 +2,7 @@ enum RiskLevel { low, moderate, high, critical }
 
 enum SeverityLevel { normal, caution, warning, critical }
 
-class AnalysisResult {
+class AnalysisResponse {
   /// Raw text from the backend — shown as-is in the gauge description.
   final String rawResponse;
 
@@ -26,7 +26,7 @@ class AnalysisResult {
 
   final String lifestyleTip;
 
-  const AnalysisResult({
+  const AnalysisResponse({
     required this.rawResponse,
     required this.riskLevel,
     required this.riskSeverity,

@@ -1,27 +1,42 @@
 import 'package:flutter/material.dart';
-import 'package:light_x/features/scan/providers/face_scanner_provider.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:light_x/core/base/src/absorber.dart';
+import 'package:light_x/features/face_scan/providers/face_scan_provider.dart';
+import 'package:light_x/features/face_scan/providers/entities/face_scan_submission.dart';
+import 'package:light_x/features/face_scan/providers/entities/face_scan_state.dart';
 import 'package:light_x/routes/app_router.dart';
 import 'package:light_x/shared/components/buttons/app_button.dart';
 import 'package:light_x/shared/components/layout/app_scaffold.dart';
 import 'package:light_x/shared/components/layout/app_text.dart';
+import 'package:light_x/shared/helpers/extensions/extensions.dart';
 import 'package:light_x/shared/theme/src/app_colors.dart';
 import 'package:light_x/shared/theme/src/app_text_styles.dart';
-import 'package:provider/provider.dart';
 
-class ScanResultScreen extends StatelessWidget {
-  const ScanResultScreen({super.key});
+class FaceScanResultScreen extends ConsumerWidget {
+  const FaceScanResultScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    final provider = context.watch<FaceScannerProvider>();
+  Widget build(BuildContext context, WidgetRef ref) {
+    final faceScanProvider = FaceScanProvider.asPro.read(ref).state;
 
     return AppScaffold(
       backgroundColor: AppColors.white,
-      body: SafeArea(
-        child: switch (provider.state) {
-          FaceScanState.success => _SuccessBody(provider: provider),
-          FaceScanState.backendError => _ErrorBody(provider: provider),
-          _ => const Center(child: CircularProgressIndicator()),
+      body: AbsorberWatch(
+        listenable: faceScanProvider,
+        builder: (_, faceScanState, _, _) {
+          return SafeArea(
+            child: switch (faceScanState.phase) {
+              FaceScanPhase.success => _SuccessBody(
+                provider: faceScanState,
+                onRetry: () => faceScanProvider.self(ref).retry(),
+              ),
+              FaceScanPhase.error => _ErrorBody(
+                provider: faceScanState,
+                onRetry: () => faceScanProvider.self(ref).retry(),
+              ),
+              _ => const Center(child: CircularProgressIndicator()),
+            },
+          );
         },
       ),
     );
@@ -31,15 +46,16 @@ class ScanResultScreen extends StatelessWidget {
 // ─── Success ───────────────────────────────────────────────────────────────
 
 class _SuccessBody extends StatelessWidget {
-  const _SuccessBody({required this.provider});
-  final FaceScannerProvider provider;
+  const _SuccessBody({required this.provider, required this.onRetry});
+  final FaceScanState provider;
+  final VoidCallback onRetry;
 
   @override
   Widget build(BuildContext context) {
-    final response = provider.successResponse!;
+    final response = provider.submission!;
 
     // Split the markdown-ish analysis into numbered sections for display
-    final sections = _parseSections(response.analysis);
+    final sections = _parseSections(response.analysis ?? '');
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -65,13 +81,17 @@ class _SuccessBody extends StatelessWidget {
                 const SizedBox(height: 24),
 
                 // Heading
-                Text(response.message, textAlign: TextAlign.center, style: AppTextStyles.scannerHeading),
+                Text(
+                  response.message ?? 'Scan Complete',
+                  textAlign: TextAlign.center,
+                  style: AppTextStyles.scannerHeading,
+                ),
 
                 const SizedBox(height: 8),
 
                 // Timestamp
                 Text(
-                  _formatTimestamp(response.timestamp),
+                  _formatTimestamp(response.timestamp ?? ''),
                   textAlign: TextAlign.center,
                   style: AppTextStyles.scannerSubtitle,
                 ),
@@ -113,7 +133,7 @@ class _SuccessBody extends StatelessWidget {
                   color: AppColors.lightGray,
                   borderRadius: 24,
                   onPressed: () {
-                    context.read<FaceScannerProvider>().retry();
+                    onRetry();
                     Navigator.of(context).pop();
                   },
                 ),
@@ -234,12 +254,13 @@ class _AnalysisCard extends StatelessWidget {
 // ─── Error ─────────────────────────────────────────────────────────────────
 
 class _ErrorBody extends StatelessWidget {
-  const _ErrorBody({required this.provider});
-  final FaceScannerProvider provider;
+  const _ErrorBody({required this.provider, required this.onRetry});
+  final FaceScanState provider;
+  final VoidCallback onRetry;
 
   @override
   Widget build(BuildContext context) {
-    final response = provider.backendError!;
+    final response = provider.submission ?? const FaceScanSubmission();
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -269,8 +290,8 @@ class _ErrorBody extends StatelessWidget {
                 const SizedBox(height: 8),
 
                 Text(
-                  'We found ${response.details.length} '
-                  'issue${response.details.length == 1 ? '' : 's'} '
+                  'We found ${response.errors.length} '
+                  'issue${response.errors.length == 1 ? '' : 's'} '
                   'with your submission. Please review and try again.',
                   textAlign: TextAlign.center,
                   style: AppTextStyles.scannerSubtitle,
@@ -278,12 +299,29 @@ class _ErrorBody extends StatelessWidget {
 
                 const SizedBox(height: 32),
 
-                ...response.details.indexed.map(
+                ...response.errors.indexed.map(
                   (e) => Padding(
                     padding: const EdgeInsets.only(bottom: 12),
-                    child: _ErrorCard(detail: e.$2, index: e.$1),
+                    child: _ErrorCard(message: e.$2, index: e.$1),
                   ),
                 ),
+
+                if (response.technicalDetails != null && response.technicalDetails!.isNotEmpty) ...[
+                  const SizedBox(height: 8),
+                  Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFF8FAFC),
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: const Color(0xFFE2E8F0)),
+                    ),
+                    child: Text(
+                      response.technicalDetails!,
+                      style: const TextStyle(fontSize: 12, color: Color(0xFF64748B), fontFamily: 'monospace'),
+                    ),
+                  ),
+                ],
 
                 const SizedBox(height: 12),
                 _PrivacyPill(),
@@ -312,7 +350,7 @@ class _ErrorBody extends StatelessWidget {
                   color: AppColors.primary,
                   borderRadius: 24,
                   onPressed: () {
-                    context.read<FaceScannerProvider>().retry();
+                    onRetry();
                     Navigator.of(context).pop();
                   },
                 ),
@@ -326,8 +364,8 @@ class _ErrorBody extends StatelessWidget {
 }
 
 class _ErrorCard extends StatelessWidget {
-  const _ErrorCard({required this.detail, required this.index});
-  final ScanErrorDetail detail;
+  const _ErrorCard({required this.message, required this.index});
+  final String message;
   final int index;
 
   @override
@@ -358,41 +396,7 @@ class _ErrorCard extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                if (detail.locationLabel.isNotEmpty) ...[
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                    decoration: BoxDecoration(color: const Color(0xFFF1F5F9), borderRadius: BorderRadius.circular(6)),
-                    child: Text(
-                      detail.locationLabel,
-                      style: TextStyle(
-                        fontSize: 11,
-                        fontWeight: FontWeight.w500,
-                        color: Color(0xFF64748B),
-                        fontFamily: 'monospace',
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                ],
-                Text(detail.msg, style: AppTextStyles.statusIndicatorValue.copyWith(color: const Color(0xFF1E293B))),
-                const SizedBox(height: 4),
-                Text(detail.type, style: AppTextStyles.statusIndicatorLabel.copyWith(color: const Color(0xFF94A3B8))),
-                if (detail.input != null && detail.input!.isNotEmpty) ...[
-                  const SizedBox(height: 8),
-                  Container(
-                    width: double.infinity,
-                    padding: const EdgeInsets.all(10),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFFFFF7ED),
-                      borderRadius: BorderRadius.circular(8),
-                      border: Border.all(color: const Color(0xFFFED7AA)),
-                    ),
-                    child: Text(
-                      'Input: ${detail.input}',
-                      style: TextStyle(fontSize: 12, color: Color(0xFF92400E), fontFamily: 'monospace'),
-                    ),
-                  ),
-                ],
+                Text(message, style: AppTextStyles.statusIndicatorValue.copyWith(color: const Color(0xFF1E293B))),
               ],
             ),
           ),

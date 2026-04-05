@@ -10,8 +10,8 @@ import 'dart:developer';
 import 'package:flutter_blue_plus/flutter_blue_plus.dart';
 import 'package:light_x/features/scan/logic/data/ble_uuid.dart';
 import 'package:light_x/features/scan/logic/watch_scan/health_parser.dart';
-import 'package:light_x/features/scan/logic/models/health_data_snapshot.dart';
-import 'package:light_x/features/scan/logic/models/health_profile.dart';
+import 'package:light_x/features/scan/logic/entities/health_data_snapshot.dart';
+import 'package:light_x/features/scan/logic/entities/health_profile.dart';
 
 const _tag = 'HealthService';
 

@@ -8,16 +8,3 @@ void main() async {
   await SharedPrefs.initialize();
   runApp(const ProviderScope(child: App()));
 }
-
-// MultiProvider _providerWrapper() {
-//   return MultiProvider(
-//     providers: [
-//       ChangeNotifierProvider(create: (_) => MainScreenProvider()),
-//       ChangeNotifierProvider(create: (c) => OnboardingProvider()),
-//       ChangeNotifierProvider(create: (c) => HealthProvider()),
-//       ChangeNotifierProvider(create: (c) => FaceScannerProvider()),
-//       ChangeNotifierProvider(create: (c) => AnalysisProvider()),
-//     ],
-//     child: const App(),
-//   );
-// }

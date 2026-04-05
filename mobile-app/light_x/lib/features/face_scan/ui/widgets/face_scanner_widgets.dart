@@ -5,15 +5,16 @@
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:light_x/core/assets/assets.gen.dart';
-import 'package:light_x/features/scan/providers/face_scanner_provider.dart';
+import 'package:light_x/features/face_scan/providers/face_scan_provider.dart';
+import 'package:light_x/features/face_scan/providers/entities/face_scan_state.dart';
 import 'package:light_x/shared/components/buttons/app_button.dart';
 import 'package:light_x/shared/components/layout/app_text.dart';
 import 'package:light_x/shared/helpers/extensions/extensions.dart';
 import 'package:light_x/shared/theme/src/app_colors.dart';
 import 'package:light_x/shared/theme/src/app_text_styles.dart';
-import 'package:provider/provider.dart';
 
 /// Instructional heading + subtitle shown at the top of the scanner.
 class ScannerHeader extends StatelessWidget {
@@ -36,7 +37,7 @@ class ScannerHeader extends StatelessWidget {
 
 /// Animated circular viewfinder with a progress arc and a live camera preview.
 /// Drop-in replacement for the original ScanningViewfinder in face_scanner_widgets.dart
-class ScanningViewfinder extends StatefulWidget {
+class ScanningViewfinder extends ConsumerStatefulWidget {
   /// Scan completion fraction 0.0–1.0.
   final double fraction;
 
@@ -46,10 +47,10 @@ class ScanningViewfinder extends StatefulWidget {
   const ScanningViewfinder({super.key, this.fraction = 0.65, this.centerContent});
 
   @override
-  State<ScanningViewfinder> createState() => _ScanningViewfinderState();
+  ConsumerState<ScanningViewfinder> createState() => _ScanningViewfinderState();
 }
 
-class _ScanningViewfinderState extends State<ScanningViewfinder> with SingleTickerProviderStateMixin {
+class _ScanningViewfinderState extends ConsumerState<ScanningViewfinder> with SingleTickerProviderStateMixin {
   late final AnimationController _spin;
 
   @override
@@ -66,14 +67,15 @@ class _ScanningViewfinderState extends State<ScanningViewfinder> with SingleTick
 
   @override
   Widget build(BuildContext context) {
-    final provider = context.watch<FaceScannerProvider>();
-    final controller = provider.controller;
+    final faceScanProvider = FaceScanProvider.asPro.read(ref);
+    final scanner = ref.watch(faceScanProvider.state);
+    final controller = faceScanProvider.state.self(ref).controller;
 
     // Build the centre content: live preview while scanning, snapshot when done,
     // fallback to the face-recognition placeholder asset otherwise.
     Widget centre;
 
-    if (controller != null && controller.value.isInitialized && provider.state == FaceScanState.scanning) {
+    if (controller != null && controller.value.isInitialized && scanner.phase == FaceScanPhase.scanning) {
       // Live camera feed, clipped to a circle to sit inside the viewfinder ring.
       centre = ClipOval(
         child: SizedBox(
@@ -89,10 +91,10 @@ class _ScanningViewfinderState extends State<ScanningViewfinder> with SingleTick
           ),
         ),
       );
-    } else if (provider.snapshot != null) {
+    } else if (scanner.snapshot != null) {
       // Captured snapshot after scan completes.
       centre = ClipOval(
-        child: SizedBox(width: 280, height: 280, child: Image.memory(provider.snapshot!, fit: BoxFit.cover)),
+        child: SizedBox(width: 280, height: 280, child: Image.memory(scanner.snapshot!, fit: BoxFit.cover)),
       );
     } else {
       // Placeholder — shown during init or error.
@@ -112,7 +114,7 @@ class _ScanningViewfinderState extends State<ScanningViewfinder> with SingleTick
           centre,
 
           // Fade-out overlay of the placeholder asset (original animation kept)
-          if (provider.state != FaceScanState.scanning)
+          if (scanner.phase != FaceScanPhase.scanning)
             Positioned.fill(
               left: 20,
               right: 20,
@@ -257,7 +259,7 @@ class ScanProgressBar extends StatelessWidget {
         const SizedBox(height: 12),
 
         // Caption
-        Text(data.caption, textAlign: TextAlign.center, style: AppTextStyles.progressCaption),
+        AppText(data.caption, textAlign: TextAlign.center, style: AppTextStyles.progressCaption),
       ],
     );
   }
@@ -282,7 +284,7 @@ class ScannerFooter extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      color: const Color(0xFFFFFFFF),
+      padding: EdgeInsets.only(bottom: context.bottomPadding + 16, left: 16, right: 16, top: 8),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [

@@ -1,7 +1,7 @@
 part of '../api.dart';
 
 class _AnalysisApi {
-  Future<ApiResponse<AnalysisResult>> analyzeVitals(HealthModel request) async {
+  Future<ApiResponse<AnalysisResponse>> analyzeVitals(HealthDetails request) async {
     try {
       AppLogger.d('Sending analysis request: ${jsonEncode(request.toJson())}');
       final response = await Api.dio.post(
@@ -34,7 +34,7 @@ class _AnalysisApi {
     }
   }
 
-  AnalysisResult _parse(String raw, HealthModel req) {
+  AnalysisResponse _parse(String raw, HealthDetails req) {
     final lower = raw.toLowerCase();
 
     final RiskLevel level;
@@ -118,7 +118,7 @@ class _AnalysisApi {
 
     final tip = _extractTip(raw) ?? _defaultTip(level, sys, dia, req.avgSleepHours.toDouble(), req.stressLevel);
 
-    return AnalysisResult(
+    return AnalysisResponse(
       rawResponse: raw,
       riskLevel: level,
       riskSeverity: riskSeverity,
@@ -206,5 +206,35 @@ class _AnalysisApi {
     }
 
     return 'Server error: $status';
+  }
+
+  Future<ApiResponse<HealthDetails>> analyzeFacial(Uint8List image) async {
+    log("Sending image for facial analysis...");
+    final result = await Result.tryRunAsync<HealthDetails>(() async {
+      final uri = Uri.parse(ApiPaths.faceAnalysis);
+
+      final request = Api.dio.postUri(
+        uri,
+        data: FormData.fromMap({
+          'file': MultipartFile.fromBytes(image, filename: 'face.jpg', contentType: DioMediaType.parse('image/jpeg')),
+        }),
+        options: Options(contentType: 'multipart/form-data', connectTimeout: 30.inSeconds),
+      );
+
+      final response = await request;
+
+      log('Face analysis response: ${response.statusCode} - ${response.data}');
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.data) as Map<String, dynamic>;
+        return HealthDetails.fromJson(data);
+      } else {
+        return null;
+      }
+    });
+
+    return result.isSuccess && result.data != null
+        ? ApiResponse.success(result.data!)
+        : ApiResponse.failure(result.message ?? 'Failed to analyze facial image');
   }
 }
